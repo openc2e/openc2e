@@ -135,7 +135,9 @@ start:
 			push_value(caostoken::TOK_ERROR);
 		}
 		p++; // the actual char
-		if (p[0] != '\'') {
+		if (p[0] == '\0') {
+			push_value(caostoken::TOK_ERROR);
+		} else if (p[0] != '\'') {
 			p++;
 			push_value(caostoken::TOK_ERROR);
 		}
