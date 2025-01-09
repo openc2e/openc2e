@@ -1,10 +1,12 @@
 ![openc2e logo](https://raw.githubusercontent.com/ligfx/openc2e/master/Openc2e-logo2008.png)
 
-
 # openc2e
 
-openc2e is an open-source game engine intended to run all the games in the
-[_Creatures_](https://creatures.wiki) series.
+openc2e is a free and open-source game engine for the [_Creatures_](https://creatures.wiki) artificial life games.
+
+The goal is to allow you to play games such as Creatures, Creatures 2, Creatures 3, Docking Station and more, on many different platforms.
+
+Want to know more? Come visit us on the [Caos Coding Cave Discord](https://discord.gg/rWFC3b3).
 
 # Games
 
