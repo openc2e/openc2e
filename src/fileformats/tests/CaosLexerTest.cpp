@@ -50,3 +50,15 @@ TEST(lexcaos, unterminated_double_quote) {
 
 	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
 }
+
+TEST(lexcaos, unterminated_byte_string) {
+	std::vector<caostoken> tokens;
+	lexcaos(tokens, "[");
+
+	std::vector<caostoken> expected{
+		{caostoken::TOK_ERROR, 1},
+		{caostoken::TOK_EOI, "\0", 1},
+	};
+
+	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+}
