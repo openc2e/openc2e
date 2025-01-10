@@ -55,7 +55,7 @@ static bool maybe_eat_whitespace(CAOSParserState& state) {
 
 static void eat_whitespace(CAOSParserState& state) {
 	if (!maybe_eat_whitespace(state)) {
-		throw Exception(fmt::format("Expected whitespace, got {} {}", state.tokens[state.p].typeAsString(), state.tokens[state.p].format()));
+		throw Exception(fmt::format("Expected whitespace, got {} {:?}", state.tokens[state.p].typeAsString(), state.tokens[state.p].data));
 	}
 }
 
@@ -80,7 +80,7 @@ static CAOSNodePtr parse_value(CAOSParserState& state) {
 		case caostoken::TOK_COMMA:
 		case caostoken::TOK_EOI:
 		case caostoken::TOK_ERROR:
-			throw Exception(fmt::format("Expected value, got {} {}", state.tokens[state.p].typeAsString(), state.tokens[state.p].format()));
+			throw Exception(fmt::format("Expected value, got {} {:?}", state.tokens[state.p].typeAsString(), state.tokens[state.p].data));
 	}
 }
 

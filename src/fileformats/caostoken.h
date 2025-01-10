@@ -69,6 +69,5 @@ struct caostoken {
 	int intval() const;
 	float floatval() const;
 
-	std::string format() const;
 	std::string typeAsString() const;
 };

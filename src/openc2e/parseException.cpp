@@ -20,7 +20,7 @@ std::string parseException::prettyPrint() const {
 		buf += " near:\n";
 		int toklen = -1, stlen = 0;
 		for (size_t i = 0; i < context->size(); i++) {
-			std::string tokstr = (*context)[i].format();
+			std::string tokstr = (*context)[i].data;
 			if (i == (size_t)ctxoffset) {
 				toklen = tokstr.size();
 			} else if (toklen == -1) {

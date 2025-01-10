@@ -283,7 +283,7 @@ void caosScript::parse(const std::string& caostext) {
 		std::string buf;
 		std::shared_ptr<std::vector<toktrace> > tokinfo(new std::vector<toktrace>());
 		for (size_t p = 0; p < tokens->size(); p++) {
-			std::string tok = (*tokens)[p].format();
+			std::string tok = (*tokens)[p].data;
 			int len = tok.size();
 			if (len > 65535) {
 				errindex = p;

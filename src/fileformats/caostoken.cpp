@@ -79,26 +79,6 @@ float caostoken::floatval() const {
 	return std::stof(data);
 }
 
-std::string caostoken::format() const {
-	switch (type) {
-		case TOK_EOI: return "<EOI>";
-		case TOK_ERROR: return "<ERROR>";
-		case TOK_COMMA:
-			return ",";
-		case TOK_INT:
-		case TOK_BINARY:
-		case TOK_CHAR:
-		case TOK_FLOAT:
-		case TOK_STRING:
-		case TOK_WORD:
-		case TOK_COMMENT:
-		case TOK_BYTESTR:
-		case TOK_WHITESPACE:
-		case TOK_NEWLINE:
-			return data;
-	}
-}
-
 std::string caostoken::typeAsString() const {
 	switch (type) {
 		case TOK_WORD: return "word";
