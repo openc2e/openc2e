@@ -293,19 +293,18 @@ void caosScript::parse(const std::string& caostext) {
 			buf += " ";
 			tokinfo->push_back(toktrace(len, (*tokens)[p].lineno));
 		}
-		shared_str code(buf);
-		installer->code = code;
+		installer->code = buf;
 		installer->tokinfo = tokinfo;
 		installer->link();
 		if (removal) {
 			removal->link();
 			removal->tokinfo = tokinfo;
-			removal->code = code;
+			removal->code = buf;
 		}
 		std::vector<std::shared_ptr<script> >::iterator i = scripts.begin();
 		while (i != scripts.end()) {
 			(*i)->tokinfo = tokinfo;
-			(*i)->code = code;
+			(*i)->code = buf;
 			(*i++)->link();
 		}
 	} catch (parseException& e) {

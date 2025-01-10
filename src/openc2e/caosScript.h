@@ -24,7 +24,6 @@
 #include "caosValue.h"
 #include "cmddata.h"
 #include "common/SimpleVariant.h"
-#include "common/shared_str.h"
 #include "dialect.h"
 #include "fileformats/caostoken.h"
 #include "serfwd.h"
@@ -82,7 +81,7 @@ class script {
 	// mostly for strings and floats
 	std::vector<caosValue> consts;
 	// a normalized copy of the script source. this is used for error tracing
-	shared_str code;
+	std::string code;
 	std::shared_ptr<std::vector<toktrace> > tokinfo;
 
   public:

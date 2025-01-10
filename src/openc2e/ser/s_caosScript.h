@@ -4,7 +4,6 @@
 #include "caosScript.h"
 #include "ser/s_bytecode.h"
 #include "ser/s_caosValue.h"
-#include "ser/s_shared_str.h"
 #include "serialization.h"
 
 #include <boost/serialization/map.hpp>
