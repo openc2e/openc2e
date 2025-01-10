@@ -25,6 +25,7 @@
 #include "bytecode.h"
 #include "caosVM.h"
 #include "cmddata.h"
+#include "common/Ascii.h"
 #include "common/Exception.h"
 #include "common/readfile.h"
 #include "dialect.h"
@@ -32,7 +33,6 @@
 #include "fileformats/caostoken.h"
 #include "parseException.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <fmt/core.h>
@@ -252,7 +252,7 @@ void caosScript::parse(const std::string& caostext) {
 		for (auto& t : rawtokens) {
 			switch (t.type) {
 				case caostoken::TOK_WORD:
-					std::transform(t.data.begin(), t.data.end(), t.data.begin(), tolower);
+					t.data = to_ascii_lowercase(t.data);
 					t.index = index++;
 					tokens->push_back(t);
 					break;
