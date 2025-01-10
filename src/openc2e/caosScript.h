@@ -115,6 +115,8 @@ class script {
 	script(const Dialect* v, const std::string& fn,
 		int fmly_, int gnus_, int spcs_, int scrp_);
 	script(const Dialect* v, const std::string& fn);
+	script(const script&) = delete;
+	script& operator=(const script&) = delete;
 	~script();
 	std::string dump();
 	//	std::string dumpLine(unsigned int);
