@@ -252,7 +252,7 @@ void caosScript::parse(const std::string& caostext) {
 		for (auto& t : rawtokens) {
 			switch (t.type) {
 				case caostoken::TOK_WORD:
-					std::transform(t.value.begin(), t.value.end(), t.value.begin(), tolower);
+					std::transform(t.data.begin(), t.data.end(), t.data.begin(), tolower);
 					t.index = index++;
 					tokens->push_back(t);
 					break;

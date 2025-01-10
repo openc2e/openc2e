@@ -41,7 +41,7 @@ struct caostoken {
 	};
 
 	toktype type;
-	std::string value;
+	std::string data;
 
 	int index;
 	int lineno;
@@ -50,18 +50,18 @@ struct caostoken {
 		: lineno(-1) {}
 	caostoken(toktype type_, int lineno_)
 		: type(type_), lineno(lineno_) {}
-	caostoken(toktype type_, std::string value_, int lineno_)
-		: type(type_), value(value_), lineno(lineno_) {}
+	caostoken(toktype type_, std::string data_, int lineno_)
+		: type(type_), data(data_), lineno(lineno_) {}
 
 	const std::string& word() const {
 		if (type != TOK_WORD)
 			abort();
-		return value;
+		return data;
 	}
 
 	void setWord(const std::string& s) {
 		type = TOK_WORD;
-		value = s;
+		data = s;
 	}
 
 	std::string stringval() const;

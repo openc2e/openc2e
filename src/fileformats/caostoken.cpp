@@ -16,17 +16,17 @@ static char char_unescape(char c) {
 std::string caostoken::stringval() const {
 	if (!(type == TOK_STRING || type == TOK_BYTESTR))
 		abort();
-	if (value[0] == '[') {
-		return value.substr(1, value.size() - 2);
+	if (data[0] == '[') {
+		return data.substr(1, data.size() - 2);
 	}
-	if (value[0] == '"') {
+	if (data[0] == '"') {
 		std::string unescaped;
-		for (size_t i = 1; i < value.size() - 1; ++i) {
-			if (value[i] == '\\' && i < value.size() - 2) {
-				unescaped += char_unescape(value[i + 1]);
+		for (size_t i = 1; i < data.size() - 1; ++i) {
+			if (data[i] == '\\' && i < data.size() - 2) {
+				unescaped += char_unescape(data[i + 1]);
 				++i;
 			} else {
-				unescaped += value[i];
+				unescaped += data[i];
 			}
 		}
 		return unescaped;
@@ -38,11 +38,11 @@ std::vector<unsigned char> caostoken::bytestr() const {
 	if (type != TOK_BYTESTR)
 		abort();
 	std::vector<unsigned char> result;
-	for (size_t i = 1; i < value.size() - 1; ++i) {
-		if (std::isdigit(value[i])) {
-			result.push_back(std::atoi(value.c_str() + i));
+	for (size_t i = 1; i < data.size() - 1; ++i) {
+		if (std::isdigit(data[i])) {
+			result.push_back(std::atoi(data.c_str() + i));
 			++i;
-			while (std::isdigit(value[i])) {
+			while (std::isdigit(data[i])) {
 				++i;
 			}
 		}
@@ -53,18 +53,18 @@ std::vector<unsigned char> caostoken::bytestr() const {
 int caostoken::intval() const {
 	if (type == TOK_INT) {
 		try {
-			return std::stoi(value);
+			return std::stoi(data);
 		} catch (std::out_of_range&) {
 			// Creatures Village has some 2147483700 literals, which don't fit in int32_t
-			throw Exception("Integer literal " + value + " is out of range");
+			throw Exception("Integer literal " + data + " is out of range");
 		}
 	} else if (type == TOK_CHAR) {
-		return value[1];
+		return data[1];
 	} else if (type == TOK_BINARY) {
 		int accum = 0;
-		for (size_t i = 1; i < value.size(); ++i) {
+		for (size_t i = 1; i < data.size(); ++i) {
 			accum <<= 1;
-			accum += (value[i] == '1');
+			accum += (data[i] == '1');
 		}
 		return accum;
 	} else {
@@ -76,7 +76,7 @@ float caostoken::floatval() const {
 	if (type != TOK_FLOAT) {
 		abort();
 	}
-	return std::stof(value);
+	return std::stof(data);
 }
 
 std::string caostoken::format() const {
@@ -95,7 +95,7 @@ std::string caostoken::format() const {
 		case TOK_BYTESTR:
 		case TOK_WHITESPACE:
 		case TOK_NEWLINE:
-			return value;
+			return data;
 	}
 }
 

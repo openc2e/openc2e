@@ -29,7 +29,7 @@ void caos1_format_visitor(CAOSNodePtr node, std::string& out) {
 			caos1_format_visitor(ccn->args[i], out);
 		}
 	} else if (CAOSLiteralValueNode* clvn = dynamic_cast<CAOSLiteralValueNode*>(node.get())) {
-		out += fmt::format("{}", clvn->token.value);
+		out += fmt::format("{}", clvn->token.data);
 	} else if (CAOSLiteralWordNode* clwn = dynamic_cast<CAOSLiteralWordNode*>(node.get())) {
 		out += clwn->word;
 	} else {
