@@ -50,3 +50,55 @@ TEST(lexcaos, unterminated_double_quote) {
 
 	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
 }
+
+TEST(lexcaos, byte_string_single_character) {
+	std::vector<caostoken> tokens;
+	lexcaos(tokens, "[0]");
+
+	std::vector<caostoken> expected{
+		{caostoken::TOK_BYTESTR, "[0]", 1},
+		{caostoken::TOK_EOI, "\0", 1},
+	};
+
+	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+}
+
+TEST(lexcaos, byte_string_multiple_characters) {
+	std::vector<caostoken> tokens;
+	lexcaos(tokens, "[0123]");
+
+	std::vector<caostoken> expected{
+		{caostoken::TOK_BYTESTR, "[0123]", 1},
+		{caostoken::TOK_EOI, "\0", 1},
+	};
+
+	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+}
+
+TEST(lexcaos, byte_string_with_newline) {
+	std::vector<caostoken> tokens;
+	lexcaos(tokens, "[01\n02]");
+
+	std::vector<caostoken> expected{
+		{caostoken::TOK_ERROR, "[01\n", 1},
+		{caostoken::TOK_INT, "02", 1},
+		{caostoken::TOK_ERROR, "]", 1},
+		{caostoken::TOK_EOI, "\0", 1},
+	};
+
+	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+}
+
+TEST(lexcaos, byte_string_with_carriage_return) {
+	std::vector<caostoken> tokens;
+	lexcaos(tokens, "[01\r02]");
+
+	std::vector<caostoken> expected{
+		{caostoken::TOK_ERROR, "[01\r", 1},
+		{caostoken::TOK_INT, "02", 1},
+		{caostoken::TOK_ERROR, "]", 1},
+		{caostoken::TOK_EOI, "\0", 1},
+	};
+
+	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+}
