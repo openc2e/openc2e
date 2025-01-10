@@ -205,6 +205,8 @@ bytestr:
 		push_value(caostoken::TOK_ERROR);
 	} else if (p[0] == '\r' || p[0] == '\n') {
 		p++;
+		yylineno++;
+		push_value(caostoken::TOK_ERROR);
 	} else if (p[0] == ']') {
 		p++;
 		push_value(caostoken::TOK_BYTESTR);

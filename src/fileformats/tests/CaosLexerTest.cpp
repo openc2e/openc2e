@@ -56,7 +56,7 @@ TEST(lexcaos, unterminated_byte_string) {
 	lexcaos(tokens, "[");
 
 	std::vector<caostoken> expected{
-		{caostoken::TOK_ERROR, 1},
+		{caostoken::TOK_ERROR, "[", 1},
 		{caostoken::TOK_EOI, "\0", 1},
 	};
 
@@ -93,9 +93,9 @@ TEST(lexcaos, byte_string_with_newline) {
 
 	std::vector<caostoken> expected{
 		{caostoken::TOK_ERROR, "[01\n", 1},
-		{caostoken::TOK_INT, "02", 1},
-		{caostoken::TOK_ERROR, "]", 1},
-		{caostoken::TOK_EOI, "\0", 1},
+		{caostoken::TOK_INT, "02", 2},
+		{caostoken::TOK_ERROR, "]", 2},
+		{caostoken::TOK_EOI, "\0", 2},
 	};
 
 	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
@@ -107,9 +107,9 @@ TEST(lexcaos, byte_string_with_carriage_return) {
 
 	std::vector<caostoken> expected{
 		{caostoken::TOK_ERROR, "[01\r", 1},
-		{caostoken::TOK_INT, "02", 1},
-		{caostoken::TOK_ERROR, "]", 1},
-		{caostoken::TOK_EOI, "\0", 1},
+		{caostoken::TOK_INT, "02", 2},
+		{caostoken::TOK_ERROR, "]", 2},
+		{caostoken::TOK_EOI, "\0", 2},
 	};
 
 	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
