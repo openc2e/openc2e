@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-std::string format_token_list(const std::vector<caostoken>& token) {
+static std::string format_token_list(const std::vector<caostoken>& token) {
 	std::string out;
 	for (const auto& t : token) {
 		out += fmt::format("{} {:?} line:{}\n", t.typeAsString(), t.data, t.lineno);
@@ -15,38 +15,33 @@ std::string format_token_list(const std::vector<caostoken>& token) {
 	return out;
 }
 
-TEST(lexcaos, unterminated_single_quote) {
+static void assert_lexcaos(const std::string& input, const std::vector<caostoken>& expected) {
 	std::vector<caostoken> tokens;
-	lexcaos(tokens, "'");
-
-	std::vector<caostoken> expected{
-		{caostoken::TOK_ERROR, "'", 1},
-		{caostoken::TOK_EOI, 1},
-	};
+	lexcaos(tokens, input);
 
 	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+}
+
+TEST(lexcaos, unterminated_single_quote) {
+	assert_lexcaos("'",
+		{
+			{caostoken::TOK_ERROR, "'", 1},
+			{caostoken::TOK_EOI, 1},
+		});
 }
 
 TEST(lexcaos, unterminated_single_quote_letter) {
-	std::vector<caostoken> tokens;
-	lexcaos(tokens, "'a");
-
-	std::vector<caostoken> expected{
-		{caostoken::TOK_ERROR, "'a", 1},
-		{caostoken::TOK_EOI, 1},
-	};
-
-	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+	assert_lexcaos("'a",
+		{
+			{caostoken::TOK_ERROR, "'a", 1},
+			{caostoken::TOK_EOI, 1},
+		});
 }
 
 TEST(lexcaos, unterminated_double_quote) {
-	std::vector<caostoken> tokens;
-	lexcaos(tokens, "\"");
-
-	std::vector<caostoken> expected{
-		{caostoken::TOK_ERROR, "\"", 1},
-		{caostoken::TOK_EOI, 1},
-	};
-
-	ASSERT_EQ(format_token_list(tokens), format_token_list(expected));
+	assert_lexcaos("\"",
+		{
+			{caostoken::TOK_ERROR, "\"", 1},
+			{caostoken::TOK_EOI, 1},
+		});
 }
