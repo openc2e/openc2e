@@ -117,10 +117,10 @@ start:
 			push_value(caostoken::TOK_ERROR);
 		}
 		p++; // the actual char
-		if (p[0] == '\0') {
-			push_value(caostoken::TOK_ERROR);
-		} else if (p[0] != '\'') {
-			p++;
+		if (p[0] != '\'') {
+			if (p[0] != '\0') {
+				p++; // TODO: should this contain the non-quote character or not?
+			}
 			push_value(caostoken::TOK_ERROR);
 		}
 		p++;
