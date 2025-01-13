@@ -22,11 +22,6 @@ void lexcaos(std::vector<caostoken>& v, const char* p) {
 	v.push_back(caostoken(type, std::string(basep, numeric_cast<std::string::size_type>(p - basep)), baseyylineno)); \
 	goto start;
 
-#define push_value_and_error(type) \
-	v.push_back(caostoken(type, std::string(basep, numeric_cast<std::string::size_type>(p - basep)), baseyylineno)); \
-	v.push_back(caostoken(caostoken::TOK_ERROR, "", baseyylineno)); \
-	goto start;
-
 start:
 	basep = p;
 	baseyylineno = yylineno;
@@ -41,19 +36,6 @@ start:
 		while (!(p[0] == '\0' || p[0] == '\n' || (p[0] == '\r' && p[1] == '\n'))) {
 			p++;
 		}
-		push_value(caostoken::TOK_COMMENT);
-	}
-	// multi-line comment
-	else if (p[0] == '(' && p[1] == '*') {
-		p += 2;
-		// TODO: do these comments allow embedded newlines?
-		while (!(p[0] == '\0' || (p[0] == '*' && p[1] == ')'))) {
-			p++;
-		}
-		if (p[0] == '\0') {
-			push_value_and_error(caostoken::TOK_COMMENT);
-		}
-		p += 2;
 		push_value(caostoken::TOK_COMMENT);
 	}
 	// unix newline
