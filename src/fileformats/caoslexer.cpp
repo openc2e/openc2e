@@ -181,7 +181,6 @@ str:
 
 bytestr:
 	if (p[0] == '\0' || p[0] == '\r' || p[0] == '\n') {
-		p++;
 		push_value(caostoken::TOK_ERROR);
 	} else if (p[0] == ']') {
 		p++;
