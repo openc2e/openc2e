@@ -93,7 +93,9 @@ void SDLBackend::init(const std::string& name, int32_t width, int32_t height) {
 	{
 		SDL_RendererInfo info;
 		SDL_GetRendererInfo(renderer, &info);
-		fmt::print("* SDL Renderer: {} max_texture_size={}x{}\n", info.name, info.max_texture_width, info.max_texture_height);
+		fmt::print("* SDL Renderer: {} max_texture_size={}x{} preferred_format={}\n",
+			info.name, info.max_texture_width, info.max_texture_height,
+			info.num_texture_formats > 0 ? SDL_GetPixelFormatName(info.texture_formats[0]) : "unknown");
 	}
 
 	SDL_ShowCursor(false);
