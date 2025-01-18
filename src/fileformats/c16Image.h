@@ -21,7 +21,7 @@
 
 #include "common/Image.h"
 
-#include <istream>
+#include <iosfwd>
 #include <string>
 
 MultiImage ReadC16File(std::istream& in);

@@ -12,13 +12,13 @@ static const std::string CREATURES_ARCHIVE_MAGIC = "Creatures Evolution Engine -
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
-		std::cerr << "syntax: creaturesarchivedumper filename" << std::endl;
+		fmt::print(stderr, "syntax: creaturesarchivedumper filename\n");
 		exit(1);
 	}
 
 	fs::path input_path(argv[1]);
 	if (!fs::exists(input_path)) {
-		std::cerr << "File " << input_path << " doesn't exist" << std::endl;
+		fmt::print(stderr, "File {:?} doesn't exist\n", input_path.string());
 		exit(1);
 	}
 

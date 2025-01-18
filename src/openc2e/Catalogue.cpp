@@ -24,7 +24,6 @@
 #include <cassert>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
-#include <iostream>
 #include <string>
 
 
@@ -61,8 +60,7 @@ void Catalogue::addFile(fs::path path) {
 			addVals(tag.name, tag.override, tag.values);
 		}
 	} catch (const catalogueException& ex) {
-		std::cerr << "Error reading catalogue file " << path.string() << ":" << std::endl
-				  << '\t' << ex.what() << std::endl;
+		fmt::print("Error reading catalogue file {}:\n\t{}\n", path.string(), ex.what());
 	}
 }
 
@@ -70,7 +68,7 @@ void Catalogue::initFrom(fs::path path, std::string language) {
 	assert(fs::exists(path));
 	assert(fs::is_directory(path));
 
-	//std::cout << "Catalogue is reading " << path.string() << std::endl;
+	//fmt::print("Catalogue is reading {}\n", path.string());
 
 	fs::directory_iterator end;
 	std::string file;
@@ -94,7 +92,7 @@ void Catalogue::initFrom(fs::path path, std::string language) {
 				}
 			}
 		} catch (const std::exception& ex) {
-			std::cerr << "directory_iterator died on '" << i->path().filename() << "' with " << ex.what() << std::endl;
+			fmt::print("directory_iterator died on '{}' with {}\n", i->path().filename().string(), ex.what());
 		}
 	}
 }

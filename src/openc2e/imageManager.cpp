@@ -30,9 +30,7 @@
 
 #include <array>
 #include <fmt/format.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
-#include <iostream>
 #include <memory>
 
 using namespace ghc::filesystem;
@@ -63,7 +61,7 @@ std::shared_ptr<creaturesImage> tryOpenBackground(std::string fname) {
 
 void imageManager::loadDefaultPalette() {
 	if (engine.gametype == "c1") {
-		std::cout << "* Loading palette.dta..." << std::endl;
+		fmt::print("* Loading palette.dta...\n");
 		// TODO: case-sensitivity for the lose
 		path palpath(findMainDirectoryFile("Palettes/palette.dta"));
 		if (exists(palpath) && !is_directory(palpath)) {
@@ -149,7 +147,7 @@ std::shared_ptr<creaturesImage> imageManager::getBackground(const std::string& n
 		throw Exception("Don't know how to load backgrounds for current engine type");
 	}
 	if (!img) {
-		std::cerr << "imageGallery couldn't find the background '" << name << "'" << std::endl;
+		fmt::print(stderr, "imageGallery couldn't find the background '{}'\n", name);
 	}
 	if (img) {
 		assert(img->images.size() == 1);
@@ -191,7 +189,7 @@ std::shared_ptr<creaturesImage> imageManager::getImage(const std::string& name) 
 				// TODO: hmm. should block size be per agent/part, instead of per loaded sprite?
 				img->setBlockSize(hed.frame_width, hed.frame_height);
 				if (img->numframes() != hed.numframes) {
-					std::cerr << hedfilename.string() << ": number of frames doesn't match\n";
+					fmt::print(stderr, "{}: number of frames doesn't match\n", hedfilename.string());
 				}
 			}
 		}
@@ -207,7 +205,7 @@ std::shared_ptr<creaturesImage> imageManager::getImage(const std::string& name) 
 	if (img) {
 		images[name] = img;
 	} else {
-		std::cerr << "imageGallery couldn't find the sprite '" << name << "'" << std::endl;
+		fmt::print(stderr, "imageGallery couldn't find the sprite '{}'\n", name);
 		return std::shared_ptr<creaturesImage>();
 	}
 

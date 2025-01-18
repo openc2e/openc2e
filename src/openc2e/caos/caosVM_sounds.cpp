@@ -30,12 +30,9 @@
 #include "caosVM.h"
 #include "common/throw_ifnot.h"
 
-#include <iostream>
 #include <limits.h>
 #include <memory>
 #include <string>
-using std::cerr;
-using std::cout;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846 /* pi */

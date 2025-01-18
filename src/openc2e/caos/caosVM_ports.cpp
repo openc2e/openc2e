@@ -22,7 +22,6 @@
 #include "caosVM.h"
 #include "common/throw_ifnot.h"
 
-#include <iostream>
 #include <memory>
 
 /**

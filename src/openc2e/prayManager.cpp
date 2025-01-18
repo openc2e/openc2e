@@ -109,7 +109,7 @@ void prayManager::update() {
 	blocks.clear();
 
 	if (!catalogue.hasTag("Pray System File Extensions")) {
-		std::cout << "Warning: Catalogue tag \"Pray System File Extensions\" wasn't found, so no PRAY files will be loaded." << std::endl;
+		fmt::print("Warning: Catalogue tag \"Pray System File Extensions\" wasn't found, so no PRAY files will be loaded.\n");
 		return;
 	}
 
@@ -118,11 +118,11 @@ void prayManager::update() {
 	for (auto ext : extensions) {
 		for (auto f : findAgentFiles("*." + ext)) {
 			// TODO: language checking!
-			//std::cout << "scanning PRAY file " << d->path().string() << std::endl;
+			//fmt::print("scanning PRAY file {}\n", d->path().string());
 			try {
 				addFile(f);
 			} catch (Exception& e) {
-				std::cerr << "PRAY file \"" << f << "\" failed to load: " << e.what() << std::endl;
+				fmt::print(stderr, "PRAY file \"{}\" failed to load: {}\n", f.string(), e.what());
 			}
 		}
 	}

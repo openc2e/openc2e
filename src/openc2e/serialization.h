@@ -35,7 +35,7 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/version.hpp>
-
+#include <fmt/core.h>
 
 template <class Archive, class Object>
 void pre_save(Archive& ar, const Object& obj, const unsigned int version) {
@@ -90,7 +90,7 @@ void post_load(Archive& ar, Object& obj, const unsigned int version) {
 	SER_PROTO(, o_serialize, c, )
 
 inline static void STUB_DIE(const std::string& msg, const char* f, unsigned int l) {
-	std::cerr << "A trickery! SER_STUB'd: " << msg << "@" << f << ":" << l << std::endl;
+	fmt::print(stderr, "A trickery! SER_STUB'd: {}@{}:{}\n", msg, f, l);
 	abort();
 }
 

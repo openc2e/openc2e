@@ -25,9 +25,7 @@
 #include "caosVM.h"
 #include "common/throw_ifnot.h"
 
-#include <iostream>
 #include <memory>
-using std::cerr;
 
 /**
  INST (command)
@@ -112,7 +110,7 @@ void c_WAIT(caosVM* vm) {
 	if (engine.version < 3 && !vm->owner) {
 		// TODO: this message is here until someone works out what the heck ;)
 		// the C1 cloud butterfly COB and C2 nesting bluebirds COB do this, at least
-		std::cout << "unblockable script is trying to WAIT, ignoring" << std::endl;
+		fmt::print("unblockable script is trying to WAIT, ignoring\n");
 		return;
 	}
 	vm->startBlocking(new blockUntilTime(ticks));

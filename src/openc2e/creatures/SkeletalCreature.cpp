@@ -45,7 +45,6 @@
 
 #include <cassert>
 #include <fmt/core.h>
-#include <iostream>
 #include <memory>
 #include <typeinfo> // TODO: remove when genome system is fixed
 
@@ -472,14 +471,14 @@ void SkeletalCreature::snapDownFoot() {
 				snapDownFoot();
 				return;
 			} else {
-				std::cerr << "Creature out of room system at (" << footx << ", " << footy << ")!" << std::endl;
+				fmt::print(stderr, "Creature out of room system at ({}, {})!\n", footx, footy);
 				// TODO: exceptiony death?
 				return;
 			}
 		}
 
 		// We fell out of the room system! How did that happen? Push ourselves back in, run collision script.
-		// std::cout << "Creature out of room system at (" << footx << ", " << footy << "), pushing it back in." << std::endl;
+		// fmt::print("Creature out of room system at ({}, {}), pushing it back in.\n", footx, footy);
 
 		// TODO: sucky code
 		x = lastgoodfootx - attachmentX(orig_footpart, 1);
@@ -489,7 +488,7 @@ void SkeletalCreature::snapDownFoot() {
 		queueScript(6);
 
 		if (!downfootroom) {
-			std::cerr << "no down foot room! (" << footx << ", " << footy << ")" << std::endl;
+			fmt::print(stderr, "no down foot room! ({}, {})\n", footx, footy);
 			// TODO: exceptiony death
 			return;
 		}
@@ -570,7 +569,7 @@ void SkeletalCreature::setPose(std::string s) {
 		case '3': posedirection = 1; break;
 		case 'X': break; // do nothing
 		default:
-			std::cout << "internal warning: SkeletalCreature::setPose didn't understand direction " << s[0] << " in pose '" << s << "'." << std::endl;
+			fmt::print("internal warning: SkeletalCreature::setPose didn't understand direction {} in pose '{}'.\n", s[0], s);
 			break;
 	}
 
@@ -604,7 +603,7 @@ void SkeletalCreature::setPose(std::string s) {
 			// TODO: '!' also?
 			case 'X': continue; // do nothing
 			default:
-				std::cout << "internal warning: SkeletalCreature::setPose didn't understand " << s[i + 1] << " in pose '" << s << "'." << std::endl;
+				fmt::print("internal warning: SkeletalCreature::setPose didn't understand {} in pose '{}'.\n", s[i + 1], s);
 				continue;
 		}
 

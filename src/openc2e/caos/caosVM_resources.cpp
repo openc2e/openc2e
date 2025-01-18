@@ -82,13 +82,13 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 
 	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
 	if (i == world.praymanager->blocks.end()) {
-		std::cout << "PRAY FILE: couldn't find block " << name << std::endl;
+		fmt::print("PRAY FILE: couldn't find block {}\n");
 		return false;
 	}
 
 	PrayBlock* p = i->second.get();
 	if (p->type != "FILE") {
-		std::cout << "PRAY FILE: block " << name << " is " << p->type << " not FILE" << std::endl;
+		fmt::print("PRAY FILE: block {} is {} not FILE\n", name, p->type);
 		// TODO: correct behaviour? possibly not..
 		return false;
 	}
@@ -432,7 +432,8 @@ void v_PRAY_INJT(caosVM* vm) {
 			world.freeVM(vm);
 			vm->result.setInt(-2);
 			report->setString(scriptname + " error: " + e.what());
-			std::cerr << "PRAY INJT caught exception trying to inject " << name << " - PRAY " << scriptname << ": " << e.prettyPrint() << std::endl;
+			fmt::print(stderr, "PRAY INJT caught exception trying to inject {} - PRAY {}: {}\n",
+				name, scriptname, e.prettyPrint());
 			return;
 		}
 		world.freeVM(vm);

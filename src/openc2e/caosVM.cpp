@@ -28,6 +28,7 @@
 #include <cassert>
 #include <climits>
 #include <fmt/core.h>
+#include <iostream>
 #include <memory>
 
 void dumpStack(caosVM* vm) {

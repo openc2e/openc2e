@@ -1,13 +1,13 @@
 #include "PathResolver.h"
 
 #include <cstdlib>
-#include <iostream>
+#include <fmt/core.h>
 #include <string>
 #include <vector>
 
 int main(int argc, char** argv) {
 	if (argc != 3) {
-		std::cerr << "Usage: " << (argc ? argv[0] : "wildtest") << " directory pattern" << std::endl;
+		fmt::print(stderr, "Usage: {} directory pattern\n", argc ? argv[0] : "wildtest");
 		return EXIT_FAILURE;
 	}
 
@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 	std::vector<std::string> results = findByWildcard(dir, wild);
 
 	for (auto& result : results) {
-		std::cout << "Result: " << result << std::endl;
+		fmt::print("Result: {}\n", result);
 	}
 	return EXIT_SUCCESS;
 }

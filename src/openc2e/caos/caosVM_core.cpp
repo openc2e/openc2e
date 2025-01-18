@@ -24,8 +24,8 @@
 #include "common/throw_ifnot.h"
 
 #include <fmt/core.h>
+#include <fmt/ostream.h>
 #include <ghc/filesystem.hpp>
-#include <iostream>
 
 namespace fs = ghc::filesystem;
 
@@ -56,7 +56,8 @@ void c_OUTX(caosVM* vm) {
 		}
 	}
 
-	*vm->outputstream << oh << "\"";
+	oh += "\"";
+	fmt::print(*vm->outputstream, "{}", oh);
 }
 
 /**
@@ -80,7 +81,7 @@ void c_OUTS(caosVM* vm) {
 	if (!vm->outputstream)
 		return;
 
-	*vm->outputstream << val;
+	fmt::print(*vm->outputstream, "{}", val);
 }
 
 /**
@@ -105,12 +106,12 @@ void c_OUTV(caosVM* vm) {
 		return;
 
 	if (val.hasFloat()) {
-		*vm->outputstream << fmt::format("{:0.06f}", val.getFloat());
+		fmt::print(*vm->outputstream, "{:0.06f}", val.getFloat());
 	} else if (val.hasInt()) {
-		*vm->outputstream << val.getInt();
+		fmt::print(*vm->outputstream, "{}", val.getInt());
 	} else if (val.hasVector()) {
 		const Vector<float>& v = val.getVector();
-		*vm->outputstream << fmt::format("({:0.6f}, {:%0.6f})", v.x, v.y);
+		fmt::print(*vm->outputstream, "({:0.6f}, {:%0.6f})", v.x, v.y);
 	} else
 		throw badParamException();
 }

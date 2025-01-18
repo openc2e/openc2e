@@ -41,7 +41,7 @@ void genomeFile::readNotes(std::istream& s) {
 	if (cversion == 3) {
 		(void)read16le(s); // gnover
 		uint16_t nosvnotes = read16le(s);
-		std::cout << "we have " << nosvnotes << " notes" << std::endl;
+		fmt::print("we have {} notes\n", nosvnotes);
 
 		for (int i = 0; i < nosvnotes; i++) {
 			(void)read16le(s); // type
@@ -190,12 +190,12 @@ std::istream& operator>>(std::istream& s, genomeFile& f) {
 			throw Exception("unsupported genome version in majic");
 	}
 
-	//std::cout << "creaturesGenomeFile: reading genome of version " << (unsigned int)f.cversion << ".\n";
+	//fmt::print("creaturesGenomeFile: reading genome of version {}.\n", (unsigned int)f.cversion);
 	f.currorgan = 0;
 	while (f.nextGene(s) != 0) {
 	}
 	f.currorgan = 0;
-	//std::cout << "creaturesGenomeFile: read " << (unsigned int)f.genes.size() << " top-level genes.\n";
+	//fmt::print("creaturesGenomeFile: read {} top-level genes.\n", (unsigned int)f.genes.size());
 
 	return s;
 }

@@ -2,6 +2,7 @@
 #include "genome.h"
 
 #include <cassert>
+#include <fmt/core.h>
 #include <fstream>
 #include <typeinfo>
 
@@ -22,24 +23,24 @@ void testGenetics() {
 	f >> g;
 	o << g;
 
-	cout << "read " << g.genes.size() << " genes\n";
+	fmt::print("read {} genes\n", g.genes.size());
 
 	for (vector<gene*>::iterator x = g.genes.begin(); x != g.genes.end(); x++) {
 		gene* t = *x;
 
-		cout << "semi-mangled name: " << typeid(*t).name() << "\n";
-		cout << "header flags: mut " << t->header.flags._mutable << " dup " << t->header.flags.dupable << " del " << t->header.flags.delable << "\n";
-		cout << "male-only " << t->header.flags.maleonly << " female-only " << t->header.flags.femaleonly << "\n";
+		fmt::print("semi-mangled name: {}\n", typeid(*t).name());
+		fmt::print("header flags: mut {} dup {} del {}\n", t->header.flags._mutable, t->header.flags.dupable, t->header.flags.delable);
+		fmt::print("male-only {} female-only {}\n", t->header.flags.maleonly, t->header.flags.femaleonly);
 		if (typeid(*t) == typeid(organGene)) {
 			for (vector<gene*>::iterator y = ((organGene*)t)->genes.begin(); y != ((organGene*)t)->genes.end(); y++) {
 				gene* s = *y;
 
-				cout << "semi-mangled name: " << typeid(*s).name() << "\n";
-				cout << "header flags: mut " << s->header.flags._mutable << " dup " << s->header.flags.dupable << " del " << s->header.flags.delable << "\n";
-				cout << "male-only " << s->header.flags.maleonly << " female-only " << s->header.flags.femaleonly << "\n";
+				fmt::print("semi-mangled name: {}\n", typeid(*s).name());
+				fmt::print("header flags: mut {} dup {} del {}\n", s->header.flags._mutable, s->header.flags.dupable, s->header.flags.delable);
+				fmt::print("male-only {} female-only {}\n", s->header.flags.maleonly, s->header.flags.femaleonly);
 			}
 		}
-		cout << '\n';
+		fmt::print("\n");
 	}
 }
 
@@ -47,26 +48,25 @@ void testCatalogue() {
 	Catalogue c;
 	c.initFrom("data/Catalogue/");
 
-	cout << "\n*** dumping catalogue\n";
+	fmt::print("\n*** dumping catalogue\n");
 
 	for (std::map<std::string, std::vector<string> >::iterator i = c.data.begin(); i != c.data.end(); i++) {
-		cout << endl
-			 << "TAG \"" << i->first << "\"" << endl;
+		fmt::print("\nTAG \"{}\n", i->first);
 		for (std::vector<std::string>::iterator j = i->second.begin(); j != i->second.end(); j++) {
-			cout << "\"" << *j << "\"" << endl;
+			fmt::print("\"{}\"\n", *j);
 		}
 	}
 }
 
 int main() {
 	try {
-		cout << "\n*** genome test\n\n";
+		fmt::print("\n*** genome test\n\n");
 		testGenetics();
-		//		cout << "\n*** catalogue test\n\n";
+		//		fmt::print("\n*** catalogue test\n\n");
 		//		testCatalogue();
-		cout << "\n*** done\n";
+		fmt::print("\n*** done\n");
 	} catch (Exception& t) {
-		cout << "exception raised: " << t.what() << "!\n";
+		fmt::print("exception raised: {}!\n", t.what());
 		return -1;
 	}
 

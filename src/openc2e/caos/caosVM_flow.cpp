@@ -25,7 +25,6 @@
 #include "common/throw_ifnot.h"
 
 #include <cmath> // sqrt
-#include <iostream>
 #include <memory>
 #include <sstream>
 

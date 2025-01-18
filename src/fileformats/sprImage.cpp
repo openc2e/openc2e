@@ -119,7 +119,7 @@ MultiImage ReadSprFile(std::istream& in) {
 	// 	// Only works if the file has 'normal' offsets we can predict, but this will only be called
 	// 	// on known files anyway.
 	// 	// TODO: can't we have a better check, eg checking if offsets are identical?
-	// 	std::cout << "Applying hack for probably-corrupt Terra Nornia background." << std::endl;
+	// 	fmt::print("Applying hack for probably-corrupt Terra Nornia background.\n");
 	// 	unsigned int currpos = 2 + (8 * numframes);
 	// 	for (unsigned int i = 0; i < numframes; i++) {
 	// 		offsets[i] = currpos;

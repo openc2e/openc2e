@@ -107,7 +107,7 @@ void World::init() {
 				}
 				theHand->finishInit();
 			} else {
-				std::cout << "There was a seemingly-useful \"Pointer Information\" catalogue tag provided, but sprite file '" << pointerinfo[2] << "' doesn't exist!" << std::endl;
+				fmt::print("There was a seemingly-useful \"Pointer Information\" catalogue tag provided, but sprite file '{}' doesn't exist!\n", pointerinfo[2]);
 			}
 		}
 	}
@@ -123,14 +123,13 @@ void World::init() {
 			theHand = new PointerAgent(img->getName());
 			if (engine.version > 2) {
 				theHand->finishInit(); // SFCFile handles this for c1/c2
-				std::cout << "Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '" << img->getName() << "'." << std::endl;
+				fmt::print("Warning: No valid \"Pointer Information\" catalogue tag, defaulting to '{}'.\n", img->getName());
 			}
 		} else {
 			if (engine.version > 2)
-				std::cout << "Couldn't find a valid \"Pointer Information\" catalogue tag, and c";
+				fmt::print("Couldn't find a valid \"Pointer Information\" catalogue tag, and couldn't find a pointer sprite, so not creating the pointer agent.\n");
 			else
-				std::cout << "C";
-			std::cout << "ouldn't find a pointer sprite, so not creating the pointer agent." << std::endl;
+				fmt::print("Couldn't find a pointer sprite, so not creating the pointer agent.\n");
 		}
 	}
 
@@ -504,8 +503,8 @@ void World::executeInitScript(std::string x) {
 
 	std::ifstream s(x);
 	assert(s.is_open());
-	//std::cout << "executing script " << x << "...\n";
-	//std::cout.flush(); std::cerr.flush();
+	//fmt::print("executing script {}\n", x);
+	//fflush(stdout); fflush(stderr);
 	try {
 		caosScript script(engine.gametype, x);
 		script.parse(s);
@@ -513,10 +512,10 @@ void World::executeInitScript(std::string x) {
 		script.installScripts();
 		vm.runEntirely(script.installer);
 	} catch (Exception& e) {
-		std::cerr << "exec of \"" << fs::path(x).filename() << "\" failed due to exception " << e.prettyPrint() << std::endl;
+		fmt::print(stderr, "exec of \"{}\" failed due to exception {}\n", fs::path(x).filename().string(), e.prettyPrint());
 	}
-	std::cout.flush();
-	std::cerr.flush();
+	fflush(stdout);
+	fflush(stderr);
 }
 
 void World::executeBootstrap(std::string p) {
@@ -638,7 +637,7 @@ std::string World::generateMoniker(std::string basename) {
 
 	// TODO: is there a better way to handle this? incoming basename is from catalogue files..
 	if (basename.size() != 4) {
-		std::cout << "World::generateMoniker got passed '" << basename << "' as a basename which isn't 4 characters, so ignoring it" << std::endl;
+		fmt::print("World::generateMoniker got passed '{}' as a basename which isn't 4 characters, so ignoring it\n", basename);
 		basename = "xxxx";
 	}
 

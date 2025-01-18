@@ -20,7 +20,6 @@
 
 #include "Scriptorium.h"
 
-#include <iostream>
 #include <memory>
 
 inline unsigned int Scriptorium::calculateValue(unsigned char family, unsigned char genus, unsigned short species) {

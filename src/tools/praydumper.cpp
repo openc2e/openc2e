@@ -5,15 +5,13 @@
 #include "fileformats/PrayFileReader.h"
 
 #include <array>
+#include <fmt/core.h>
+#include <fmt/ostream.h>
 #include <fstream>
 #include <ghc/filesystem.hpp>
-#include <iostream>
 
 namespace fs = ghc::filesystem;
 
-using std::cerr;
-using std::cout;
-using std::endl;
 using std::ifstream;
 using std::ofstream;
 using std::vector;
@@ -127,42 +125,42 @@ optional<PrayTagBlock> get_block_as_tags(PrayFileReader& file, int i) {
 	if (!s.eof()) {
 		return {};
 	}
-	cerr << "Unknown block type '" << file.getBlockType(i) << "' looks like a tag block" << endl;
+	fmt::print(stderr, "Unknown block type '{}' looks like a tag block\n", file.getBlockType(i));
 	return PrayTagBlock(integerValues, stringValues);
 }
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
-		cerr << "syntax: praydumper filename" << endl;
+		fmt::print(stderr, "syntax: praydumper filename\n");
 		return 1;
 	}
 
 	fs::path inputfile = fs::path(argv[1]);
 	if (!fs::exists(inputfile)) {
-		cerr << "input file doesn't exist!" << endl;
+		fmt::print(stderr, "input file doesn't exist!");
 		return 1;
 	}
 
 	fs::path output_directory = inputfile.stem();
 	if (fs::exists(output_directory)) {
-		cerr << "Output directory " << output_directory << " already exists" << endl;
+		fmt::print(stderr, "Output directory {} already exists\n", output_directory.string());
 		exit(1);
 	}
 	if (!fs::create_directory(output_directory)) {
-		cerr << "Couldn't create output directory " << output_directory << endl;
+		fmt::print(stderr, "Couldn't create output directory {}\n", output_directory.string());
 		exit(1);
 	}
 
 	std::string pray_source_filename = (output_directory / inputfile.stem()).string() + ".txt";
 	std::ofstream pray_source(pray_source_filename);
-	cout << "Writing \"" << pray_source_filename << "\"" << endl;
-	pray_source << "(- praydumper-generated PRAY file from '" << inputfile.filename().string() << "' -)" << endl;
-	pray_source << endl
-				<< "\"en-GB\"" << endl;
+	fmt::print("Writing {:?}\n", pray_source_filename);
+	fmt::print(pray_source, "(- praydumper-generated PRAY file from {:?} -)\n", inputfile.filename().string());
+	fmt::print(pray_source, "\n");
+	fmt::print(pray_source, "\"en-GB\"\n");
 
 	std::ifstream in(inputfile.string(), std::ios::binary);
 	if (!in) {
-		cerr << "Error opening file " << inputfile << endl;
+		fmt::print(stderr, "Error opening file {}\n", inputfile.string());
 		exit(1);
 	}
 
@@ -173,32 +171,34 @@ int main(int argc, char** argv) {
 
 		auto tags = get_block_as_tags(file, i);
 		if (tags) {
-			pray_source << endl
-						<< "group " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\"" << endl;
+			fmt::print(pray_source, "\n");
+			fmt::print(pray_source, "group {} \"{}\"\n", file.getBlockType(i), file.getBlockName(i));
 
 			auto int_tags = tags->first;
 			auto string_tags = tags->second;
 
 			for (auto y : int_tags) {
-				pray_source << "\"" << y.first << "\" " << y.second << endl;
+				fmt::print(pray_source, "\"{}\" {}\n", y.first, y.second);
 			}
 
 			for (auto y : string_tags) {
 				std::string name = y.first;
 				if ((name.substr(0, 7) == "Script ") || (name.substr(0, 13) == "Remove script")) {
 					name = file.getBlockName(i) + " - " + name + ".cos";
-					cout << "Writing " << (output_directory / name) << endl;
+					fmt::print("Writing {}\n", (output_directory / name).string());
 					ofstream output(output_directory / name);
 					output.write(y.second.c_str(), y.second.size());
-					pray_source << "\"" << y.first << "\" @ \"" << name << "\"" << endl;
+					fmt::print(pray_source, "\"{}\" @ \"{}\"\n", y.first, name);
 				} else {
-					pray_source << "\"" << y.first << "\" \"" << y.second << "\"" << endl;
+					fmt::print(pray_source, "\"{}\" \"{}\"\n", y.first, y.second);
 				}
 			}
 		} else {
-			pray_source << endl
-						<< "inline " << file.getBlockType(i) << " \"" << file.getBlockName(i) << "\" \"" << file.getBlockName(i) << "\"" << endl;
-			cout << "Writing " << (output_directory / file.getBlockName(i)) << endl;
+			fmt::print(pray_source, "\n");
+			fmt::print(pray_source, "inline {} \"{}\" \"{}\"\n",
+				file.getBlockType(i), file.getBlockName(i), file.getBlockName(i));
+
+			fmt::print("Writing {}\n", (output_directory / file.getBlockName(i)).string());
 			ofstream output(output_directory / file.getBlockName(i));
 			auto buf = file.getBlockRawData(i);
 			output.write((char*)buf.data(), buf.size());

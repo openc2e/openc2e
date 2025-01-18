@@ -21,7 +21,7 @@
 #define _SFCFILE_H
 
 #include <cstdint>
-#include <istream>
+#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>

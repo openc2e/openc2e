@@ -22,7 +22,7 @@
 #include "Agent.h"
 
 #include <cassert>
-#include <iostream>
+#include <fmt/core.h>
 #include <memory>
 
 void AgentRef::checkLife() const {
@@ -37,7 +37,7 @@ void AgentRef::set(Agent* a) {
 }
 
 void AgentRef::dump() const {
-	std::cerr << "AgentRef " << (void*)this << " pointing to " << (void*)ref.lock().get() << std::endl;
+	fmt::print("AgentRef {} pointing to {}\n", (void*)this, (void*)ref.lock().get());
 }
 
 std::shared_ptr<Agent> AgentRef::lock() const {

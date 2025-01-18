@@ -26,7 +26,6 @@
 #include <fmt/core.h>
 #include <fstream>
 #include <ghc/filesystem.hpp>
-#include <iostream>
 #include <sstream>
 namespace fs = ghc::filesystem;
 

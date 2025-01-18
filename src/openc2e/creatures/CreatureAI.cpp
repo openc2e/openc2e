@@ -218,11 +218,11 @@ bool c2eCreature::processInstinct() {
 
 	// *** debug output
 
-	/*std::cout << "*** processing instinct for verb #" << actualverb << std::endl;
-	std::cout << "reinforce using drive #" << (int)g->drive << " at level " << ((int)g->level - 128) / 128.0f << std::endl;
+	/*fmt::print("*** processing instinct for verb #{}\n", actualverb);
+	fmt::print("reinforce using drive #{} at level {}\n", (int)g->drive, ((int)g->level - 128) / 128.0f);
 	for (unsigned int i = 0; i < 3; i++) {
 		if (g->lobes[i] != 255) {
-			std::cout << "input: lobe tissue #" << (int)(g->lobes[i] - 1) << ", neuron #" << (int)g->neurons[i] << std::endl;
+			fmt::print("input: lobe tissue #{}, neuron #{}\n", (int)(g->lobes[i] - 1), (int)g->neurons[i]);
 		}
 	}*/
 
@@ -323,8 +323,8 @@ bool c2eCreature::processInstinct() {
 	for (auto& lobe : brain->lobes)
 		lobe.second->wipe();
 
-	//std::cout << "*** instinct done" << std::endl;
-	//std::cout << std::endl;
+	//fmt::print("*** instinct done\n");
+	//fmt::print("\n");
 
 	return true;
 }

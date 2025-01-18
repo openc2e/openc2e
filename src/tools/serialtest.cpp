@@ -6,7 +6,6 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/version.hpp>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #define CV 1
 
@@ -43,10 +42,10 @@ genomeFile* tryLoadGenome() {
 		genestream >> std::noskipws >> *f;
 		//        f->readNotes(notestream);
 
-		std::cout << "pre-save, loaded " << f->genes.size() << " genes." << std::endl;
+		fmt::print("pre-save, loaded {} genes.\n", f->genes.size());
 	} catch (std::exception& e) {
-		std::cerr << "Warning, genome load failed, skipping that test." << std::endl;
-		std::cerr << "Exception was: " << e.what() << std::endl;
+		fmt::print(stderr, "Warning, genome load failed, skipping that test.\n");
+		fmt::print(stderr, "Exception was: {}\n", e.what());
 		if (f)
 			delete f;
 		f = NULL;
@@ -94,21 +93,21 @@ int main(int argc, char** argv) {
 		std::ifstream ifs("sertest.dat", std::ios::binary);
 		boost::archive::text_iarchive ia(ifs);
 		ia >> v;
-		std::cout << "v.i = " << v.i << std::endl;
+		fmt::print("v.i = {}\n", v.i);
 		ia >> nnull >> nstr >> nintv >> nfloatv;
 		ia >> si;
 
 		genomeFile* f;
 		ia >> f;
 		if (!f)
-			std::cerr << "Warning, no genome class found in output. Load failed maybe?" << std::endl;
+			fmt::print(stderr, "Warning, no genome class found in output. Load failed maybe?\n");
 		else
-			std::cout << "f->genes.size() = " << f->genes.size() << std::endl;
+			fmt::print("f->genes.size() = {}\n", f->genes.size());
 		delete f;
 	}
 
 #if CV
-#define D(x) std::cout << #x << " = " << x.dump() << std::endl
+#define D(x) fmt::print(#x " = {}\n", x.dump());
 #else
 #define D(x) \
 	do { \
@@ -118,6 +117,6 @@ int main(int argc, char** argv) {
 	D(nstr);
 	D(nintv);
 	D(nfloatv);
-	std::cout << si.installer->dump() << std::endl;
+	fmt::print("{}\n", si.installer->dump());
 	return 0;
 }

@@ -28,11 +28,11 @@
 
 #include <algorithm>
 #include <cctype>
-#include <iostream>
 #include <memory>
 
 // #include "malloc.h" <- unportable horror!
 #include <fmt/core.h>
+#include <fmt/ostream.h>
 #include <sstream>
 
 /**
@@ -160,11 +160,6 @@ void c_DBG_MALLOC(caosVM*) {
 	MPRINT(fordblks);
 	MPRINT(keepcost);
 	malloc_stats(); */
-
-	/*std::cerr << "caosSlab free=" << caosValueSlab.free_elements() <<
-				 " used=" << caosValueSlab.used_elements() <<
-				 " total=" << caosValueSlab.total_elements() <<
-				 std::endl;*/
 }
 
 /**
@@ -175,7 +170,7 @@ void c_DBG_MALLOC(caosVM*) {
  Dumps the current script's bytecode to stderr.
 */
 void c_DBG_DUMP(caosVM* vm) {
-	std::cerr << vm->currentscript->dump();
+	fmt::print(stderr, "{}", vm->currentscript->dump());
 }
 
 /**
@@ -188,7 +183,7 @@ void c_DBG_DUMP(caosVM* vm) {
 void c_DBG_TRACE(caosVM* vm) {
 	VM_PARAM_INTEGER(en)
 
-	std::cerr << "trace: " << en << std::endl;
+	fmt::print(stderr, "trace: {}\n", en);
 	vm->trace = en;
 	if (vm->trace < 0)
 		vm->trace = 0;
@@ -215,16 +210,15 @@ void c_MANN(caosVM* vm) {
 			std::string d = i->docs;
 			// TODO: docs should always include name/parameters/etc, so should never be empty
 			if (d.size())
-				*vm->outputstream << std::string(i->docs) << std::endl;
+				fmt::print(*vm->outputstream, "{}\n", i->docs);
 			else
-				*vm->outputstream << "no documentation for " << cmd << std::endl
-								  << std::endl;
+				fmt::print(*vm->outputstream, "no documentation for {}\n\n", cmd);
 		}
 		i++;
 	}
 
 	if (!found) {
-		*vm->outputstream << "didn't find " << cmd << std::endl;
+		fmt::print(*vm->outputstream, "didn't find {}\n", cmd);
 		return;
 	}
 }
@@ -251,11 +245,11 @@ void c_DBG_DISA(caosVM* vm) {
 	std::shared_ptr<script> s = world.scriptorium->getScript(family, genus, species, event);
 	if (s) {
 		if (s->fmly != family || s->gnus != genus || s->spcs != species) {
-			*vm->outputstream << "warning: search resulted in script from " << s->fmly << ", " << s->gnus << ", " << s->spcs << " script" << std::endl;
+			fmt::print(*vm->outputstream, "warning: search resulted in script from {}, {}, {} script\n", s->fmly, s->gnus, s->spcs);
 		}
-		*vm->outputstream << s->dump();
+		fmt::print(*vm->outputstream, "{}", s->dump());
 	} else
-		*vm->outputstream << "no such script" << std::endl;
+		fmt::print(*vm->outputstream, "no such script\n");
 }
 
 /**
@@ -381,7 +375,7 @@ void v_DBG_SIZO(caosVM* vm) {
 	std::ostringstream oss;
 #define SIZEOF_OUT(t) \
 	do { \
-		oss << "sizeof(" #t ") = " << sizeof(t) << std::endl; \
+		fmt::print(oss, "sizeof(" #t ") = {}\n", sizeof(t)); \
 	} while (0)
 	SIZEOF_OUT(caosVM);
 	SIZEOF_OUT(caosValue);
@@ -392,9 +386,9 @@ void v_DBG_SIZO(caosVM* vm) {
 #ifdef PROFILE_ALLOCATION_COUNT
 	AllocationCounter::walk(oss);
 #else
-	oss << "This build of openc2e does not have allocation profiling enabled." << std::endl;
+	fmt::print(oss, "This build of openc2e does not have allocation profiling enabled.\n");
 #endif
-	oss << "caosVMs in pool: " << world.vmpool_size() << std::endl;
+	fmt::print(oss, "caosVMs in pool: {}\n", world.vmpool_size());
 #undef SIZEOF_OUT
 
 	vm->result.setString(oss.str());

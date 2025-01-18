@@ -20,7 +20,7 @@
 #pragma once
 
 #include <cstdint>
-#include <iostream>
+#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>

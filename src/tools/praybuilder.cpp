@@ -1,9 +1,9 @@
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
 
+#include <fmt/core.h>
 #include <fstream>
 #include <ghc/filesystem.hpp>
-#include <iostream>
 #include <map>
 #include <string>
 
@@ -31,14 +31,14 @@ int main(int argc, char** argv) {
 
 		auto events = PraySourceParser::parse(str);
 		if (auto* error = events[0].get_if<PraySourceParser::Error>()) {
-			std::cout << "Error: " << error->message << "\n";
+			fmt::print(stderr, "Error: {}\n", error->message);
 			return 1;
 		}
 
-		std::cout << "Writing output to \"" << output_filename << "\"" << std::endl;
+		fmt::print("Writing output to {:?}\n", output_filename);
 		std::ofstream out(output_filename, std::ios::binary);
 		if (!out) {
-			std::cerr << "Couldn't open \"" << output_filename << "\"" << std::endl;
+			fmt::print(stderr, "Couldn't open {:?}\n", output_filename);
 			exit(1);
 		}
 		PrayFileWriter writer(out);
@@ -56,20 +56,15 @@ int main(int argc, char** argv) {
 
 			} else if (auto* event = res.get_if<PraySourceParser::GroupBlockEnd>()) {
 				writer.writeBlockTags(event->type, event->name, int_tags, string_tags);
-				std::cout << "Tag block " << event->type << " \""
-						  << event->name << "\"\n";
+				fmt::print("Tag block {} \"{}\"\n", event->type, event->name);
 
 			} else if (auto* event = res.get_if<PraySourceParser::InlineBlock>()) {
-				std::cout << "Inline block " << event->type << " \""
-						  << event->name << "\" from file \"" << event->filename
-						  << "\"\n";
+				fmt::print("Inline block {} \"{}\" from file {:?}\n", event->type, event->name, event->filename);
 
 				// TODO: check in same directory
 				std::ifstream in((parent_path / event->filename).string());
 				if (!in) {
-					std::cout << "Couldn't open file \""
-							  << (parent_path / event->filename).string() << "\""
-							  << std::endl;
+					fmt::print(stderr, "Couldn't open file {:?}\n", (parent_path / event->filename).string());
 					exit(1);
 				}
 				std::vector<unsigned char> data((std::istreambuf_iterator<char>(in)),
@@ -84,9 +79,7 @@ int main(int argc, char** argv) {
 				// TODO: check in same directory
 				std::ifstream in((parent_path / event->filename).string());
 				if (!in) {
-					std::cout << "Couldn't open file \""
-							  << (parent_path / event->filename).string() << "\""
-							  << std::endl;
+					fmt::print("Couldn't open file {:?}\n", (parent_path / event->filename).string());
 					exit(1);
 				}
 				std::string val((std::istreambuf_iterator<char>(in)),
@@ -98,10 +91,10 @@ int main(int argc, char** argv) {
 				int_tags[event->key] = event->value;
 
 			} else {
-				std::cout << "Not Implemented: " << format_as(res) << std::endl;
+				fmt::print(stderr, "Not Implemented: {}\n", res);
 			}
 		}
 
-		std::cout << "Done!" << std::endl;
+		fmt::print("Done!\n");
 	}
 }

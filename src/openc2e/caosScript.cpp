@@ -36,7 +36,6 @@
 #include <cassert>
 #include <cstring>
 #include <fmt/core.h>
-#include <iostream>
 #include <memory>
 
 using std::string;
@@ -50,7 +49,7 @@ script::~script() {
 void script::link() {
 	ops.push_back(caosOp(CAOS_STOP, 0, -1));
 	assert(!linked);
-	//	std::cout << "Pre-link:" << std::endl << dump();
+	//	fmt::print("Pre-link:\n{}", dump());
 	// check relocations
 	for (unsigned int i = 1; i < relocations.size(); i++) {
 		// handle relocations-to-relocations
@@ -64,7 +63,7 @@ void script::link() {
 			op.argument = relocations[-op.argument];
 	}
 	linked = true;
-	//	std::cout << "Post-link:" << std::endl << dump();
+	//	fmt::print("Post-link:\n{}", dump());
 	relocations.clear();
 }
 

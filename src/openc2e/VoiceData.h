@@ -21,7 +21,7 @@
 #define _VOICEDATA_H
 
 #include <cstdint>
-#include <istream>
+#include <iosfwd>
 #include <string>
 #include <vector>
 

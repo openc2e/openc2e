@@ -849,7 +849,7 @@ void SFCFile::copyToWorld() {
 				if (a->var[varno].hasInt()) {
 					a->var[varno].setAgent(0);
 					// This is useful to enable when you're testing a new patch.
-					//std::cout << "Warning: Couldn't apply agent patch #" << j << "!" << std::endl;
+					// fmt::print("Warning: Couldn't apply agent patch #{}!\n", j);
 				}
 			}
 		}
@@ -1251,7 +1251,7 @@ void SFCScript::install() {
 		script.installInstallScript(family, genus, species, eventno);
 		script.installScripts();
 	} catch (Exception& e) {
-		std::cerr << "installation of \"" << scriptinfo << "\" failed due to exception " << e.prettyPrint() << std::endl;
+		fmt::print(stderr, "installation of \"{}\" failed due to exception {}\n", scriptinfo, e.prettyPrint());
 	}
 }
 
@@ -1287,7 +1287,7 @@ void SFCMacro::activate() {
 		return;
 	}
 
-	std::cout << "Warning: SFCFile failed to find the real script for an SFCMacro owned by " << ourAgent->identify() << std::endl;
+	fmt::print("Warning: SFCFile failed to find the real script for an SFCMacro owned by {}\n", ourAgent->identify());
 }
 
 /* vim: set noet: */

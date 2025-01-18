@@ -31,7 +31,7 @@
 
 #include <cassert>
 #include <climits>
-#include <iostream>
+#include <fmt/core.h>
 #include <memory>
 
 // TODO: change imagecount?
@@ -426,13 +426,12 @@ void PointerAgent::handleEvent(BackendEvent& event) {
 		} else if (event.button == buttonmiddle) {
 			std::vector<std::shared_ptr<Room> > rooms = world.map->roomsAt(x, y);
 			if (rooms.size() > 0)
-				std::cout << "Room at cursor is " << rooms[0]->id << std::endl;
+				fmt::print("Room at cursor is {}\n", rooms[0]->id);
 			Agent* a = world.agentAt(x, y, true);
 			if (a)
-				std::cout << "Agent under mouse is " << a->identify();
+				fmt::print("Agent under mouse is {}\n", a->identify());
 			else
-				std::cout << "No agent under cursor";
-			std::cout << std::endl;
+				fmt::print("No agent under cursor\n");
 		}
 	}
 }

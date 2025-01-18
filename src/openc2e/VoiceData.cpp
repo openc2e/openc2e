@@ -20,6 +20,7 @@
 #include "VoiceData.h"
 
 #include "Catalogue.h"
+#include "common/Exception.h"
 #include "common/NumericCast.h"
 #include "common/endianlove.h"
 

@@ -29,9 +29,7 @@
 #include "historyManager.h"
 
 #include <cassert>
-#include <iostream>
 #include <memory>
-using std::cerr;
 
 CreatureAgent* caosVM::getTargCreatureAgent() {
 	valid_agent(targ);

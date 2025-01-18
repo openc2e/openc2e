@@ -40,7 +40,6 @@
 
 #include <cassert>
 #include <fmt/core.h>
-#include <iostream>
 #include <memory>
 
 #ifndef M_PI
@@ -323,7 +322,8 @@ bool Agent::fireScript(unsigned short event, Agent* from, caosValue one, caosVal
 			}
 			break;
 		case 92: // TODO: hack for 'UI Mouse Down' event - we need a real event system!
-			std::cout << "faking event 92 on " << identify() << std::endl;
+			fmt::print("faking event 92 on {}\n", identify());
+			;
 			CompoundPart* p = world.partAt(world.hand()->pointerX(), world.hand()->pointerY());
 			if (!p || p->getParent() != this) // if something is horridly broken here, return
 				return false; // was THROW_IFNOT(p && p->getParent() == this);
@@ -681,7 +681,7 @@ void Agent::physicsTick() {
 					static bool tryingmove;
 					tryingmove = false; // avoid infinite loop
 					if (!tryingmove && tryMoveToPlaceAround(x, y)) {
-						//std::cout << identify() << " was out of room system due to a physics bug but we hopefully moved it back in.." << std::endl;
+						//fmt::print("{} was out of room system due to a physics bug but we hopefully moved it back in..\n", identity());
 						tryingmove = true;
 						physicsTick();
 						return;
@@ -1167,15 +1167,15 @@ void Agent::unhandledException(std::string info, bool wasscript) {
 	} else if (world.autokill && !dynamic_cast<CreatureAgent*>(this)) { // don't autokill creatures! TODO: someday we probably should :)
 		kill();
 		if (wasscript)
-			std::cerr << identify() << " was autokilled during script " << lastScript << " due to: " << info << std::endl;
+			fmt::print("{} was autokilled during script {} due to: {}\n", identify(), lastScript, info);
 		else
-			std::cerr << identify() << " was autokilled due to: " << info << std::endl;
+			fmt::print("{} was autokilled due to: {}\n", identify(), info);
 	} else {
 		stopScript();
 		if (wasscript)
-			std::cerr << identify() << " caused an exception during script " << lastScript << ": " << info << std::endl;
+			fmt::print("{} caused an exception during script {}: {}\n", identify(), lastScript, info);
 		else
-			std::cerr << identify() << " caused an exception: " << info << std::endl;
+			fmt::print("{} caused an exception: {}\n", identify(), info);
 	}
 }
 

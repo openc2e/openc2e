@@ -55,9 +55,9 @@ void c_SERL_MAPP(caosVM* vm) {
 			world.map->Reset();
 			ia >> world.map; // if this fails the game will explode
 		} catch (std::exception &e) {
-			std::cerr << "Deserialization failed; game is in an unknown state!" << std::endl;
-			std::cerr << "Exception was: " << e.what() << std::endl;
-			std::cerr << "Aborting..." << std::endl;
+			fmt::print(stderr, "Deserialization failed; game is in an unknown state!\n" );
+			fmt::print(stderr, "Exception was: {}\n", e.what() );
+			fmt::print(stderr, "Aborting...\n" );
 			throw;
 		}
 	}
@@ -82,9 +82,9 @@ void c_SERL_SCRP(caosVM* vm) {
 		try {
 			ia >> world.scriptorium; // if this fails the game will explode
 		} catch (std::exception& e) {
-			std::cerr << "Deserialization failed; game is in an unknown state!" << std::endl;
-			std::cerr << "Exception was: " << e.what() << std::endl;
-			std::cerr << "Aborting..." << std::endl;
+			fmt::print(stderr, "Deserialization failed; game is in an unknown state!\n");
+			fmt::print(stderr, "Exception was: {}\n", e.what());
+			fmt::print(stderr, "Aborting...\n");
 			throw;
 		}
 	}

@@ -30,8 +30,7 @@
 
 #include <cassert>
 #include <fmt/core.h>
-#include <istream>
-#include <list>
+#include <iosfwd>
 #include <map>
 #include <memory>
 #include <string>

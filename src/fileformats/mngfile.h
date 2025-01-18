@@ -22,9 +22,7 @@
 #include "common/Exception.h"
 #include "common/shared_array.h"
 
-#include <cmath>
-#include <istream>
-#include <list>
+#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>

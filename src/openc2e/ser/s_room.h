@@ -27,7 +27,7 @@
 
 #include <boost/serialization/set.hpp>
 #include <cassert>
-#include <iostream>
+#include <fmt/core.h>
 
 SERIALIZE(RoomDoor) {
 	ar& obj.first& obj.second& obj.perm;
@@ -50,9 +50,9 @@ SERIALIZE(Room) {
 	std::vector<float> hack;
 	hack.resize(CA_COUNT);
 	for (int i = 0; i < CA_COUNT; i++) {
-		/*        std::cerr << "CA loop, i=" << i << " pre=" << obj.ca[i] << std::endl;
+		/*        fmt::print(stderr, "CA loop, i={} pre={}\n", i, obj.ca[i]);
 				  ar & obj.ca[i];
-				  std::cerr << "Post=" << obj.ca[i] << std::endl;*/
+				  fmt::print(stderr, "Post={}\n", obj.ca[i]);*/
 	}
 #endif
 	ar& obj.ca;

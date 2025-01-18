@@ -25,7 +25,7 @@
 #include "common/Exception.h"
 
 #include <cassert>
-#include <iostream>
+#include <fmt/core.h>
 #include <memory>
 
 MetaRoom* Map::getFallbackMetaroom() {
@@ -210,11 +210,9 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 		Point temppoint;
 		if (x[i].intersect(movement, temppoint)) {
 			if (!movement.containsPoint(temppoint)) {
-				std::cout << "physics bug: intersect wasn't on movement line at (" << temppoint.x << ", " << temppoint.y << ")" << std::endl;
-				std::cout << "room line: (" << x[i].getStart().x << ", " << x[i].getStart().y << ") to ";
-				std::cout << "(" << x[i].getEnd().x << ", " << x[i].getEnd().y << ")" << std::endl;
-				std::cout << "movement line: (" << src.x << ", " << src.y << ") to ";
-				std::cout << "(" << dest.x << ", " << dest.y << ")" << std::endl;
+				fmt::print("physics bug: intersect wasn't on movement line at ({}, {})\n", temppoint.x, temppoint.y);
+				fmt::print("room line: ({}, {}) to ({}, {})\n", x[i].getStart().x, x[i].getStart().y, x[i].getEnd().x, x[i].getEnd().y);
+				fmt::print("movement line: ({}, {}) to ({}, {})\n", src.x, src.y, dest.x, dest.y);
 				return false; // go away
 			}
 			assert(movement.containsPoint(temppoint));
@@ -241,11 +239,9 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 			//}
 
 			if (room->containsPoint(newx, newy)) { // if a little along our movement vector is still in our room, forget it
-				/*std::cout << "physics debug: next room is original room at (" << temppoint.x << ", " << temppoint.y << ")" << std::endl;
-				std::cout << "room line: (" << x[i].getStart().x << ", " << x[i].getStart().y << ") to ";
-				std::cout << "(" << x[i].getEnd().x << ", " << x[i].getEnd().y << ")" << std::endl;
-				std::cout << "movement line: (" << movement.getStart().x << ", " << movement.getStart().y << ") to ";
-				std::cout << "(" << movement.getEnd().x << ", " << movement.getEnd().y << ")" << std::endl;
+				/* fmt::print("physics debug: next room is original room at ({}, {})\n", temppoint.x, temppoint.y);
+				fmt::print("room line: ({}, {}) to ({}, {})\n", x[i].getStart().x, x[i].getStart().y, x[i].getEnd().x, x[i].getEnd().y);
+				fmt::print("movement line: ({}, {}) to ({}, {})\n", movement.getStart().x, movement.getStart().y, movement.getEnd().x, movement.getEnd().y);
 				return false;*/
 				continue; // continue, bad collision
 			}
@@ -281,11 +277,9 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 			std::shared_ptr<Room> z = roomAt(temppoint.x, temppoint.y); // TODO: evil performance-killing debug check
 			if (!z) {
 				// TODO: commented out this error message for sake of fuzzie's sanity, but it's still an issue
-				/*std::cout << "physics bug: fell out of room system at (" << where.x << ", " << where.y << ")" << std::endl;
-				std::cout << "room line: (" << x[i].getStart().x << ", " << x[i].getStart().y << ") to ";
-				std::cout << "(" << x[i].getEnd().x << ", " << x[i].getEnd().y << ")" << std::endl;
-				std::cout << "movement line: (" << movement.getStart().x << ", " << movement.getStart().y << ") to ";
-				std::cout << "(" << movement.getEnd().x << ", " << movement.getEnd().y << ")" << std::endl;*/
+				/* fmt::print("physics bug: fell out of room system at ({}, {})\n", where.x, where.y);
+				fmt::print("room line: ({}, {}) to ({}, {})\n", x[i].getStart().x, x[i].getStart().y, x[i].getEnd().x, x[i].getEnd().y);
+				fmt::print("movement line: ({}, {}) to ({}, {})\n", movement.getStart().x, movement.getStart().y, movement.getEnd().x, movement.getEnd().y); */
 				return false; // go away
 			}
 
@@ -305,9 +299,8 @@ bool Map::collideLineWithRoomBoundaries(Point src, Point dest, std::shared_ptr<R
 		} else {
 			where = src; // TODO: can't we assume this anyway?
 			// TODO: commented out this error message for sake of fuzzie's sanity, but it's still an issue
-			/*std::cout << "physics bug: didn't collide with a line, nor stay in the current room!" << std::endl;
-			std::cout << "movement line: (" << movement.getStart().x << ", " << movement.getStart().y << ") to ";
-			std::cout << "(" << movement.getEnd().x << ", " << movement.getEnd().y << ")" << std::endl;*/
+			/* fmt::print("physics bug: didn't collide with a line, nor stay in the current room!\n");
+			fmt::print("movement line: ({}, {}) to ({}, {})\n", movement.getStart().x, movement.getStart().y, movement.getEnd().x,  movement.getEnd().y); */
 		}
 		return false;
 	}

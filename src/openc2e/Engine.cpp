@@ -57,6 +57,7 @@
 #define CXXOPTS_VECTOR_DELIMITER '\0'
 #include <cxxopts.hpp>
 #include <fmt/core.h>
+#include <fmt/ostream.h>
 #include <memory>
 #include <stdexcept>
 
@@ -129,13 +130,13 @@ void Engine::setBackend(Backend* b) {
 static std::vector<std::string> read_wordlist(peFile* exefile, PeLanguage lang) {
 	optional<resourceInfo> r = exefile->findResource(PE_RESOURCETYPE_STRING, lang, 14);
 	if (!r) {
-		std::cout << "Warning: Couldn't load word list (couldn't find resource)!" << std::endl;
+		fmt::print("Warning: Couldn't load word list (couldn't find resource)!\n");
 		return {};
 	}
 
 	std::vector<std::string> strings = exefile->getResourceStrings(*r);
 	if (strings.size() < 6) {
-		std::cout << "Warning: Couldn't load word list (string table too small)!" << std::endl;
+		fmt::print("Warning: Couldn't load word list (string table too small)!\n");
 		return {};
 	}
 
@@ -247,10 +248,10 @@ void Engine::loadGameData() {
 			try {
 				exefile = new peFile(exepath);
 			} catch (Exception& e) {
-				std::cout << "Warning: Couldn't load word list (" << e.what() << ")!" << std::endl;
+				fmt::print("Warning: Couldn't load word list ({})!\n", e.what());
 			}
 		} else
-			std::cout << "Warning: Couldn't load word list (couldn't find Creatures2.exe)!" << std::endl;
+			fmt::print("Warning: Couldn't load word list (couldn't find Creatures2.exe)!\n");
 
 		if (exefile) {
 			auto english_wordlist = read_wordlist(exefile, PE_LANGUAGE_ENGLISH);
@@ -410,7 +411,7 @@ void Engine::handleKeyboardScrolling() {
 				wasdMode = false;
 				break;
 			default: // disable
-				std::cout << "Warning: engine_wasd_scrolling is set to unknown value " << v.getInt() << std::endl;
+				fmt::print("Warning: engine_wasd_scrolling is set to unknown value {}\n", v.getInt());
 				world.variables["engine_wasd_scrolling"] = caosValue(0);
 				wasdMode = false;
 				break;
@@ -741,10 +742,10 @@ static const char data_default[] = "./data";
 
 static void opt_version() {
 	// We already showed the primary version bit, just throw in some random legalese
-	std::cout << "This is free software; see the source for copying conditions.  There is NO" << std::endl
-			  << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << std::endl
-			  << std::endl
-			  << "...please don't sue us." << std::endl;
+	fmt::print("This is free software; see the source for copying conditions.  There is NO\n"
+			   "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+			   "\n"
+			   "...please don't sue us.\n");
 }
 
 static std::string detectGameType(fs::path directory) {
@@ -863,14 +864,14 @@ static fs::path showDirectoryPicker() {
 
 	ComPtr<IFileOpenDialog> fo;
 	if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, fo.receive_vpp()))) {
-		std::cout << "Couldn't open File Dialog" << std::endl;
+		fmt::print("Couldn't open File Dialog\n");
 		return {};
 	}
 	fo->SetOptions(FOS_PICKFOLDERS);
 
 	// Show the Open dialog box.
 	if (FAILED(fo->Show(NULL))) {
-		std::cout << "Couldn't show File Open Dialog" << std::endl;
+		fmt::print("Couldn't show File Open Dialog\n");
 		return {};
 	}
 
@@ -931,7 +932,7 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 	cmdline_norun = vm.count("norun");
 
 	if (vm.count("help")) {
-		std::cout << desc.help() << std::endl;
+		fmt::print("{}\n", desc.help());
 		return false;
 	}
 
@@ -956,7 +957,7 @@ bool Engine::parseCommandLine(int argc, char* argv[]) {
 		}
 #endif
 		if (data_vec.empty()) {
-			std::cout << "Warning: No data path specified, trying default of '" << data_default << "', see --help if you need to specify one." << std::endl;
+			fmt::print("Warning: No data path specified, trying default of '{}', see --help if you need to specify one.\n", data_default);
 			data_vec.push_back(data_default);
 		}
 	}
@@ -1042,7 +1043,7 @@ bool Engine::initialSetup() {
 	if (cmdline_norun)
 		preferred_backend = "null";
 	if (preferred_backend != "null")
-		std::cout << "* Initialising backend " << preferred_backend << "..." << std::endl;
+		fmt::print("* Initialising backend {}...\n", preferred_backend);
 	Backend* b = possible_backends[preferred_backend];
 	if (!b)
 		throw Exception("No such backend " + preferred_backend);
@@ -1057,7 +1058,7 @@ bool Engine::initialSetup() {
 	if (cmdline_norun)
 		preferred_audiobackend = "null";
 	if (preferred_audiobackend != "null")
-		std::cout << "* Initialising audio backend " << preferred_audiobackend << "..." << std::endl;
+		fmt::print("* Initialising audio backend {}...\n", preferred_audiobackend);
 	AudioBackend* a = possible_audiobackends[preferred_audiobackend];
 	if (!a)
 		throw Exception("No such audio backend " + preferred_audiobackend);
@@ -1065,8 +1066,8 @@ bool Engine::initialSetup() {
 		a->init();
 		set_audio_backend(a);
 	} catch (Exception& e) {
-		std::cerr << "* Couldn't initialize backend " << preferred_audiobackend << ": " << e.what() << std::endl
-				  << "* Continuing without sound." << std::endl;
+		fmt::print("* Couldn't initialize backend {}: {}\n", preferred_audiobackend, e.what());
+		fmt::print("* Continuing without sound.\n");
 		set_audio_backend(NullAudioBackend::get_instance());
 		get_audio_backend()->init();
 	}
@@ -1076,14 +1077,14 @@ bool Engine::initialSetup() {
 	int listenport = net->init();
 	if (listenport != -1) {
 		// inform the user of the port used, and store it in the relevant file
-		std::cout << "* Listening for connections on port " << listenport << "." << std::endl;
+		fmt::print("* Listening for connections on port {}.\n", listenport);
 #ifndef _WIN32
 		fs::path p = homeDirectory() / ".creaturesengine";
 		if (!fs::exists(p))
 			fs::create_directory(p);
 		if (fs::is_directory(p)) {
 			std::ofstream f(p / "port", std::ios::trunc);
-			f << std::to_string(listenport);
+			fmt::print(f, "{}", listenport);
 		}
 #endif
 	}
@@ -1101,13 +1102,13 @@ bool Engine::initialSetup() {
 
 	// initial setup
 	if (engine.version == 3) {
-		std::cout << "* Reading catalogue files..." << std::endl;
+		fmt::print("* Reading catalogue files...\n");
 		world.initCatalogue();
 	}
-	std::cout << "* Initial setup..." << std::endl;
+	fmt::print("* Initial setup...\n");
 	world.init(); // just reads mouse cursor (we want this after the catalogue reading so we don't play "guess the filename")
 	if (engine.version > 2) {
-		std::cout << "* Reading PRAY files..." << std::endl;
+		fmt::print("* Reading PRAY files...\n");
 		world.praymanager->update();
 	}
 
@@ -1122,13 +1123,13 @@ bool Engine::initialSetup() {
 		// Set working directory
 		SetCurrentDirectory(exepath);
 	} else // err, oops
-		std::cerr << "Warning: Setting working directory to " << exepath << " failed.";
+		fmt::print(stderr, "Warning: Setting working directory to {} failed.\n", exepath);
 #endif
 
 	loadGameData();
 
 	// execute the initial scripts!
-	std::cout << "* Executing initial scripts..." << std::endl;
+	fmt::print("* Executing initial scripts...\n");
 	if (cmdline_bootstrap.size() == 0) {
 		world.executeBootstrap(false);
 	} else {
@@ -1143,7 +1144,7 @@ bool Engine::initialSetup() {
 				// pass it to the world to execute (it handles both files and directories)
 
 				if (!fs::exists(scriptdir)) {
-					std::cerr << "Warning: Couldn't find a specified script directory (trying " << bsi << ")!\n";
+					fmt::print(stderr, "Warning: Couldn't find a specified script directory (trying {})!\n", bsi);
 					continue;
 				}
 
@@ -1169,11 +1170,11 @@ bool Engine::initialSetup() {
 		throw Exception("No metarooms found in given bootstrap directories or files");
 	}
 
-	std::cout << "* Done startup." << std::endl;
+	fmt::print("* Done startup.\n");
 
 	if (cmdline_norun) {
 		// TODO: see comment above about avoiding backend when norun is set
-		std::cout << "Told not to run the world, so stopping now." << std::endl;
+		fmt::print("Told not to run the world, so stopping now.\n");
 		shutdown();
 		return false;
 	}

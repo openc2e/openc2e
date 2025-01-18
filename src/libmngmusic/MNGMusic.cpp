@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include <cmath> // for cos/sin
-#include <iostream> // for debug messages
+#include <fmt/core.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846 /* pi */
@@ -56,7 +56,7 @@ void MNGMusic::playTrack(MNGFile* file, std::string trackname) {
 	auto parsed_script = mngparse(file->script);
 	auto track = find_if(parsed_script.tracks, [&](const auto& t) { return to_ascii_lowercase(t.name) == trackname; });
 	if (!track) {
-		std::cout << "Couldn't find MNG track '" << trackname << "' ('" << file->name << "')!" << std::endl;
+		fmt::print("Couldn't find MNG track '{}' ('{}')!\n", trackname, file->name);
 		return; // TODO: exception?
 	}
 

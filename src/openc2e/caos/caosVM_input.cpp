@@ -24,9 +24,6 @@
 #include "common/NumericCast.h"
 #include "common/backend/Backend.h"
 
-#include <iostream>
-using std::cerr;
-
 /**
  CLAC (command) message (integer)
  %status maybe

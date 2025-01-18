@@ -47,7 +47,8 @@ void AllocationCounter::decrement() {
 }
 
 void AllocationCounter::dump(std::ostream& s) {
-	s << getName() << "; Live objects:" << getCount() << " Max residency: " << getMaxCount() << " Total allocation count: " << getTotalAllocs() << std::endl;
+	fmt::print(s, "{}; Live objects: {} Max residency: {} Total allocation count: {}\n",
+		getName(), getCount(), getMaxCount(), getTotalAllocs());
 }
 
 void AllocationCounter::walk_one(std::ostream& s) {
@@ -58,7 +59,7 @@ void AllocationCounter::walk_one(std::ostream& s) {
 
 void AllocationCounter::walk(std::ostream& s) {
 	if (!alloc_count_walk)
-		s << "No counters registered!" << std::endl;
+		fmt::print(s, "No counters registered!\n");
 	else
 		alloc_count_walk->walk_one(s);
 }
