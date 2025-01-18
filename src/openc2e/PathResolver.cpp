@@ -134,7 +134,7 @@ static std::vector<fs::path> findByWildcard(FileDirectory type, std::string wild
 			wild = fs::path(wild).filename().string();
 		}
 		for (const auto& entry : case_insensitive_filesystem::directory_iterator(dirname)) {
-			if (wildcard_match(wild, entry.lexically_relative(dirname).native())) {
+			if (wildcard_match_ignore_case(wild, entry.lexically_relative(dirname).native())) {
 				results.push_back(entry);
 			}
 		}

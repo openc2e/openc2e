@@ -43,7 +43,7 @@ std::vector<fs::path> PathManager::find_path_wildcard(PathType type, const std::
 	// assume pattern is a single filename, cannot have directory separators
 	std::vector<fs::path> results;
 	for (const auto& entry : case_insensitive_filesystem::directory_iterator(dirname)) {
-		if (wildcard_match(pattern, entry.filename().string())) {
+		if (wildcard_match_ignore_case(pattern, entry.filename().string())) {
 			results.push_back(entry.filename());
 		}
 	}
