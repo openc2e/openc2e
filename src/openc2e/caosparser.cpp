@@ -192,7 +192,15 @@ static CAOSNodePtr parse_command(CAOSParserState& state, bool is_toplevel) {
 	// parse the arguments
 	std::vector<CAOSNodePtr> args;
 	for (int i = 0; i < commandinfo->argc; ++i) {
-		eat_whitespace(state);
+		if (i == 0 && commandnormalized == "anim" && state.dialect->name == "c1") {
+			// The learning computer and cloud butterflies have scripts that go
+			// `anim[0123]` with no whitespace separating the ANIM command and
+			// the string argument. If we're followed directly by the string
+			// bracket, skip trying to parse a separator.
+			maybe_eat_whitespace(state);
+		} else {
+			eat_whitespace(state);
+		}
 		switch (commandinfo->argtypes[i]) {
 			case CI_OTHER:
 			case CI_COMMAND:

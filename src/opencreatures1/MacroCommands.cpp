@@ -26,10 +26,10 @@ void Command_ADDV(MacroContext& ctx, Macro& m) {
 
 void Command_ANIM(MacroContext& ctx, Macro& m) {
 	if (m.script[m.ip] == '[') {
-		// The learning computer has a script that goes `anim[0123]` with no
-		// whitespace separating the ANIM command and the string argument.
-		// If we're followed directly by the string bracket, skip trying to
-		// parse a separator.
+		// The learning computer and cloud butterflies have scripts that go
+		// `anim[0123]` with no whitespace separating the ANIM command and
+		// the string argument. If we're followed directly by the string
+		// bracket, skip trying to parse a separator.
 	} else {
 		ctx.read_arg_separator(m);
 	}
