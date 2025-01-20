@@ -3,6 +3,7 @@
 // Once openc2e goes to C++20, replace this with std::span
 
 #include <cstddef>
+#include <type_traits>
 
 template <class T>
 class span {
@@ -12,9 +13,18 @@ class span {
 		: data_(first), size_(count) {}
 	span(T* first, T* last)
 		: data_(first), size_(last - first) {}
-	template <class R>
+	template <class R, class = decltype(std::declval<R>().size())>
 	span(R&& r)
 		: data_(r.data()), size_(r.size()) {}
+
+	// construct a span from a C-style array. disable this for char arrays because
+	// const char array literals always have a nul character at the end, which is
+	// likely _not_ what you want! use StringView instead, or if you really need
+	// a span over a char array use the span<char>(char*, size_t) overload.
+	template <size_t N, typename U = T,
+		typename = std::enable_if_t<!std::is_same<std::remove_cv_t<U>, char>::value>>
+	span(T (&data)[N])
+		: span(data, N) {}
 
 	T& front() const { return data_[0]; }
 	T& back() const { return data_[size_ - 1]; }
