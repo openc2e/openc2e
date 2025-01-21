@@ -114,8 +114,8 @@ static fs::path getDirectory(const DataDirectory& d, FileDirectory type) {
 
 static fs::path findFile(FileDirectory type, fs::path name) {
 	// TODO: check user directory before or after data directories?
-	std::error_code err;
 	for (auto d : data_directories) {
+		std::error_code err;
 		fs::path resolved = case_insensitive_filesystem::canonical(getDirectory(d, type) / name, err);
 		if (!err) {
 			return resolved;
