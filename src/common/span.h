@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <type_traits>
 
-template <class T>
+template <typename T>
 class span {
   public:
 	span() {}
@@ -13,7 +13,9 @@ class span {
 		: data_(first), size_(count) {}
 	span(T* first, T* last)
 		: data_(first), size_(last - first) {}
-	template <class R, class = decltype(std::declval<R>().size())>
+	template <typename R,
+		typename = decltype(std::declval<R>().size()),
+		typename = std::enable_if_t<std::is_convertible<decltype(std::declval<R>().data()), T*>::value>>
 	span(R&& r)
 		: data_(r.data()), size_(r.size()) {}
 
