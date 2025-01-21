@@ -33,7 +33,7 @@ class span {
 	T& operator[](size_t i) const { return data_[i]; }
 
 	T* begin() const { return data_; }
-	T* end() const { return data_[size_]; }
+	T* end() const { return data_ + size_; }
 
 	T* data() const { return data_; }
 	size_t size() const { return size_; }
