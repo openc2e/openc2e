@@ -44,6 +44,10 @@ void TextPart::addTint(std::string tintinfo) {
 	int where = 0;
 	std::string cur;
 	for (unsigned int i = 0; i <= tintinfo.size(); i++) {
+		if (i == tintinfo.size() && cur.empty()) {
+			// handle cases of empty <tint>
+			break;
+		}
 		if (i == tintinfo.size() || tintinfo[i] == ' ') {
 			unsigned short val = std::stoi(cur);
 			if (val <= 256) {
