@@ -39,7 +39,6 @@
 #include "caosValue.h"
 #include "common/backend/Backend.h"
 #include "common/creaturesImage.h"
-#include "common/namedifstream.h"
 #include "common/throw_ifnot.h"
 #include "imageManager.h"
 
@@ -233,22 +232,23 @@ void SkeletalCreature::skeletonInit() {
 			throw Exception(fmt::format("SkeletalCreature couldn't find an image for part {:c} of species {}, variant {}, stage {}", x, (int)partspecies, (int)partvariant, (int)creature->getStage()));
 
 		// find relevant ATT data
-		namedifstream attfile;
+		decltype(findBodyDataFile("")) attpath;
 		int var = partvariant;
-		while (var > -1 && !attfile.is_open()) {
+		while (var > -1 && attpath.empty()) {
 			int stage_to_try = creature->getStage();
-			while (stage_to_try > -1 && !attfile.is_open()) {
-				attfile = openBodyDataFile(x + dataString(stage_to_try, false, spe, var) + ".att");
+			while (stage_to_try > -1 && attpath.empty()) {
+				attpath = findBodyDataFile(x + dataString(stage_to_try, false, spe, var) + ".att");
 				stage_to_try--;
 			}
 			var--;
 		}
-		if (!attfile.is_open())
+		if (attpath.empty())
 			throw Exception(fmt::format("SkeletalCreature couldn't find body data for part {:c} of species {}, variant {}, stage {}", x, (int)partspecies, (int)partvariant, creature->getStage()));
 
 		// load ATT file
+		std::ifstream attfile(attpath, std::ios::binary);
 		if (attfile.fail())
-			throw Exception(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attfile.name().string()));
+			throw Exception(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attpath.string()));
 		att[i] = ReadAttFile(attfile);
 
 		images[i] = tintBodySprite(images[i]);

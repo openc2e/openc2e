@@ -22,7 +22,6 @@
 #include "common/Ascii.h"
 #include "common/Exception.h"
 #include "common/case_insensitive_filesystem.h"
-#include "common/namedifstream.h"
 #include "common/wildcard_match.h"
 
 #include <assert.h>
@@ -184,23 +183,6 @@ fs::path findOverlayDataFile(fs::path path) {
 
 fs::path findSoundFile(fs::path path) {
 	return findFile(DIRECTORY_SOUNDS, path);
-}
-
-namedifstream openBodyDataFile(fs::path path) {
-	auto filename = findFile(DIRECTORY_BODY_DATA, path);
-	if (filename.empty()) {
-		return {};
-	}
-	return namedifstream(filename);
-}
-
-namedifstream openVoiceFile(fs::path path) {
-	assert(engine.version < 3);
-	auto filename = findFile(DIRECTORY_MAIN, path);
-	if (filename.empty()) {
-		return {};
-	}
-	return namedifstream(filename);
 }
 
 fs::path getCurrentWorldJournalPath(fs::path filename) {

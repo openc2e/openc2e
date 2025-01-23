@@ -24,8 +24,6 @@
 #include <string>
 #include <vector>
 
-class namedifstream;
-
 class DataDirectory {
   public:
 	DataDirectory(ghc::filesystem::path main);
@@ -59,9 +57,6 @@ ghc::filesystem::path findGeneticsFile(ghc::filesystem::path name);
 ghc::filesystem::path findImageFile(ghc::filesystem::path name);
 ghc::filesystem::path findOverlayDataFile(ghc::filesystem::path name);
 ghc::filesystem::path findSoundFile(ghc::filesystem::path name);
-
-namedifstream openBodyDataFile(ghc::filesystem::path name);
-namedifstream openVoiceFile(ghc::filesystem::path name);
 
 std::ofstream createUserBackgroundFile(ghc::filesystem::path name);
 std::ofstream createUserBodyDataFile(ghc::filesystem::path name);

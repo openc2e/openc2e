@@ -35,7 +35,6 @@
 #include "caosVM.h"
 #include "common/audio/AudioBackend.h"
 #include "common/creaturesImage.h"
-#include "common/namedifstream.h"
 #include "common/throw_ifnot.h"
 
 #include <cassert>
@@ -1568,11 +1567,13 @@ void Agent::join(unsigned int outid, AgentRef dest, unsigned int inid) {
 
 void Agent::setVoice(std::string name) {
 	if (engine.version < 3) {
-		namedifstream f = openVoiceFile(name + ".vce");
-		if (!f.is_open() && f.fail()) {
-			throw Exception(fmt::format("can't open {}.vce", name));
-		} else if (!f.is_open()) {
+		auto voicepath = findMainDirectoryFile(name + ".vce");
+		if (voicepath.empty()) {
 			throw Exception(fmt::format("can't find {}.vce", name));
+		}
+		std::ifstream f(voicepath, std::ios::binary);
+		if (!f.is_open() || f.fail()) {
+			throw Exception(fmt::format("can't open {}", voicepath.string()));
 		}
 		voice = std::shared_ptr<VoiceData>(new VoiceData(f));
 	} else {
