@@ -39,7 +39,7 @@ static bool is_printable(const std::string& s) {
 	return true;
 }
 
-optional<PrayTagBlock> get_block_as_tags(PrayFileReader& file, int i) {
+optional<PrayTagBlock> maybe_get_block_as_tags(PrayFileReader& file, int i) {
 	for (auto tagblock : tagblocks) {
 		if (file.getBlockType(i) == tagblock) {
 			return file.getBlockTags(i);
@@ -48,85 +48,25 @@ optional<PrayTagBlock> get_block_as_tags(PrayFileReader& file, int i) {
 	if (file.getBlockType(i) == "FILE") {
 		return {};
 	}
-	auto buf = file.getBlockRawData(i);
+
 	// maybe it's a tag block anyways?
-	spanstream s(buf);
-	unsigned int nointvalues = read32le(s);
-	if (s.fail()) {
+	try {
+		auto tags = file.getBlockTags(i);
+		for (const auto& int_tag : tags.first) {
+			if (!is_printable(int_tag.first)) {
+				return {};
+			}
+		}
+		for (const auto& string_tag : tags.second) {
+			if (!is_printable(string_tag.first) || !is_printable(string_tag.second)) {
+				return {};
+			}
+		}
+		fmt::print(stderr, "Successfully parsed unknown block type '{}' as a tag block\n", file.getBlockType(i));
+		return tags;
+	} catch (...) {
 		return {};
 	}
-
-
-	std::map<std::string, unsigned int> integerValues;
-	for (unsigned int i = 0; i < nointvalues; i++) {
-		unsigned int keylength = read32le(s);
-		if (s.fail()) {
-			return {};
-		}
-		if (keylength > 256) {
-			return {};
-		}
-
-		std::string key(keylength, '0');
-		s.read(&key[0], keylength);
-		if (s.fail()) {
-			return {};
-		}
-		if (!is_printable(key)) {
-			return {};
-		}
-
-		unsigned int value = read32le(s);
-		if (s.fail()) {
-			return {};
-		}
-
-		integerValues[key] = value;
-	}
-
-	unsigned int nostrvalues = read32le(s);
-	if (s.fail()) {
-		return {};
-	}
-
-	std::map<std::string, std::string> stringValues;
-	for (unsigned int i = 0; i < nostrvalues; i++) {
-		unsigned int keylength = read32le(s);
-		if (s.fail()) {
-			return {};
-		}
-
-		std::string key(keylength, '0');
-		s.read(&key[0], keylength);
-		if (s.fail()) {
-			return {};
-		}
-		if (!is_printable(key)) {
-			return {};
-		}
-
-		unsigned int valuelength = read32le(s);
-		if (s.fail()) {
-			return {};
-		}
-
-		std::string value(valuelength, '0');
-		s.read(&value[0], valuelength);
-		if (s.fail()) {
-			return {};
-		}
-		if (!is_printable(value)) {
-			return {};
-		}
-
-		stringValues[key] = value;
-	}
-	s.peek();
-	if (!s.eof()) {
-		return {};
-	}
-	fmt::print(stderr, "Unknown block type '{}' looks like a tag block\n", file.getBlockType(i));
-	return PrayTagBlock(integerValues, stringValues);
 }
 
 int main(int argc, char** argv) {
@@ -169,7 +109,7 @@ int main(int argc, char** argv) {
 	for (size_t i = 0; i < file.getNumBlocks(); i++) {
 		// TODO: s/"/\\"/ in the data (use find/replace methods of string)
 
-		auto tags = get_block_as_tags(file, i);
+		auto tags = maybe_get_block_as_tags(file, i);
 		if (tags) {
 			fmt::print(pray_source, "\n");
 			fmt::print(pray_source, "group {} \"{}\"\n", file.getBlockType(i), file.getBlockName(i));
