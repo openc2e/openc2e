@@ -49,6 +49,7 @@ Image ReadBlkFile(std::istream& in) {
 	shared_array<uint8_t> buffer(totalwidth * totalheight * 2);
 
 	for (auto i = 0; i < numsprites; ++i) {
+		// TODO: make sure we're at the correct offset
 		auto x = i / height_blocks;
 		auto y = i % height_blocks;
 		for (auto blocky = 0; blocky < 128; ++blocky) {
