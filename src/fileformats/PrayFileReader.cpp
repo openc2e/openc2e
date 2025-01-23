@@ -142,32 +142,34 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 
 	auto buffer = getBlockRawData(i);
 	spanstream s(buffer);
+	s.exceptions(std::ios::failbit | std::ios::badbit);
 
-	unsigned int nointvalues = read32le(s);
-	for (unsigned int i = 0; i < nointvalues; i++) {
-		std::string n = ensure_utf8(tagStringRead(s));
-		unsigned int v = read32le(s);
-		if (integerValues.find(n) == integerValues.end()) {
-			integerValues[n] = v;
-		} else if (integerValues[n] != v) {
-			throw Exception(std::string("Duplicate tag \"") + n + "\"");
+	try {
+		unsigned int nointvalues = read32le(s);
+		for (unsigned int i = 0; i < nointvalues; i++) {
+			std::string n = ensure_utf8(tagStringRead(s));
+			unsigned int v = read32le(s);
+			if (integerValues.find(n) == integerValues.end()) {
+				integerValues[n] = v;
+			} else if (integerValues[n] != v) {
+				throw Exception(std::string("Duplicate tag \"") + n + "\"");
+			}
 		}
-	}
 
-	unsigned int nostrvalues = read32le(s);
-	for (unsigned int i = 0; i < nostrvalues; i++) {
-		std::string n = ensure_utf8(tagStringRead(s));
-		std::string v = ensure_utf8(tagStringRead(s));
-		if (stringValues.find(n) == stringValues.end()) {
-			stringValues[n] = v;
-		} else if (stringValues[n] != v) {
-			throw Exception(std::string("Duplicate tag \"") + n + "\"");
+		unsigned int nostrvalues = read32le(s);
+		for (unsigned int i = 0; i < nostrvalues; i++) {
+			std::string n = ensure_utf8(tagStringRead(s));
+			std::string v = ensure_utf8(tagStringRead(s));
+			if (stringValues.find(n) == stringValues.end()) {
+				stringValues[n] = v;
+			} else if (stringValues[n] != v) {
+				throw Exception(std::string("Duplicate tag \"") + n + "\"");
+			}
 		}
-	}
-
-	if (!s) {
+	} catch (const std::ios::failure&) {
 		throw Exception("Stream failure reading tags from PRAY block \"" + name + "\"");
 	}
+
 	s.peek();
 	if (!s.eof()) {
 		throw Exception("Didn't read whole block while reading tags from PRAY block \"" + name + "\"");
