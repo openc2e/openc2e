@@ -23,7 +23,6 @@
 #else
 
 #include <cstdlib>
-#include <iosfwd>
 #include <string>
 
 class AllocationCounter {

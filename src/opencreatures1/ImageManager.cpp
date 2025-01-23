@@ -6,6 +6,7 @@
 #include "common/Exception.h"
 #include "common/NumericCast.h"
 #include "common/backend/Backend.h"
+#include "common/io/FileReader.h"
 #include "fileformats/ImageUtils.h"
 #include "fileformats/paletteFile.h"
 #include "fileformats/sprImage.h"
@@ -86,7 +87,7 @@ const ImageGallery& ImageManager::get_image(std::string name, int32_t absolute_b
 	}
 
 	// TODO: faster to memory map file?
-	std::ifstream in(path, std::ifstream::binary);
+	FileReader in(path);
 	auto data = ReadSprFileWithMetadata(in, absolute_base, image_count);
 
 	for (auto& i : data.images) {

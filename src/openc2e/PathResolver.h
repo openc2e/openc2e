@@ -20,9 +20,11 @@
 #pragma once
 
 #include <ghc/filesystem.hpp>
-#include <iosfwd>
 #include <string>
 #include <vector>
+
+class FileReader;
+class FileWriter;
 
 class DataDirectory {
   public:
@@ -58,14 +60,14 @@ ghc::filesystem::path findImageFile(ghc::filesystem::path name);
 ghc::filesystem::path findOverlayDataFile(ghc::filesystem::path name);
 ghc::filesystem::path findSoundFile(ghc::filesystem::path name);
 
-std::ofstream createUserBackgroundFile(ghc::filesystem::path name);
-std::ofstream createUserBodyDataFile(ghc::filesystem::path name);
-std::ofstream createUserCatalogueFile(ghc::filesystem::path name);
-std::ofstream createUserCobFile(ghc::filesystem::path name);
-std::ofstream createUserGeneticsFile(ghc::filesystem::path name);
-std::ofstream createUserImageFile(ghc::filesystem::path name);
-std::ofstream createUserOverlayDataFile(ghc::filesystem::path name);
-std::ofstream createUserSoundFile(ghc::filesystem::path name);
+FileWriter createUserBackgroundFile(ghc::filesystem::path name);
+FileWriter createUserBodyDataFile(ghc::filesystem::path name);
+FileWriter createUserCatalogueFile(ghc::filesystem::path name);
+FileWriter createUserCobFile(ghc::filesystem::path name);
+FileWriter createUserGeneticsFile(ghc::filesystem::path name);
+FileWriter createUserImageFile(ghc::filesystem::path name);
+FileWriter createUserOverlayDataFile(ghc::filesystem::path name);
+FileWriter createUserSoundFile(ghc::filesystem::path name);
 
 ghc::filesystem::path getCurrentWorldJournalPath(ghc::filesystem::path name);
 ghc::filesystem::path getMainJournalPath(ghc::filesystem::path name);

@@ -20,12 +20,13 @@
 #include "c16Image.h"
 
 #include "common/endianlove.h"
+#include "common/io/Reader.h"
 #include "common/throw_ifnot.h"
 
 #include <memory>
 #include <string.h>
 
-MultiImage ReadC16File(std::istream& in) {
+MultiImage ReadC16File(Reader& in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	THROW_IFNOT(flags & 0x02);
@@ -54,7 +55,7 @@ MultiImage ReadC16File(std::istream& in) {
 
 	// track position manually because ifstreams implementations often call seek
 	// on the underlying file even when we're already at the right position!
-	size_t curpos = in.tellg();
+	size_t curpos = in.tell();
 
 	// todo: we assume the file format is valid here. we shouldn't.
 	for (size_t i = 0; i < numframes; i++) {
@@ -63,7 +64,7 @@ MultiImage ReadC16File(std::istream& in) {
 		for (int j = 0; j < images[i].height; j++) {
 			if (lineoffsets[i][j] != curpos) {
 				// TODO: log warning?
-				in.seekg(lineoffsets[i][j], std::ios::beg);
+				in.seek_absolute(lineoffsets[i][j]);
 			}
 			while (true) {
 				uint16_t tag = read16le(in);

@@ -21,10 +21,11 @@
 #include "PathResolver.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/io/Writer.h"
+#include "common/io/WriterFmt.h"
 #include "common/throw_ifnot.h"
 
 #include <fmt/core.h>
-#include <fmt/ostream.h>
 #include <ghc/filesystem.hpp>
 
 namespace fs = ghc::filesystem;

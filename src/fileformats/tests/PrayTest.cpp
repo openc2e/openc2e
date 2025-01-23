@@ -1,5 +1,5 @@
-#include "common/spanstream.h"
-#include "common/vectorstream.h"
+#include "common/io/SpanReader.h"
+#include "common/io/VectorWriter.h"
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
@@ -49,7 +49,7 @@ TEST(praysourceparser, character_escapes) {
 }
 
 TEST(praywriter, doesnt_compress_if_would_be_bigger) {
-	vectorstream v;
+	VectorWriter v;
 	PrayFileWriter writer(v);
 	std::map<std::string, std::string> string_tags{
 		{"Description", "Mon agent est tr\xc3\xa8s cool"}};
@@ -122,7 +122,7 @@ TEST(praysourceparser, utf8_to_utf8) {
 }
 
 TEST(praywriter, utf8_to_cp1252) {
-	vectorstream v;
+	VectorWriter v;
 	PrayFileWriter writer(v);
 	std::map<std::string, std::string> string_tags{
 		{"Repr\xc3\xa8sentation", "Mon agent est tr\xc3\xa8s cool"}};
@@ -155,7 +155,7 @@ TEST(prayreader, windows1252_to_utf8) {
 		'a', 'g', 'e', 'n', 't', ' ', 'e', 's', 't', ' ', 't', 'r', 0xe8, 's',
 		' ', 'c', 'o', 'o', 'l'};
 
-	spanstream s(praybytes.data(), praybytes.size());
+	SpanReader s(praybytes);
 
 	PrayFileReader reader(s);
 	ASSERT_EQ(reader.getNumBlocks(), 1);

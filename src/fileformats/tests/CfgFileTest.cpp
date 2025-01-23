@@ -1,6 +1,6 @@
 #include "fileformats/cfgFile.h"
 
-#include "common/spanstream.h"
+#include "common/io/SpanReader.h"
 
 #include <gtest/gtest.h>
 
@@ -16,7 +16,7 @@ TEST(fileformats, CfgFile) {
 		"Default Background" DS_splash.blk
 		"Server 0 Host" 127.0.0.1
 	)";
-	spanstream in(buffer);
+	SpanReader in(buffer);
 
 	auto cfg = readcfgfile(in);
 	EXPECT_EQ(cfg["Backgrounds Directory"], "Backgrounds");

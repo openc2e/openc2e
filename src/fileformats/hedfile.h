@@ -1,10 +1,9 @@
 #pragma once
 
-
 #include <cstdint>
-#include <iosfwd>
 #include <string>
-#include <vector>
+
+class Reader;
 
 struct hedfile {
 	uint32_t frame_width;
@@ -13,4 +12,4 @@ struct hedfile {
 };
 
 hedfile read_hedfile(const std::string& path);
-hedfile read_hedfile(std::istream& in);
+hedfile read_hedfile(Reader& in);

@@ -1,10 +1,10 @@
 #include "case_insensitive_filesystem.h"
 
 #include "Ascii.h"
+#include "common/io/FileWriter.h"
 
 #include <algorithm>
 #include <assert.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <system_error>
 #include <unordered_map>
@@ -141,21 +141,19 @@ bool exists(const fs::path& path) {
 	return !err;
 }
 
-std::ofstream ofstream(const fs::path& path) {
+FileWriter create_file(const fs::path& path) {
 	std::error_code err;
 	auto canonpath = case_insensitive_filesystem::canonical(path, err);
 	if (err) {
-		std::ofstream out(path, std::ios_base::binary);
-		if (!out.fail()) {
-			// insert directly into the cache as an optimization. created
-			// files are often immediately read back by other systems (e.g.
-			// when injecting agents), so this avoids a full directory
-			// iteration and cache update.
-			s_cache[to_ascii_lowercase(path)] = {path};
-		}
+		// insert directly into the cache as an optimization. created
+		// files are often immediately read back by other systems (e.g.
+		// when injecting agents), so this avoids a full directory
+		// iteration and cache update.
+		FileWriter out(path);
+		s_cache[to_ascii_lowercase(path)] = {path};
 		return out;
 	}
-	return std::ofstream(canonpath, std::ios_base::binary);
+	return FileWriter(canonpath);
 }
 
 directory_iterator::directory_iterator(const fs::path& dirname) {

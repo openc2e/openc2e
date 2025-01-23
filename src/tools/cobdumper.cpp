@@ -1,6 +1,7 @@
 #include "common/Exception.h"
 #include "common/Ranges.h"
 #include "common/endianlove.h"
+#include "common/io/FileReader.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 #include "fileformats/caoslexer.h"
@@ -9,7 +10,6 @@
 #include "openc2e/dialect.h"
 
 #include <fmt/format.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 
 namespace fs = ghc::filesystem;
@@ -100,11 +100,11 @@ int main(int argc, char** argv) {
 
 	fs::path stem = input_path.stem();
 
-	std::ifstream in(input_path, std::ios::binary);
+	FileReader in(input_path);
 
 	unsigned char magic[4];
 	in.read((char*)magic, 4);
-	in.seekg(0);
+	in.seek_absolute(0);
 
 	if (memcmp(magic, "cob2", 4) == 0) {
 		fmt::print("\"cob2\"\n");

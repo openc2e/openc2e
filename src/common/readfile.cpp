@@ -1,21 +1,18 @@
 #include "readfile.h"
 
-#include <fstream>
+#include "common/io/FileReader.h"
+#include "common/io/Reader.h"
 
 std::string readfile(const std::string& filename) {
-	std::ifstream in(filename, std::ios_base::binary);
+	FileReader in(filename);
 	return readfile(in);
 }
 
-std::string readfile(std::istream& in) {
-	return std::string(std::istreambuf_iterator<char>(in), {});
+std::string readfile(Reader& in) {
+	std::vector<uint8_t> data = in.read_to_end();
+	return std::string(reinterpret_cast<char*>(data.data()), data.size());
 }
 
 std::vector<uint8_t> readfilebinary(const std::string& filename) {
-	std::ifstream in(filename, std::ios_base::binary);
-	return readfilebinary(in);
-}
-
-std::vector<uint8_t> readfilebinary(std::istream& in) {
-	return std::vector<uint8_t>(std::istreambuf_iterator<char>(in), {});
+	return FileReader(filename).read_to_end();
 }

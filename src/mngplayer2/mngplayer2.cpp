@@ -5,6 +5,8 @@
 #include "common/backtrace.h"
 #include "common/endianlove.h"
 #include "common/ends_with.h"
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
 #include "common/readfile.h"
 #include "common/scope_guard.h"
 #include "fileformats/mngfile.h"
@@ -16,7 +18,6 @@
 #include <chrono>
 #include <cstring>
 #include <fmt/core.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -278,15 +279,16 @@ static struct AppState {
 			for (size_t i = 0; i < sample_names.size(); ++i) {
 				auto sample_filename = (fs::path(outPath).parent_path() / sample_names[i]).string() + ".wav";
 
-				std::ifstream in(sample_filename, std::ios_base::binary);
-				if (!in.is_open()) {
-					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error opening file", sample_filename.c_str(), backend->window);
+				try {
+					FileReader in(sample_filename);
+					// in.ignore(16); // skip wav header
+					auto data = in.read_to_end();
+					newfile.samples.push_back(shared_array<uint8_t>(data.begin(), data.end()));
+					newfile.samplemappings[sample_names[i]] = i;
+				} catch (...) {
+					SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error reading file", sample_filename.c_str(), backend->window);
 					return;
 				}
-				// in.ignore(16); // skip wav header
-				auto data = readfilebinary(in);
-				newfile.samples.push_back(shared_array<uint8_t>(data.begin(), data.end()));
-				newfile.samplemappings[sample_names[i]] = i;
 			}
 
 		} catch (const std::exception& e) {
@@ -323,8 +325,7 @@ static struct AppState {
 		}
 
 		try {
-			std::ofstream out(output_path, std::ios_base::binary);
-			out.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+			FileWriter out(output_path);
 
 			const int number_of_samples = mngfile.samples.size();
 			write32le(out, number_of_samples);
@@ -384,15 +385,13 @@ static struct AppState {
 
 		try {
 			fs::path script_filename = output_directory / replace_extension(filename, "mng.txt");
-			std::ofstream out(script_filename, std::ios_base::binary);
-			out.exceptions(std::ofstream::failbit | std::ofstream::badbit | std::ofstream::eofbit);
+			FileWriter out(script_filename);
 			out.write(mngfile.script.data(), mngfile.script.size());
 
 
 			for (auto kv : zip(mngfile.getSampleNames(), mngfile.samples)) {
 				fs::path sample_filename = (output_directory / kv.first).string() + ".wav";
-				std::ofstream out(sample_filename, std::ios_base::binary);
-				out.exceptions(std::ofstream::failbit | std::ofstream::badbit | std::ofstream::eofbit);
+				FileWriter out(sample_filename);
 				out.write((const char*)kv.second.data(), kv.second.size());
 			}
 

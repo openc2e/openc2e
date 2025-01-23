@@ -30,7 +30,6 @@
 
 #include <cassert>
 #include <fmt/core.h>
-#include <iosfwd>
 #include <map>
 #include <memory>
 #include <string>
@@ -38,6 +37,7 @@
 
 
 class Agent;
+class Reader;
 
 struct toktrace {
 	unsigned short width;
@@ -215,7 +215,7 @@ class caosScript { //: Collectable {
 	caosScript(const std::string& dialect, const std::string& filename);
 	caosScript() { d = NULL; }
 	void parse(const std::string& caostext);
-	void parse(std::istream& in);
+	void parse(Reader& in);
 	~caosScript();
 	void installScripts();
 	void installInstallScript(unsigned char family, unsigned char genus, unsigned short species, unsigned short eventid);

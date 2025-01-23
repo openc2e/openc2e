@@ -5,7 +5,6 @@
 #include "common/ResizableContainerView.h"
 #include "common/span.h"
 
-#include <iosfwd>
 #include <map>
 #include <memory>
 #include <stdint.h>
@@ -13,11 +12,13 @@
 #include <utility>
 #include <vector>
 
+class Reader;
+
 // Windows MFC serialized data / CArchive serialized data
 
 class MFCReader {
   public:
-	MFCReader(std::istream& in);
+	MFCReader(Reader& in);
 	~MFCReader();
 
 	void ascii_dword(std::string&);
@@ -88,7 +89,7 @@ class MFCReader {
 	std::shared_ptr<MFCObject> read_object();
 	std::string read_ascii(size_t n);
 
-	std::istream& m_in;
+	Reader& m_in;
 
 	std::map<std::pair<std::string, int>, ClassInfo> m_classregistry;
 	std::map<uint16_t, ClassInfo> m_classids;

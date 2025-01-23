@@ -1,5 +1,4 @@
 #include "common/creaturesImage.h"
-#include "common/readfile.h"
 #include "openc2e/PathResolver.h"
 #include "openc2e/World.h"
 #include "openc2e/caosScript.h"
@@ -30,9 +29,8 @@ class Openc2eTestHelper {
 };
 
 static void run_script(const std::string& dialect, const std::string& s) {
-	std::stringstream stream(s);
 	caosScript script(dialect, "");
-	script.parse(stream);
+	script.parse(s);
 
 	caosVM vm(nullptr);
 	try {

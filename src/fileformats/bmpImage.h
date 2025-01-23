@@ -21,9 +21,10 @@
 
 #include "common/Image.h"
 
-#include <iosfwd>
 #include <string>
 
-Image ReadBmpFile(std::istream& in);
+class Reader;
+
+Image ReadBmpFile(Reader& in);
 Image ReadBmpFile(const std::string& path);
-Image ReadDibFile(std::istream& in);
+Image ReadDibFile(Reader& in);

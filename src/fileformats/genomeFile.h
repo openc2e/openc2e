@@ -26,6 +26,9 @@
 #include <string>
 #include <vector>
 
+class Reader;
+class Writer;
+
 class gene;
 struct geneNote;
 class organGene;
@@ -35,17 +38,17 @@ class genomeFile {
 	uint8_t cversion;
 	organGene* currorgan;
 
-	gene* nextGene(std::istream&); // returns NULL upon 'gend'
+	gene* nextGene(Reader&); // returns NULL upon 'gend'
 	geneNote* findNote(uint8_t type, uint8_t subtype, uint8_t which);
 
-	friend std::ostream& operator<<(std::ostream&, const genomeFile&);
-	friend std::istream& operator>>(std::istream&, genomeFile&);
+	friend Writer& operator<<(Writer&, const genomeFile&);
+	friend Reader& operator>>(Reader&, genomeFile&);
 
   public:
 	std::vector<std::unique_ptr<gene>> genes;
 
-	void readNotes(std::istream&);
-	void writeNotes(std::ostream&) const;
+	void readNotes(Reader&);
+	void writeNotes(Writer&) const;
 
 	uint8_t getVersion() { return cversion; }
 
@@ -111,8 +114,8 @@ struct geneHeader {
 
 //! The base class for all Creatures genes.
 class gene {
-	friend std::ostream& operator<<(std::ostream&, const gene&);
-	friend std::istream& operator>>(std::istream&, gene&);
+	friend Writer& operator<<(Writer&, const gene&);
+	friend Reader& operator>>(Reader&, gene&);
 
   protected:
 	uint8_t cversion;
@@ -120,8 +123,8 @@ class gene {
 	virtual uint8_t type() const = 0;
 	virtual uint8_t subtype() const = 0;
 
-	virtual void write(std::ostream&) const = 0;
-	virtual void read(std::istream&) = 0;
+	virtual void write(Writer&) const = 0;
+	virtual void read(Reader&) = 0;
 
 	friend class genomeFile;
 
@@ -157,8 +160,8 @@ class organGene : public gene {
 			return 0;
 	}
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	bool isBrain() { return brainorgan; }
@@ -194,8 +197,8 @@ class c2eBrainLobeGene : public brainGene {
   protected:
 	uint8_t subtype() const { return 0; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t id[4]; // todo: string
@@ -249,8 +252,8 @@ struct oldDendriteInfo {
 	uint8_t backproprule[12];
 	uint8_t forproprule[12];
 
-	friend std::ostream& operator<<(std::ostream&, const oldDendriteInfo&);
-	friend std::istream& operator>>(std::istream&, oldDendriteInfo&);
+	friend Writer& operator<<(Writer&, const oldDendriteInfo&);
+	friend Reader& operator>>(Reader&, oldDendriteInfo&);
 
 	oldDendriteInfo(uint8_t v) { cversion = v; }
 };
@@ -260,8 +263,8 @@ class oldBrainLobeGene : public brainGene {
   protected:
 	uint8_t subtype() const { return 0; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	// rules have size 8 for C1, size 12 for C2
@@ -292,8 +295,8 @@ class c2eBrainTractGene : public brainGene {
   protected:
 	uint8_t subtype() const { return 2; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint16_t updatetime;
@@ -333,8 +336,8 @@ class bioReceptorGene : public bioGene {
   protected:
 	uint8_t subtype() const { return 0; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t organ;
@@ -357,8 +360,8 @@ class bioEmitterGene : public bioGene {
   protected:
 	uint8_t subtype() const { return 1; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t organ;
@@ -382,8 +385,8 @@ class bioReactionGene : public bioGene {
   protected:
 	uint8_t subtype() const { return 2; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t reactant[4];
@@ -400,8 +403,8 @@ class bioHalfLivesGene : public bioGene {
   protected:
 	uint8_t subtype() const { return 3; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t halflives[256];
@@ -416,8 +419,8 @@ class bioInitialConcentrationGene : public bioGene {
   protected:
 	uint8_t subtype() const { return 4; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t chemical;
@@ -433,8 +436,8 @@ class bioNeuroEmitterGene : public bioGene {
   protected:
 	uint8_t subtype() const { return 5; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t lobes[3];
@@ -463,8 +466,8 @@ class creatureStimulusGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 0; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t stim;
@@ -488,8 +491,8 @@ class creatureGenusGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 1; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t genus;
@@ -506,8 +509,8 @@ class creatureAppearanceGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 2; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t part;
@@ -524,8 +527,8 @@ class creaturePoseGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 3; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t poseno;
@@ -544,8 +547,8 @@ class creatureGaitGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 4; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t drive;
@@ -563,8 +566,8 @@ class creatureInstinctGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 5; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t lobes[3];
@@ -583,8 +586,8 @@ class creaturePigmentGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 6; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t color;
@@ -600,8 +603,8 @@ class creaturePigmentBleedGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 7; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint8_t rotation;
@@ -617,8 +620,8 @@ class creatureFacialExpressionGene : public creatureGene {
   protected:
 	uint8_t subtype() const { return 8; }
 
-	void write(std::ostream&) const;
-	void read(std::istream&);
+	void write(Writer&) const;
+	void read(Reader&);
 
   public:
 	uint16_t expressionno;

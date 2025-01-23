@@ -2,12 +2,12 @@
 #include "common/Exception.h"
 #include "common/Image.h"
 #include "common/endianlove.h"
+#include "common/io/FileWriter.h"
 
-#include <fstream>
 #include <zlib.h>
 
 void WritePngFile(const Image& image, const std::string& filename) {
-	std::ofstream out(filename, std::ios_base::binary);
+	FileWriter out(filename);
 
 	out.write("\x89PNG\r\n\x1a\n", 8);
 

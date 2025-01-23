@@ -1,9 +1,10 @@
 #pragma once
 
 #include <ghc/filesystem.hpp>
-#include <iosfwd>
 #include <system_error>
 #include <unordered_map>
+
+class FileWriter;
 
 namespace case_insensitive_filesystem {
 
@@ -16,7 +17,7 @@ struct cacheinfo {
 
 fs::path canonical(const fs::path&, std::error_code&);
 bool exists(const fs::path&);
-std::ofstream ofstream(const fs::path&);
+FileWriter create_file(const fs::path&);
 
 class directory_iterator {
   public:

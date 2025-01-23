@@ -21,12 +21,18 @@
 #include "PathResolver.h"
 #include "World.h"
 #include "caosVM.h"
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
+#include "common/io/Getline.h"
+#include "common/io/IOException.h"
+#include "common/io/Reader.h"
+#include "common/io/Scanf.h"
+#include "common/io/SpanReader.h"
+#include "common/io/WriterFmt.h"
 #include "common/throw_ifnot.h"
 
 #include <fmt/core.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
-#include <sstream>
 namespace fs = ghc::filesystem;
 
 static fs::path calculateJournalFilename(int directory, std::string filename) {
@@ -78,7 +84,23 @@ void c_FILE_GLOB(caosVM* vm) {
 		str += possiblefile.string() + "\n";
 	}
 
-	vm->inputstream = new std::istringstream(str);
+	class OwningStringReader : public SpanReader {
+	  public:
+		OwningStringReader(std::string s) {
+			s_ = s;
+			static_cast<SpanReader&>(*this) = SpanReader(s_);
+		}
+		// can't move because SpanReader is pointing at ourself
+		OwningStringReader(const OwningStringReader&) = delete;
+		OwningStringReader(OwningStringReader&&) = delete;
+		OwningStringReader& operator=(const OwningStringReader&) = delete;
+		OwningStringReader& operator=(OwningStringReader&&) = delete;
+
+	  private:
+		std::string s_;
+	};
+
+	vm->inputstream = new OwningStringReader(str);
 }
 
 /**
@@ -109,11 +131,10 @@ void c_FILE_IOPE(caosVM* vm) {
 	c_FILE_ICLO(vm);
 
 	std::string fullfilename = calculateJournalFilename(directory, filename);
-	vm->inputstream = new std::ifstream(fullfilename);
-
-	if (vm->inputstream->fail()) {
-		delete vm->inputstream;
-		vm->inputstream = 0;
+	try {
+		vm->inputstream = new FileReader(fullfilename);
+	} catch (const IOException&) {
+		return;
 	}
 }
 
@@ -174,13 +195,12 @@ void c_FILE_OOPE(caosVM* vm) {
 
 	std::string fullfilename = calculateJournalFilename(directory, filename);
 
-	if (append)
-		vm->outputstream = new std::ofstream(fullfilename, std::ios::app);
-	else
-		vm->outputstream = new std::ofstream(fullfilename, std::ios::trunc);
-
-	if (vm->outputstream->fail()) {
-		vm->outputstream = 0;
+	try {
+		if (append)
+			vm->outputstream = new FileWriter(fullfilename, FileWriter::option_append);
+		else
+			vm->outputstream = new FileWriter(fullfilename);
+	} catch (const IOException&) {
 		throw caosException(fmt::format("FILE OOPE failed to open {}", fullfilename));
 	}
 }
@@ -207,8 +227,8 @@ void v_INNF(caosVM* vm) {
 	if (!vm->inputstream)
 		throw caosException("no input stream in INNF!");
 
-	float f = 0.0f;
-	*vm->inputstream >> f;
+	float f = 0.0;
+	f = scan_float(*vm->inputstream);
 	vm->result.setFloat(f);
 }
 
@@ -223,7 +243,7 @@ void v_INNI(caosVM* vm) {
 		throw caosException("no input stream in INNI!");
 
 	int i = 0;
-	*vm->inputstream >> i;
+	i = scan_int(*vm->inputstream);
 	vm->result.setInt(i);
 }
 
@@ -236,8 +256,7 @@ void v_INNI(caosVM* vm) {
 void v_INNL(caosVM* vm) {
 	if (!vm->inputstream)
 		throw caosException("no input stream in INNL!");
-	std::string str;
-	std::getline(*vm->inputstream, str);
+	std::string str = getline(*vm->inputstream);
 	vm->result.setString(str);
 }
 
@@ -249,8 +268,6 @@ void v_INNL(caosVM* vm) {
 */
 void v_INOK(caosVM* vm) {
 	if (!vm->inputstream)
-		vm->result.setInt(0);
-	else if (vm->inputstream->fail())
 		vm->result.setInt(0);
 	else
 		vm->result.setInt(1);

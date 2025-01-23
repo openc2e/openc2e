@@ -1,5 +1,5 @@
 /*
- *  mmapifstream.h
+ *  mappedfile.h
  *  openc2e
  *
  *  Created by Alyssa Milburn on Sat Jul 24 2004.

@@ -39,6 +39,8 @@
 #include "caosValue.h"
 #include "common/backend/Backend.h"
 #include "common/creaturesImage.h"
+#include "common/io/FileReader.h"
+#include "common/io/IOException.h"
 #include "common/throw_ifnot.h"
 #include "imageManager.h"
 
@@ -246,10 +248,12 @@ void SkeletalCreature::skeletonInit() {
 			throw Exception(fmt::format("SkeletalCreature couldn't find body data for part {:c} of species {}, variant {}, stage {}", x, (int)partspecies, (int)partvariant, creature->getStage()));
 
 		// load ATT file
-		std::ifstream attfile(attpath, std::ios::binary);
-		if (attfile.fail())
+		try {
+			FileReader attfile(attpath);
+			att[i] = ReadAttFile(attfile);
+		} catch (const IOException&) {
 			throw Exception(fmt::format("SkeletalCreature couldn't load body data for part {:c} of species {}, variant {}, stage {} (tried file {})", x, (int)partspecies, (int)partvariant, creature->getStage(), attpath.string()));
-		att[i] = ReadAttFile(attfile);
+		}
 
 		images[i] = tintBodySprite(images[i]);
 	}

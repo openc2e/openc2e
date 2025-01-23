@@ -1,8 +1,8 @@
+#include "common/io/FileReader.h"
 #include "common/readfile.h"
 #include "fileformats/attFile.h"
 
 #include <fmt/core.h>
-#include <fstream>
 
 int main(int argc, char** argv) {
 	if (argc == 1) {
@@ -14,14 +14,7 @@ int main(int argc, char** argv) {
 		std::string filename = argv[i];
 		fmt::print("{}\n", filename);
 
-		std::ifstream in;
-		in.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-		try {
-			in.open(filename, std::ios_base::binary);
-		} catch (std::ios_base::failure& e) {
-			fmt::print(stderr, "Couldn't open file\n");
-			return 1;
-		}
+		FileReader in(filename);
 
 		auto att = ReadAttFile(in);
 		for (unsigned int i = 0; i < att.nolines; ++i) {

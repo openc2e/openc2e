@@ -1,6 +1,7 @@
+#include "common/io/FileWriter.h"
+#include "common/io/SpanReader.h"
+#include "common/io/VectorWriter.h"
 #include "common/readfile.h"
-#include "common/spanstream.h"
-#include "common/vectorstream.h"
 #include "fileformats/PrayFileReader.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/genomeFile.h"
@@ -9,7 +10,6 @@
 #include <algorithm>
 #include <ctype.h>
 #include <fmt/core.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,11 +72,12 @@ int breed_slot_name_to_number(std::string name) {
 
 void check_roundtrip(const std::vector<uint8_t>& data) {
 	genomeFile genome;
-	spanstream(data) >> genome;
+	SpanReader in(data);
+	in >> genome;
 
-	vectorstream out;
+	VectorWriter out;
 	out << genome;
-	while (static_cast<size_t>(out.tellp()) < data.size()) {
+	while (out.vector().size() < data.size()) {
 		out.write("", 1);
 	}
 
@@ -92,7 +93,8 @@ std::vector<uint8_t> change_genome(const std::vector<uint8_t>& data, int new_spe
 	check_roundtrip(data);
 
 	genomeFile genome;
-	spanstream(data) >> genome;
+	SpanReader in(data);
+	in >> genome;
 
 	for (size_t i = 0; i < genome.genes.size(); ++i) {
 		gene* gene = genome.genes[i].get();
@@ -126,10 +128,10 @@ std::vector<uint8_t> change_genome(const std::vector<uint8_t>& data, int new_spe
 		}
 	}
 
-	vectorstream out;
+	VectorWriter out;
 	out << genome;
 
-	while (static_cast<size_t>(out.tellp()) < data.size()) {
+	while (out.vector().size() < data.size()) {
 		out.write("", 1);
 	}
 	return out.vector();
@@ -170,10 +172,10 @@ std::string get_new_filename(std::string filename, int new_species_number, int n
 }
 
 std::vector<uint8_t> change_prayfile(const std::vector<uint8_t>& data, int new_species_number, int new_slot_number) {
-	spanstream in(data);
+	SpanReader in(data);
 	PrayFileReader reader(in);
 
-	vectorstream out;
+	VectorWriter out;
 	PrayFileWriter writer(out);
 
 	for (size_t i = 0; i < reader.getNumBlocks(); ++i) {
@@ -236,7 +238,7 @@ int main(int argc, char** argv) {
 		auto newdata = change_genome(data, new_species_number, new_slot_number);
 
 		fmt::print("writing to {}\n", filename);
-		std::ofstream out(filename, std::ios_base::binary);
+		FileWriter out(filename);
 		out.write((char*)newdata.data(), newdata.size());
 
 	} else if (extension == ".c16" || extension == ".s16" || extension == ".att") {
@@ -255,7 +257,7 @@ int main(int argc, char** argv) {
 		auto newdata = change_prayfile(data, new_species_number, new_slot_number);
 
 		fmt::print("writing to {}\n", filename);
-		std::ofstream out(filename, std::ios_base::binary);
+		FileWriter out(filename);
 		out.write((char*)newdata.data(), newdata.size());
 
 	} else {

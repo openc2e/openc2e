@@ -21,9 +21,10 @@
 #define _VOICEDATA_H
 
 #include <cstdint>
-#include <iosfwd>
 #include <string>
 #include <vector>
+
+class Reader;
 
 struct VoiceEntry {
 	std::string name;
@@ -33,7 +34,7 @@ struct VoiceEntry {
 class VoiceData {
   public:
 	VoiceData();
-	VoiceData(std::istream& in);
+	VoiceData(Reader& in);
 	VoiceData(std::string tagname);
 	operator bool() const;
 

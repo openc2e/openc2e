@@ -27,6 +27,7 @@
 #include "cmddata.h"
 #include "common/Ascii.h"
 #include "common/Exception.h"
+#include "common/io/Reader.h"
 #include "common/readfile.h"
 #include "dialect.h"
 #include "fileformats/caoslexer.h"
@@ -234,7 +235,7 @@ void caosScript::putBackToken(caostoken*) {
 		// so make sure we refer to the token before it
 }
 
-void caosScript::parse(std::istream& in) {
+void caosScript::parse(Reader& in) {
 	// slurp our input stream
 	return parse(readfile(in));
 }

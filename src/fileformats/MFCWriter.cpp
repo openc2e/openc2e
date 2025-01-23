@@ -4,12 +4,10 @@
 #include "common/endianlove.h"
 
 #include <fmt/core.h>
-#include <iostream>
 #include <stdexcept>
 
-MFCWriter::MFCWriter(std::ostream& out)
+MFCWriter::MFCWriter(Writer& out)
 	: m_out(out) {
-	out.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 }
 
 MFCWriter::~MFCWriter() {
@@ -114,9 +112,6 @@ void MFCWriter::operator()(int32_t val) {
 
 void MFCWriter::operator()(span<const uint8_t> buf) {
 	m_out.write(reinterpret_cast<const char*>(buf.data()), buf.size());
-	if (!m_out) {
-		throw Exception(fmt::format("Failed writing buffer of size {}", buf.size()));
-	}
 }
 
 void MFCWriter::write_object(MFCObject* obj, std::type_index type) {

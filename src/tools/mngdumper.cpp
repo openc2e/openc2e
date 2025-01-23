@@ -1,9 +1,9 @@
 #include "common/Ranges.h"
 #include "common/endianlove.h"
+#include "common/io/FileWriter.h"
 #include "fileformats/mngfile.h"
 
 #include <fmt/format.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <utility>
 
@@ -35,14 +35,14 @@ int main(int argc, char** argv) {
 
 	fs::path script_filename((output_directory / stem).native() + ".txt");
 	fmt::print("{}\n", script_filename.string());
-	std::ofstream script(script_filename, std::ios_base::binary);
+	FileWriter script(script_filename);
 	script.write(file.script.c_str(), file.script.size());
 
 	for (auto kv : zip(file.getSampleNames(), file.samples)) {
 		fs::path sample_filename((output_directory / kv.first).native() + ".wav");
 		fmt::print("{}\n", sample_filename.string());
 
-		std::ofstream out((output_directory / kv.first).native() + ".wav", std::ios_base::binary);
+		FileWriter out((output_directory / kv.first).native() + ".wav");
 		out.write((const char*)kv.second.data(), kv.second.size());
 	}
 }

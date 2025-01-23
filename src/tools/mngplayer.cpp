@@ -7,7 +7,6 @@
 #include <atomic>
 #include <condition_variable>
 #include <fmt/format.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <mutex>
 #include <thread>

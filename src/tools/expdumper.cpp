@@ -1,11 +1,12 @@
 #include "common/backtrace.h"
+#include "common/io/FileReader.h"
 #include "fileformats/NewSFCFile.h"
 
 #include <fmt/core.h>
-#include <fstream>
 
 
-static void print_limb(std::shared_ptr<sfc::LimbV1> limb, const std::string& indent) {
+static void
+print_limb(std::shared_ptr<sfc::LimbV1> limb, const std::string& indent) {
 	if (!limb) {
 		fmt::print("null\n");
 		return;
@@ -80,7 +81,7 @@ int main(int argc, char** argv) {
 
 	auto input_filename = argv[1];
 
-	std::ifstream in(input_filename, std::ios_base::binary);
+	FileReader in(input_filename);
 	auto exp = sfc::read_exp_v1_file(in);
 
 	fmt::print("creature = Creature {{\n");
@@ -365,10 +366,5 @@ int main(int argc, char** argv) {
 	print_genome(exp.child_genome);
 
 	// check if we read all of it
-	if (!in.eof()) {
-		// stupid iostreams throw an error if you try to peek a file that's at EOF,
-		// _after_ you've already peeked once to tell if it's at EOF. stupid stupid stupid.
-		in.peek();
-	}
-	fmt::print("read entire file? {}\n", in.eof());
+	fmt::print("read entire file? {}\n", in.has_data_left());
 }

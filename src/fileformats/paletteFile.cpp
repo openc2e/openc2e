@@ -1,14 +1,16 @@
 #include "paletteFile.h"
 
+#include "common/io/FileReader.h"
+#include "common/io/Reader.h"
+
 #include <array>
-#include <fstream>
 
 shared_array<Color> ReadPaletteFile(const std::string& path) {
-	std::ifstream in(path, std::ios::binary);
+	FileReader in(path);
 	return ReadPaletteFile(in);
 }
 
-shared_array<Color> ReadPaletteFile(std::istream& in) {
+shared_array<Color> ReadPaletteFile(Reader& in) {
 	std::array<uint8_t, 768> palette_data;
 	in.read((char*)palette_data.data(), 768);
 

@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include <iostream>
+#include "common/io/Reader.h"
+#include "common/io/Writer.h"
+
 #include <stdint.h>
 #include <string.h>
 #ifdef _WIN32
 #include <stdlib.h>
 #endif
-
-#include "common/NumericCast.h"
 
 /*
 
@@ -64,24 +64,24 @@ static inline uint32_t byte_swap_32(uint32_t val) {
 	return static_cast<uint32_t>(((val & 0xff000000) >> 24) | ((val & 0xff0000) >> 8) | ((val & 0xff00) << 8) | ((val & 0xff) << 24));
 }
 
-static inline uint8_t read8(std::istream& s) {
+static inline uint8_t read8(Reader& s) {
 	uint8_t t;
 	s.read(reinterpret_cast<char*>(&t), 1);
 	return t;
 }
 
-static inline int8_t readsigned8(std::istream& s) {
+static inline int8_t readsigned8(Reader& s) {
 	// assumes two's complement
 	uint8_t t;
 	s.read(reinterpret_cast<char*>(&t), 1);
 	return static_cast<int8_t>(t);
 }
 
-static inline void write8(std::ostream& s, uint8_t v) {
-	s.write(reinterpret_cast<char*>(&v), 1);
+static inline void write8(Writer& w, uint8_t v) {
+	w.write(reinterpret_cast<char*>(&v), 1);
 }
 
-static inline void writesigned8(std::ostream& s, int8_t v_) {
+static inline void writesigned8(Writer& s, int8_t v_) {
 	// assumes two's complement
 	uint8_t v = static_cast<uint8_t>(v_);
 	s.write(reinterpret_cast<char*>(&v), 1);
@@ -93,13 +93,13 @@ static inline uint16_t read16le(const uint8_t* buf) {
 	return is_little_endian() ? val : byte_swap_16(val);
 }
 
-static inline uint16_t read16le(std::istream& s) {
+static inline uint16_t read16le(Reader& r) {
 	uint16_t val;
-	s.read(reinterpret_cast<char*>(&val), 2);
+	r.read(reinterpret_cast<uint8_t*>(&val), 2);
 	return is_little_endian() ? val : byte_swap_16(val);
 }
 
-static inline int16_t readsigned16le(std::istream& s) {
+static inline int16_t readsigned16le(Reader& s) {
 	// assumes two's complement
 	uint16_t val;
 	s.read(reinterpret_cast<char*>(&val), 2);
@@ -107,21 +107,21 @@ static inline int16_t readsigned16le(std::istream& s) {
 	return static_cast<int16_t>(val);
 }
 
-static inline void write16le(std::ostream& s, uint16_t v) {
+static inline void write16le(Writer& s, uint16_t v) {
 	uint16_t t = is_little_endian() ? v : byte_swap_16(v);
 	s.write(reinterpret_cast<char*>(&t), 2);
 }
 
-static inline void writesigned16le(std::ostream& s, int16_t v_) {
+static inline void writesigned16le(Writer& s, int16_t v_) {
 	// assumes two's complement
 	uint16_t v = static_cast<uint16_t>(v_);
 	uint16_t t = is_little_endian() ? v : byte_swap_16(v);
 	s.write(reinterpret_cast<char*>(&t), 2);
 }
 
-static inline void readmany16le(std::istream& s, uint16_t* out, size_t n) {
+static inline void readmany16le(Reader& s, uint16_t* out, size_t n) {
 	// this needs to be fast! it's used in the sprite file reading functions
-	s.read(reinterpret_cast<char*>(out), numeric_cast<std::streamsize>(n * 2));
+	s.read(reinterpret_cast<char*>(out), n * 2);
 	if (!is_little_endian()) {
 		for (size_t i = 0; i < n; ++i) {
 			out[i] = byte_swap_16(out[i]);
@@ -129,13 +129,13 @@ static inline void readmany16le(std::istream& s, uint16_t* out, size_t n) {
 	}
 }
 
-static inline uint32_t read32le(std::istream& s) {
+static inline uint32_t read32le(Reader& r) {
 	uint32_t t;
-	s.read(reinterpret_cast<char*>(&t), 4);
+	r.read(reinterpret_cast<char*>(&t), 4);
 	return is_little_endian() ? t : byte_swap_32(t);
 }
 
-static inline int32_t readsigned32le(std::istream& s) {
+static inline int32_t readsigned32le(Reader& s) {
 	// assumes two's complement
 	uint32_t t;
 	s.read(reinterpret_cast<char*>(&t), 4);
@@ -143,12 +143,12 @@ static inline int32_t readsigned32le(std::istream& s) {
 	return static_cast<int32_t>(t);
 }
 
-static inline void write32le(std::ostream& s, uint32_t v) {
+static inline void write32le(Writer& s, uint32_t v) {
 	uint32_t t = is_little_endian() ? v : byte_swap_32(v);
 	s.write(reinterpret_cast<char*>(&t), 4);
 }
 
-static inline void writesigned32le(std::ostream& s, int32_t v_) {
+static inline void writesigned32le(Writer& s, int32_t v_) {
 	// assumes two's complement
 	uint32_t v = static_cast<uint32_t>(v_);
 	uint32_t t = is_little_endian() ? v : byte_swap_32(v);
@@ -163,19 +163,19 @@ static inline void write32le(uint8_t* b, uint32_t v) {
 // big-endian integers are used in two places: c2e genome files (yes, for some
 // crazy reason!), and macOS versions of spritefiles (.m16, .n16, and .blk)
 
-static inline uint16_t read16be(std::istream& s) {
+static inline uint16_t read16be(Reader& s) {
 	uint16_t t;
 	s.read(reinterpret_cast<char*>(&t), 2);
 	return is_little_endian() ? byte_swap_16(t) : t;
 }
 
-static inline void write16be(std::ostream& s, uint16_t v) {
+static inline void write16be(Writer& s, uint16_t v) {
 	uint16_t t = is_little_endian() ? byte_swap_16(v) : v;
 	s.write(reinterpret_cast<char*>(&t), 2);
 }
 
-static inline void readmany16be(std::istream& s, uint16_t* out, size_t n) {
-	s.read(reinterpret_cast<char*>(out), numeric_cast<std::streamsize>(n * 2));
+static inline void readmany16be(Reader& s, uint16_t* out, size_t n) {
+	s.read(reinterpret_cast<char*>(out), n * 2);
 	if (is_little_endian()) {
 		for (size_t i = 0; i < n; ++i) {
 			// gets optimized into fast SIMD instructions on Clang and MSVC at
@@ -185,13 +185,13 @@ static inline void readmany16be(std::istream& s, uint16_t* out, size_t n) {
 	}
 }
 
-static inline uint32_t read32be(std::istream& s) {
+static inline uint32_t read32be(Reader& s) {
 	uint32_t t;
 	s.read(reinterpret_cast<char*>(&t), 4);
 	return is_little_endian() ? byte_swap_32(t) : t;
 }
 
-static inline void write32be(std::ostream& s, uint32_t v) {
+static inline void write32be(Writer& s, uint32_t v) {
 	uint32_t t = is_little_endian() ? byte_swap_32(v) : v;
 	s.write(reinterpret_cast<char*>(&t), 4);
 }

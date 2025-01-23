@@ -2,14 +2,10 @@
 
 #include "common/Exception.h"
 #include "common/endianlove.h"
-
-#include <fstream>
+#include "common/io/FileReader.h"
 
 std::vector<std::string> ReadStrFile(const std::string& path) {
-	std::ifstream in(path, std::ios_base::binary);
-	if (!in.good()) {
-		throw Exception("Couldn't open " + path);
-	}
+	FileReader in(path);
 
 	int num_strings = read16le(in);
 

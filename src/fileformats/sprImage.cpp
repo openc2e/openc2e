@@ -25,7 +25,7 @@
 
 #include <fmt/core.h>
 
-static MultiImage ReadPrototypeSprFile(std::istream& in, int numframes, uint32_t first_offset) {
+static MultiImage ReadPrototypeSprFile(Reader& in, int numframes, uint32_t first_offset) {
 	MultiImage images(numframes);
 
 	std::vector<uint16_t> offsets(numframes);
@@ -46,7 +46,7 @@ static MultiImage ReadPrototypeSprFile(std::istream& in, int numframes, uint32_t
 
 	for (int i = 0; i < numframes; i++) {
 		// TODO: don't seek
-		in.seekg(offsets[i]);
+		in.seek_absolute(offsets[i]);
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
 		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
 	}
@@ -55,7 +55,7 @@ static MultiImage ReadPrototypeSprFile(std::istream& in, int numframes, uint32_t
 }
 
 
-SprFileData ReadSprFileWithMetadata(std::istream& in, int32_t absolute_base, int32_t image_count) {
+SprFileData ReadSprFileWithMetadata(Reader& in, int32_t absolute_base, int32_t image_count) {
 	uint16_t total_image_count = read16le(in);
 	std::vector<int32_t> offsets(image_count);
 	MultiImage images(image_count);
@@ -67,7 +67,7 @@ SprFileData ReadSprFileWithMetadata(std::istream& in, int32_t absolute_base, int
 
 	// skip metadata up until absolute base
 	// each metadata block is 8 bytes - 4 byte offset, 2 byte width, 2 byte height
-	in.ignore(8 * absolute_base);
+	in.seek_relative(8 * absolute_base);
 
 	// read metadata
 	for (uint16_t i = 0; i < image_count; ++i) {
@@ -81,20 +81,20 @@ SprFileData ReadSprFileWithMetadata(std::istream& in, int32_t absolute_base, int
 
 	// skip remaining metadata
 	for (uint16_t i = 0; i < total_image_count - absolute_base - image_count; i++) {
-		in.ignore(8 * absolute_base);
+		in.seek_relative(8 * absolute_base);
 	}
 
 	// now read actual data
 	for (int32_t i = 0; i < image_count; i++) {
 		// TODO: don't seek if possible, it can be slower than just reading linearly
-		in.seekg(offsets[i]);
+		in.seek_absolute(offsets[i]);
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
 		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
 	}
 	return SprFileData{images, offsets};
 }
 
-MultiImage ReadSprFile(std::istream& in) {
+MultiImage ReadSprFile(Reader& in) {
 	int numframes = read16le(in);
 	MultiImage images(numframes);
 
@@ -129,7 +129,7 @@ MultiImage ReadSprFile(std::istream& in) {
 
 	for (int i = 0; i < numframes; i++) {
 		// TODO: don't seek
-		in.seekg(offsets[i]);
+		in.seek_absolute(offsets[i]);
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
 		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
 	}

@@ -2,17 +2,17 @@
 
 #include "MFCReader.h"
 #include "MFCWriter.h"
-
-#include <fstream>
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
 
 namespace sfc {
 
 SFCFile read_sfc_v1_file(const std::string& path) {
-	std::ifstream in(path, std::ios_base::binary);
+	FileReader in(path);
 	return read_sfc_v1_file(in);
 }
 
-SFCFile read_sfc_v1_file(std::istream& in) {
+SFCFile read_sfc_v1_file(Reader& in) {
 	// set up types
 	MFCReader reader(in);
 	reader.register_class<MapDataV1>("MapData", 1);
@@ -43,11 +43,11 @@ SFCFile read_sfc_v1_file(std::istream& in) {
 }
 
 void write_sfc_v1_file(const std::string& path, SFCFile& sfc) {
-	std::ofstream out(path, std::ios_base::binary);
+	FileWriter out(path);
 	return write_sfc_v1_file(out, sfc);
 }
 
-void write_sfc_v1_file(std::ostream& out, SFCFile& sfc) {
+void write_sfc_v1_file(Writer& out, SFCFile& sfc) {
 	MFCWriter writer(out);
 	writer.register_class<sfc::MapDataV1>("MapData", 1);
 	writer.register_class<sfc::CGalleryV1>("CGallery", 1);
@@ -75,11 +75,11 @@ void write_sfc_v1_file(std::ostream& out, SFCFile& sfc) {
 }
 
 EXPFile read_exp_v1_file(const std::string& path) {
-	std::ifstream in(path, std::ios_base::binary);
+	FileReader in(path);
 	return read_exp_v1_file(in);
 }
 
-EXPFile read_exp_v1_file(std::istream& in) {
+EXPFile read_exp_v1_file(Reader& in) {
 	// set up types
 	MFCReader reader(in);
 	reader.register_class<CGalleryV1>("CGallery", 1);
@@ -94,7 +94,7 @@ EXPFile read_exp_v1_file(std::istream& in) {
 	// read file
 	EXPFile exp;
 	reader(exp.creature);
-	if (in.peek(), in.eof()) {
+	if (!in.has_data_left()) {
 		// we do this stupid conditional because some EXP files floating around
 		// just totally skip the ending genome. in that case, just treat it as
 		// null I guess?

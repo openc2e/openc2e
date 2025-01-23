@@ -27,9 +27,11 @@
 #include "common/macro_stringify.h"
 
 #include <array>
-#include <iosfwd>
 #include <memory>
 #include <type_traits>
+
+class Reader;
+class Writer;
 
 class script;
 
@@ -88,8 +90,8 @@ class caosVM {
 	std::vector<caosValue> auxStack;
 	std::vector<callStackItem> callStack;
 
-	std::istream* inputstream;
-	std::ostream* outputstream;
+	Reader* inputstream;
+	Writer* outputstream;
 
 	// ...which includes variables accessible to script
 	std::array<caosValue, 100> var;
@@ -113,7 +115,6 @@ class caosVM {
 		_p_[1] = two;
 	}
 	void setOwner(Agent* a) { owner = a; }
-	void setOutputStream(std::ostream& o) { outputstream = &o; }
 
 	class CreatureAgent* getTargCreatureAgent();
 	class Creature* getTargCreature();

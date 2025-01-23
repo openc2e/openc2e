@@ -20,8 +20,6 @@
 #pragma once
 
 #include "common/Image.h"
+class Reader;
 
-#include <iosfwd>
-#include <string>
-
-MultiImage ReadC16File(std::istream& in);
+MultiImage ReadC16File(Reader&);

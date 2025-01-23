@@ -21,9 +21,10 @@
 
 #include "common/Exception.h"
 #include "common/endianlove.h"
+#include "common/io/FileReader.h"
+#include "common/io/Reader.h"
 #include "common/throw_ifnot.h"
 
-#include <fstream>
 #include <memory>
 #include <string.h>
 
@@ -33,22 +34,22 @@
 #define BI_BITFIELDS 3
 
 Image ReadBmpFile(const std::string& path) {
-	std::ifstream in(path, std::ios_base::binary);
+	FileReader in(path);
 	return ReadBmpFile(in);
 }
 
-Image ReadBmpFile(std::istream& in) {
+Image ReadBmpFile(Reader& in) {
 	char magic[2];
 	in.read(magic, 2);
 	if (std::string(magic, 2) != "BM")
 		throw Exception("Doesn't seem to be a BMP file.");
 
-	in.seekg(12, std::ios::cur); // skip filesize, reserved bytes, and data offset
+	in.seek_relative(12); // skip filesize, reserved bytes, and data offset
 
 	return ReadDibFile(in);
 }
 
-Image ReadDibFile(std::istream& in) {
+Image ReadDibFile(Reader& in) {
 	uint32_t biWidth, biHeight;
 	shared_array<Color> palette;
 	imageformat imgformat;
@@ -130,7 +131,7 @@ Image ReadDibFile(std::istream& in) {
 		bmpdata = shared_array<uint8_t>(rowsize * biHeight);
 		for (size_t i = 0; i < biHeight; ++i) {
 			in.read((char*)bmpdata.data() + (biHeight - 1 - i) * rowsize, rowsize);
-			in.seekg(stride - rowsize, std::ios_base::cur);
+			in.seek_relative(stride - rowsize);
 		}
 	} else {
 		bmpdata = shared_array<uint8_t>(biSizeImage);

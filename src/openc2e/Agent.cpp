@@ -35,6 +35,7 @@
 #include "caosVM.h"
 #include "common/audio/AudioBackend.h"
 #include "common/creaturesImage.h"
+#include "common/io/FileReader.h"
 #include "common/throw_ifnot.h"
 
 #include <cassert>
@@ -1571,10 +1572,7 @@ void Agent::setVoice(std::string name) {
 		if (voicepath.empty()) {
 			throw Exception(fmt::format("can't find {}.vce", name));
 		}
-		std::ifstream f(voicepath, std::ios::binary);
-		if (!f.is_open() || f.fail()) {
-			throw Exception(fmt::format("can't open {}", voicepath.string()));
-		}
+		FileReader f(voicepath);
 		voice = std::shared_ptr<VoiceData>(new VoiceData(f));
 	} else {
 		voice = std::shared_ptr<VoiceData>(new VoiceData(name));

@@ -1,24 +1,16 @@
 #include "verticalbarFile.h"
 
-#include "common/Exception.h"
-
-#include <fstream>
+#include "common/io/FileReader.h"
+#include "common/io/Getline.h"
 
 std::vector<std::vector<std::string>> ReadVerticalBarSeparatedValuesFile(const std::string& path) {
-	std::ifstream in(path, std::ios_base::binary);
-	if (!in.good()) {
-		throw Exception("Couldn't open " + path);
-	}
+	FileReader in(path);
 
 	std::vector<std::vector<std::string>> lines;
 	while (true) {
-		std::string line;
-		getline(in, line);
-		if (line.empty() && in.eof()) {
+		std::string line = getline(in);
+		if (line.empty() && !in.has_data_left()) {
 			break;
-		}
-		if (in.bad()) {
-			throw Exception("error reading file " + path);
 		}
 		if (line.empty() || line[0] == '#') {
 			continue;

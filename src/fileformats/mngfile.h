@@ -22,7 +22,6 @@
 #include "common/Exception.h"
 #include "common/shared_array.h"
 
-#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>

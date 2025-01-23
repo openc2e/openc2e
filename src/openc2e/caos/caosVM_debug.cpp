@@ -23,6 +23,9 @@
 #include "caosScript.h"
 #include "caosVM.h"
 #include "cmddata.h"
+#include "common/io/StringWriter.h"
+#include "common/io/Writer.h"
+#include "common/io/WriterFmt.h"
 #include "common/throw_ifnot.h"
 #include "dialect.h"
 
@@ -32,8 +35,6 @@
 
 // #include "malloc.h" <- unportable horror!
 #include <fmt/core.h>
-#include <fmt/ostream.h>
-#include <sstream>
 
 /**
  DBG: OUTS (command) val (string)
@@ -372,7 +373,7 @@ DBG: SIZO (string)
  various internal data structures
  */
 void v_DBG_SIZO(caosVM* vm) {
-	std::ostringstream oss;
+	StringWriter oss;
 #define SIZEOF_OUT(t) \
 	do { \
 		fmt::print(oss, "sizeof(" #t ") = {}\n", sizeof(t)); \
@@ -391,7 +392,7 @@ void v_DBG_SIZO(caosVM* vm) {
 	fmt::print(oss, "caosVMs in pool: {}\n", world.vmpool_size());
 #undef SIZEOF_OUT
 
-	vm->result.setString(oss.str());
+	vm->result.setString(oss.string());
 }
 
 /* vim: set noet: */

@@ -1,8 +1,9 @@
 #include "common/Image.h"
 #include "common/shared_array.h"
 
-#include <iosfwd>
 #include <string>
 
+class Reader;
+
 shared_array<Color> ReadPaletteFile(const std::string& path);
-shared_array<Color> ReadPaletteFile(std::istream& in);
+shared_array<Color> ReadPaletteFile(Reader& in);

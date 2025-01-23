@@ -1,11 +1,11 @@
 #include "catalogueFile.h"
 
 #include "common/Ascii.h"
+#include "common/io/FileReader.h"
 #include "common/readfile.h"
 
 #include <assert.h>
 #include <fmt/core.h>
-#include <fstream>
 
 enum cataloguetokentype {
 	TOK_BAREWORD_TAG,
@@ -219,11 +219,11 @@ CatalogueFile catalogueparse(const std::vector<CatalogueToken>& tokens) {
 }
 
 CatalogueFile readCatalogueFile(ghc::filesystem::path p) {
-	std::ifstream in(p, std::ios_base::binary);
+	FileReader in(p);
 	return readCatalogueFile(in);
 }
 
-CatalogueFile readCatalogueFile(std::istream& in) {
+CatalogueFile readCatalogueFile(Reader& in) {
 	std::string data = readfile(in);
 	return catalogueparse(cataloguelex(data.c_str()));
 }

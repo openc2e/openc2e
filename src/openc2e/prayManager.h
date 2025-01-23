@@ -33,7 +33,7 @@ class PrayBlock {
 	bool tagsloaded;
 	std::vector<unsigned char> buffer;
 
-	std::streampos offset;
+	size_t offset;
 	bool compressed;
 	unsigned int size, compressedsize;
 

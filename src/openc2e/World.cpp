@@ -36,6 +36,7 @@
 #include "common/Random.h"
 #include "common/backend/Backend.h"
 #include "common/creaturesImage.h"
+#include "common/io/FileReader.h"
 #include "common/throw_ifnot.h"
 #include "creatures/CreatureAgent.h"
 #include "fileformats/genomeFile.h"
@@ -501,8 +502,7 @@ void World::executeInitScript(std::string x) {
 	assert(fs::exists(x));
 	assert(!fs::is_directory(x));
 
-	std::ifstream s(x);
-	assert(s.is_open());
+	FileReader s(x);
 	//fmt::print("executing script {}\n", x);
 	//fflush(stdout); fflush(stderr);
 	try {
@@ -548,8 +548,7 @@ void World::executeBootstrap(bool switcher) {
 		std::string edenpath = findMainDirectoryFile("Eden.sfc");
 		if (fs::exists(edenpath) && !fs::is_directory(edenpath)) {
 			SFCFile sfc;
-			std::ifstream f(edenpath, std::ios::binary);
-			f >> std::noskipws;
+			FileReader f(edenpath);
 			sfc.read(&f);
 			sfc.copyToWorld();
 			return;
@@ -609,9 +608,7 @@ std::shared_ptr<genomeFile> World::loadGenome(std::string& genefile) {
 	auto filename = rand_choice(possibles);
 
 	std::shared_ptr<genomeFile> p(new genomeFile());
-	std::ifstream gfile(filename, std::ios::binary);
-	THROW_IFNOT(gfile.is_open());
-	gfile >> std::noskipws;
+	FileReader gfile(filename);
 	gfile >> *(p.get());
 
 	return p;

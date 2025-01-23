@@ -1,10 +1,11 @@
 #include "cfgFile.h"
 
 #include "common/Exception.h"
+#include "common/io/FileReader.h"
+#include "common/io/Reader.h"
 #include "common/readfile.h"
 
 #include <assert.h>
-#include <fstream>
 
 static char unescape(char c) {
 	switch (c) {
@@ -118,7 +119,7 @@ eoi:
 	return v;
 }
 
-std::map<std::string, std::string> readcfgfile(std::istream& in) {
+std::map<std::string, std::string> readcfgfile(Reader& in) {
 	std::string data = readfile(in);
 	std::map<std::string, std::string> result;
 
@@ -182,6 +183,6 @@ std::map<std::string, std::string> readcfgfile(std::istream& in) {
 }
 
 std::map<std::string, std::string> readcfgfile(ghc::filesystem::path p) {
-	std::ifstream in(p, std::ios_base::binary);
+	FileReader in(p);
 	return readcfgfile(in);
 }

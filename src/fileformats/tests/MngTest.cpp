@@ -1,4 +1,3 @@
-#include "common/spanstream.h"
 #include "fileformats/mngparser.h"
 
 #include <gtest/gtest.h>

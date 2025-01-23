@@ -22,11 +22,11 @@
 #include "World.h" // enum
 #include "caosScript.h" // CAOS
 #include "caosVM.h"
+#include "common/io/StringWriter.h"
 #include "common/throw_ifnot.h"
 
 #include <cmath> // sqrt
 #include <memory>
-#include <sstream>
 
 /**
  DOIF (command) condition (condition)
@@ -515,13 +515,10 @@ void v_CAOS(caosVM* vm) {
 
 		s.installScripts();
 
-		std::ostringstream oss;
+		StringWriter oss;
 		sub->outputstream = &oss;
-
-
 		sub->runEntirely(s.installer);
-
-		vm->result.setString(oss.str());
+		vm->result.setString(oss.string());
 		sub->outputstream = 0;
 	} catch (Exception& e) {
 		sub->outputstream = 0; // very important that this isn't pointing onto dead stack when the VM is freed

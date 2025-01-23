@@ -1,3 +1,6 @@
+#include "common/io/FileReader.h"
+#include "common/io/SpanReader.h"
+
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/serialization/base_object.hpp>
@@ -6,7 +9,6 @@
 #include <boost/serialization/utility.hpp>
 #include <boost/serialization/version.hpp>
 #include <fstream>
-#include <sstream>
 #define CV 1
 
 #include "caosScript.h"
@@ -37,9 +39,9 @@ genomeFile* tryLoadGenome() {
 	genomeFile* f = NULL;
 	try {
 		f = new genomeFile();
-		std::ifstream genestream("data/Genetics/norn.bengal46.gen.brain.gen", std::ios::binary | std::ios::in);
-		//        std::ifstream notestream("data/Genetics/norn.bengal46.gen.brain.gno", std::ios::binary | std::ios::in);
-		genestream >> std::noskipws >> *f;
+		FileReader genestream("data/Genetics/norn.bengal46.gen.brain.gen");
+		//        FileReader notestream("data/Genetics/norn.bengal46.gen.brain.gno");
+		genestream >> *f;
 		//        f->readNotes(notestream);
 
 		fmt::print("pre-save, loaded {} genes.\n", f->genes.size());
@@ -65,12 +67,12 @@ int main(int argc, char** argv) {
 	intv.setInt(42);
 	floatv.setFloat(0.5);
 
-	std::istringstream ss("inst sets va00 \"hello world\\n\" outv 42 outs \"\\n\" outs va00 slow stop rscr");
+	SpanReader ss("inst sets va00 \"hello world\\n\" outv 42 outs \"\\n\" outs va00 slow stop rscr");
 
 	if (argc != 2)
 		scr.parse(ss);
 	else {
-		std::ifstream ifs(argv[1]);
+		FileReader ifs(argv[1]);
 		scr.parse(ifs);
 	}
 

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "common/io/Writer.h"
 #include "common/span.h"
 
-#include <iosfwd>
 #include <map>
 #include <string>
 
@@ -13,7 +13,7 @@ class PrayFileWriter {
 		PRAY_COMPRESS_OFF
 	};
 
-	PrayFileWriter(std::ostream& stream);
+	PrayFileWriter(Writer&);
 
 	void writeBlockRawData(const std::string& type, const std::string& name,
 		const unsigned char* data, size_t data_size,
@@ -27,5 +27,5 @@ class PrayFileWriter {
 		Compression compress = PRAY_COMPRESS_ON);
 
   private:
-	std::ostream& stream;
+	Writer& stream;
 };

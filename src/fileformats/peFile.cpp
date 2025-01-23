@@ -23,20 +23,15 @@
 #include "common/Exception.h"
 #include "common/encoding.h"
 #include "common/endianlove.h"
-#include "common/spanstream.h"
+#include "common/io/SpanReader.h"
 
 /*
  * This isn't a full PE parser, but it manages to extract resources from the
  * .exe files included with both Creatures and Creatures 2.
  */
 
-peFile::peFile(fs::path filepath) {
-	path = filepath;
-	file.open(path.string(), std::ios::binary);
-
-	if (!file.is_open())
-		throw Exception(std::string("couldn't open PE file \"") + path.string() + "\"");
-
+peFile::peFile(fs::path filepath)
+	: path(filepath), file(filepath) {
 	// check the signature of the file
 	char majic[2];
 	file.read(majic, 2);
@@ -44,7 +39,7 @@ peFile::peFile(fs::path filepath) {
 		throw Exception(std::string("couldn't understand PE file \"") + path.string() + "\" (not a PE file?)");
 
 	// skip the rest of the DOS header
-	file.ignore(58);
+	file.seek_relative(58);
 
 	// read the location of the PE header
 	uint32_t e_lfanew = read32le(file);
@@ -52,21 +47,21 @@ peFile::peFile(fs::path filepath) {
 		throw Exception(std::string("couldn't understand PE file \"") + path.string() + "\" (DOS program?)");
 
 	// seek to the PE header and check the signature
-	file.seekg(e_lfanew, std::ios::beg);
+	file.seek_absolute(e_lfanew);
 	char pemajic[4];
 	file.read(pemajic, 4);
 	if (memcmp(pemajic, "PE\0\0", 4) != 0)
 		throw Exception(std::string("couldn't understand PE file \"") + path.string() + "\" (corrupt?)");
 
 	// read the necessary data from the PE file header
-	file.ignore(2);
+	file.seek_relative(2);
 	uint16_t nosections = read16le(file);
-	file.ignore(12);
+	file.seek_relative(12);
 	uint16_t optionalheadersize = read16le(file);
-	file.ignore(2);
+	file.seek_relative(2);
 
 	// skip the optional header
-	file.ignore(optionalheadersize);
+	file.seek_relative(optionalheadersize);
 
 	std::map<std::string, peSection> sections;
 	for (unsigned int i = 0; i < nosections; i++) {
@@ -74,7 +69,7 @@ peFile::peFile(fs::path filepath) {
 		section_name[8] = 0;
 		file.read(section_name, 8);
 
-		file.ignore(4);
+		file.seek_relative(4);
 
 		peSection section;
 		section.vaddr = read32le(file);
@@ -82,7 +77,7 @@ peFile::peFile(fs::path filepath) {
 		section.offset = read32le(file);
 		sections[std::string(section_name)] = section;
 
-		file.ignore(16);
+		file.seek_relative(16);
 	}
 
 	// parse resources
@@ -95,9 +90,7 @@ peFile::peFile(fs::path filepath) {
 }
 
 void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int level) {
-	file.seekg(off, std::ios::beg);
-
-	file.ignore(12);
+	file.seek_absolute(off + 12);
 
 	uint16_t nonamedentries = read16le(file);
 	uint16_t noidentries = read16le(file);
@@ -106,7 +99,7 @@ void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int le
 		uint32_t name = read32le(file);
 		uint32_t offset = read32le(file);
 
-		unsigned int here = file.tellg();
+		unsigned int here = file.tell();
 
 		if (level == 0) {
 			currtype = name;
@@ -125,7 +118,7 @@ void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int le
 		} else {
 			/* bottom level, file data is here */
 
-			file.seekg(s.offset + offset, std::ios::beg);
+			file.seek_absolute(s.offset + offset);
 
 			uint32_t offset = read32le(file);
 			offset += s.offset;
@@ -144,7 +137,7 @@ void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int le
 			resources.push_back(info);
 		}
 
-		file.seekg(here, std::ios::beg);
+		file.seek_absolute(here);
 	}
 }
 
@@ -181,7 +174,7 @@ optional<resourceInfo> peFile::findResource(
 
 shared_array<uint8_t> peFile::getResourceData(resourceInfo r) {
 	shared_array<uint8_t> data(r.size);
-	file.seekg(r.offset, std::ios::beg);
+	file.seek_absolute(r.offset);
 	file.read((char*)data.data(), r.size);
 	return data;
 }
@@ -194,7 +187,7 @@ Image peFile::getBitmap(uint32_t name) {
 		return {};
 
 	auto data = getResourceData(*r);
-	spanstream ss(data.data(), data.size());
+	SpanReader ss(data);
 	Image bmp = ReadDibFile(ss);
 	return bmp;
 }

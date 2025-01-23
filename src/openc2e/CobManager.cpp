@@ -7,6 +7,7 @@
 #include "common/Exception.h"
 #include "common/Ranges.h"
 #include "common/case_insensitive_filesystem.h"
+#include "common/io/FileWriter.h"
 #include "fileformats/c1cobfile.h"
 #include "fileformats/c2cobfile.h"
 
@@ -114,14 +115,15 @@ void CobManager::inject(const CobFileInfo& info) {
 			}
 			cobFileBlock f(*depBlock);
 
-			std::ofstream output;
-			if (deptype == 0) {
-				output = createUserImageFile(depname);
-			} else if (deptype == 1) {
-				output = createUserSoundFile(depname);
-			} else {
-				throw Exception("Unknown dependency type " + std::to_string(deptype));
-			}
+			FileWriter output = [&] {
+				if (deptype == 0) {
+					return createUserImageFile(depname);
+				} else if (deptype == 1) {
+					return createUserSoundFile(depname);
+				} else {
+					throw Exception("Unknown dependency type " + std::to_string(deptype));
+				}
+			}();
 
 			output.write((char*)f.getFileContents(), f.filesize);
 		}

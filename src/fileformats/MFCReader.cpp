@@ -2,14 +2,13 @@
 
 #include "common/encoding.h"
 #include "common/endianlove.h"
+#include "common/io/Reader.h"
 
 #include <fmt/core.h>
-#include <iostream>
 #include <stdexcept>
 
-MFCReader::MFCReader(std::istream& in)
+MFCReader::MFCReader(Reader& in)
 	: m_in(in) {
-	in.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 	m_objects.emplace_back(nullptr);
 }
 
@@ -113,9 +112,6 @@ void MFCReader::operator()(int32_t& out) {
 
 void MFCReader::operator()(span<uint8_t> out) {
 	m_in.read(reinterpret_cast<char*>(out.data()), out.size());
-	if (!m_in) {
-		throw Exception(fmt::format("Could only read {} out of {} bytes", m_in.gcount(), out.size()));
-	}
 }
 
 std::shared_ptr<MFCObject> MFCReader::read_object() {

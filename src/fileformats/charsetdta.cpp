@@ -61,8 +61,8 @@ static shared_array<Color> getDefaultCharsetPalette() {
  After the character data, there are either 128 or 256 2-byte integers that
  define the character widths.
 */
-MultiImage ReadCharsetDtaFile(std::istream& in) {
-	std::vector<uint8_t> filedata{std::istreambuf_iterator<char>(in), {}};
+MultiImage ReadCharsetDtaFile(Reader& in) {
+	std::vector<uint8_t> filedata = in.read_to_end();
 
 	if (!(filedata.size() == 9472 || filedata.size() == 17152 || filedata.size() == 18944)) {
 		throw Exception("Expected size of charset.dta file to be 9472, 17152, 18944 - got " + std::to_string(filedata.size()));

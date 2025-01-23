@@ -19,10 +19,12 @@
 #include "genomeFile.h"
 
 #include "common/endianlove.h"
+#include "common/io/IOException.h"
+#include "common/io/Reader.h"
+#include "common/io/Writer.h"
 
 #include <cstring>
 #include <exception>
-#include <iostream>
 #include <typeinfo>
 
 geneNote* genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
@@ -37,7 +39,7 @@ geneNote* genomeFile::findNote(uint8_t type, uint8_t subtype, uint8_t which) {
 	return 0;
 }
 
-void genomeFile::readNotes(std::istream& s) {
+void genomeFile::readNotes(Reader& s) {
 	if (cversion == 3) {
 		(void)read16le(s); // gnover
 		uint16_t nosvnotes = read16le(s);
@@ -60,10 +62,12 @@ void genomeFile::readNotes(std::istream& s) {
 
 		uint16_t ver = 0;
 
-		while (ver != 0x02) {
-			if (s.fail() || s.eof())
-				throw Exception("c3 gno loading broke ... second magic not present");
-			ver = read16le(s);
+		try {
+			while (ver != 0x02) {
+				ver = read16le(s);
+			}
+		} catch (const IOException&) {
+			throw Exception("c3 gno loading broke ... second magic not present");
 		}
 	}
 
@@ -93,11 +97,11 @@ void genomeFile::readNotes(std::istream& s) {
 	}
 }
 
-void genomeFile::writeNotes(std::ostream&) const {
+void genomeFile::writeNotes(Writer&) const {
 	// TODO
 }
 
-gene* genomeFile::nextGene(std::istream& s) {
+gene* genomeFile::nextGene(Reader& s) {
 	uint8_t majic[3];
 	s.read((char*)majic, 3);
 	if (strncmp((char*)majic, "gen", 3) != 0)
@@ -169,7 +173,7 @@ gene* genomeFile::nextGene(std::istream& s) {
 	return g;
 }
 
-std::istream& operator>>(std::istream& s, genomeFile& f) {
+Reader& operator>>(Reader& s, genomeFile& f) {
 	char majic[3];
 	s.read(majic, 3);
 	if (strncmp((char*)majic, "gen", 3) == 0) {
@@ -179,7 +183,7 @@ std::istream& operator>>(std::istream& s, genomeFile& f) {
 		else
 			throw Exception("bad majic for genome");
 
-		s.seekg(0, std::ios::beg);
+		s.seek_absolute(0);
 	} else {
 		if (strncmp((char*)majic, "dna", 3) != 0)
 			throw Exception("bad majic for genome");
@@ -200,7 +204,7 @@ std::istream& operator>>(std::istream& s, genomeFile& f) {
 	return s;
 }
 
-std::ostream& operator<<(std::ostream& s, const genomeFile& f) {
+Writer& operator<<(Writer& s, const genomeFile& f) {
 	char majic[4] = {'d', 'n', 'a', static_cast<char>(f.cversion + 48)}; // 48 = ASCII '0';
 	s.write(majic, 4);
 
@@ -244,7 +248,7 @@ void geneFlags::operator()(uint8_t f) {
 	reserved2 = ((f & 128) != 0);
 }
 
-std::ostream& operator<<(std::ostream& s, const gene& g) {
+Writer& operator<<(Writer& s, const gene& g) {
 	s.write("gene", 4);
 	write8(s, g.type());
 	write8(s, g.subtype());
@@ -263,7 +267,7 @@ std::ostream& operator<<(std::ostream& s, const gene& g) {
 	return s;
 }
 
-std::istream& operator>>(std::istream& s, gene& g) {
+Reader& operator>>(Reader& s, gene& g) {
 	g.note.which = read8(s);
 	g.header.generation = read8(s);
 	g.header.switchontime = (lifestage)read8(s);
@@ -279,7 +283,7 @@ std::istream& operator>>(std::istream& s, gene& g) {
 	return s;
 }
 
-void bioEmitterGene::write(std::ostream& s) const {
+void bioEmitterGene::write(Writer& s) const {
 	write8(s, organ);
 	write8(s, tissue);
 	write8(s, locus);
@@ -291,7 +295,7 @@ void bioEmitterGene::write(std::ostream& s) const {
 	write8(s, flags);
 }
 
-void bioEmitterGene::read(std::istream& s) {
+void bioEmitterGene::read(Reader& s) {
 	organ = read8(s);
 	tissue = read8(s);
 	locus = read8(s);
@@ -305,29 +309,29 @@ void bioEmitterGene::read(std::istream& s) {
 	invert = ((flags & 4) != 0);
 }
 
-void bioHalfLivesGene::write(std::ostream& s) const {
+void bioHalfLivesGene::write(Writer& s) const {
 	for (unsigned char halflive : halflives) {
 		write8(s, halflive);
 	}
 }
 
-void bioHalfLivesGene::read(std::istream& s) {
+void bioHalfLivesGene::read(Reader& s) {
 	for (unsigned char& halflive : halflives) {
 		halflive = read8(s);
 	}
 }
 
-void bioInitialConcentrationGene::write(std::ostream& s) const {
+void bioInitialConcentrationGene::write(Writer& s) const {
 	write8(s, chemical);
 	write8(s, quantity);
 }
 
-void bioInitialConcentrationGene::read(std::istream& s) {
+void bioInitialConcentrationGene::read(Reader& s) {
 	chemical = read8(s);
 	quantity = read8(s);
 }
 
-void bioNeuroEmitterGene::write(std::ostream& s) const {
+void bioNeuroEmitterGene::write(Writer& s) const {
 	for (int i = 0; i < 3; i++) {
 		write8(s, lobes[i]);
 		write8(s, neurons[i]);
@@ -339,7 +343,7 @@ void bioNeuroEmitterGene::write(std::ostream& s) const {
 	}
 }
 
-void bioNeuroEmitterGene::read(std::istream& s) {
+void bioNeuroEmitterGene::read(Reader& s) {
 	for (int i = 0; i < 3; i++) {
 		lobes[i] = read8(s);
 		neurons[i] = read8(s);
@@ -351,7 +355,7 @@ void bioNeuroEmitterGene::read(std::istream& s) {
 	}
 }
 
-void bioReactionGene::write(std::ostream& s) const {
+void bioReactionGene::write(Writer& s) const {
 	for (int i = 0; i < 4; i++) {
 		write8(s, quantity[i]);
 		write8(s, reactant[i]);
@@ -360,7 +364,7 @@ void bioReactionGene::write(std::ostream& s) const {
 	write8(s, rate);
 }
 
-void bioReactionGene::read(std::istream& s) {
+void bioReactionGene::read(Reader& s) {
 	for (int i = 0; i < 4; i++) {
 		quantity[i] = read8(s);
 		reactant[i] = read8(s);
@@ -369,7 +373,7 @@ void bioReactionGene::read(std::istream& s) {
 	rate = read8(s);
 }
 
-void bioReceptorGene::write(std::ostream& s) const {
+void bioReceptorGene::write(Writer& s) const {
 	write8(s, organ);
 	write8(s, tissue);
 	write8(s, locus);
@@ -381,7 +385,7 @@ void bioReceptorGene::write(std::ostream& s) const {
 	write8(s, flags);
 }
 
-void bioReceptorGene::read(std::istream& s) {
+void bioReceptorGene::read(Reader& s) {
 	organ = read8(s);
 	tissue = read8(s);
 	locus = read8(s);
@@ -395,7 +399,7 @@ void bioReceptorGene::read(std::istream& s) {
 	digital = ((flags & 2) != 0);
 }
 
-void c2eBrainLobeGene::write(std::ostream& s) const {
+void c2eBrainLobeGene::write(Writer& s) const {
 	for (unsigned char i : id)
 		write8(s, i);
 
@@ -420,7 +424,7 @@ void c2eBrainLobeGene::write(std::ostream& s) const {
 		write8(s, i);
 }
 
-void c2eBrainLobeGene::read(std::istream& s) {
+void c2eBrainLobeGene::read(Reader& s) {
 	for (unsigned char& i : id)
 		i = read8(s);
 
@@ -445,7 +449,7 @@ void c2eBrainLobeGene::read(std::istream& s) {
 		i = read8(s);
 }
 
-void c2eBrainTractGene::write(std::ostream& s) const {
+void c2eBrainTractGene::write(Writer& s) const {
 	write16be(s, updatetime);
 	for (unsigned char i : srclobe)
 		write8(s, i);
@@ -470,7 +474,7 @@ void c2eBrainTractGene::write(std::ostream& s) const {
 		write8(s, i);
 }
 
-void c2eBrainTractGene::read(std::istream& s) {
+void c2eBrainTractGene::read(Reader& s) {
 	updatetime = read16be(s);
 	for (unsigned char& i : srclobe)
 		i = read8(s);
@@ -495,21 +499,21 @@ void c2eBrainTractGene::read(std::istream& s) {
 		i = read8(s);
 }
 
-void creatureAppearanceGene::write(std::ostream& s) const {
+void creatureAppearanceGene::write(Writer& s) const {
 	write8(s, part);
 	write8(s, variant);
 	if (cversion > 1)
 		write8(s, species);
 }
 
-void creatureAppearanceGene::read(std::istream& s) {
+void creatureAppearanceGene::read(Reader& s) {
 	part = read8(s);
 	variant = read8(s);
 	if (cversion > 1)
 		species = read8(s);
 }
 
-void creatureFacialExpressionGene::write(std::ostream& s) const {
+void creatureFacialExpressionGene::write(Writer& s) const {
 	write16le(s, expressionno);
 	write8(s, weight);
 
@@ -519,7 +523,7 @@ void creatureFacialExpressionGene::write(std::ostream& s) const {
 	}
 }
 
-void creatureFacialExpressionGene::read(std::istream& s) {
+void creatureFacialExpressionGene::read(Reader& s) {
 	expressionno = read16le(s);
 	weight = read8(s);
 
@@ -529,7 +533,7 @@ void creatureFacialExpressionGene::read(std::istream& s) {
 	}
 }
 
-void creatureGaitGene::write(std::ostream& s) const {
+void creatureGaitGene::write(Writer& s) const {
 	write8(s, drive);
 
 	for (int i = 0; i < gaitLength(); i++) {
@@ -537,7 +541,7 @@ void creatureGaitGene::write(std::ostream& s) const {
 	}
 }
 
-void creatureGaitGene::read(std::istream& s) {
+void creatureGaitGene::read(Reader& s) {
 	drive = read8(s);
 
 	for (int i = 0; i < gaitLength(); i++) {
@@ -545,7 +549,7 @@ void creatureGaitGene::read(std::istream& s) {
 	}
 }
 
-void creatureGenusGene::write(std::ostream& s) const {
+void creatureGenusGene::write(Writer& s) const {
 	write8(s, genus);
 
 	// TODO: we read past the end of the returned buffer here!
@@ -553,7 +557,7 @@ void creatureGenusGene::write(std::ostream& s) const {
 	s.write(dad.c_str(), (cversion == 3) ? 32 : 4);
 }
 
-void creatureGenusGene::read(std::istream& s) {
+void creatureGenusGene::read(Reader& s) {
 	genus = read8(s);
 
 	char buf[33];
@@ -568,7 +572,7 @@ void creatureGenusGene::read(std::istream& s) {
 	dad = (char*)buf;
 }
 
-void creatureInstinctGene::write(std::ostream& s) const {
+void creatureInstinctGene::write(Writer& s) const {
 	for (int i = 0; i < 3; i++) {
 		write8(s, lobes[i]);
 		write8(s, neurons[i]);
@@ -579,7 +583,7 @@ void creatureInstinctGene::write(std::ostream& s) const {
 	write8(s, level);
 }
 
-void creatureInstinctGene::read(std::istream& s) {
+void creatureInstinctGene::read(Reader& s) {
 	for (int i = 0; i < 3; i++) {
 		lobes[i] = read8(s);
 		neurons[i] = read8(s);
@@ -590,27 +594,27 @@ void creatureInstinctGene::read(std::istream& s) {
 	level = read8(s);
 }
 
-void creaturePigmentGene::write(std::ostream& s) const {
+void creaturePigmentGene::write(Writer& s) const {
 	write8(s, color);
 	write8(s, amount);
 }
 
-void creaturePigmentGene::read(std::istream& s) {
+void creaturePigmentGene::read(Reader& s) {
 	color = read8(s);
 	amount = read8(s);
 }
 
-void creaturePigmentBleedGene::write(std::ostream& s) const {
+void creaturePigmentBleedGene::write(Writer& s) const {
 	write8(s, rotation);
 	write8(s, swap);
 }
 
-void creaturePigmentBleedGene::read(std::istream& s) {
+void creaturePigmentBleedGene::read(Reader& s) {
 	rotation = read8(s);
 	swap = read8(s);
 }
 
-void creaturePoseGene::write(std::ostream& s) const {
+void creaturePoseGene::write(Writer& s) const {
 	write8(s, poseno);
 
 	for (int i = 0; i < poseLength(); i++) {
@@ -618,7 +622,7 @@ void creaturePoseGene::write(std::ostream& s) const {
 	}
 }
 
-void creaturePoseGene::read(std::istream& s) {
+void creaturePoseGene::read(Reader& s) {
 	poseno = read8(s);
 
 	for (int i = 0; i < poseLength(); i++) {
@@ -626,7 +630,7 @@ void creaturePoseGene::read(std::istream& s) {
 	}
 }
 
-void creatureStimulusGene::write(std::ostream& s) const {
+void creatureStimulusGene::write(Writer& s) const {
 	write8(s, stim);
 	write8(s, significance);
 	write8(s, sensoryneuron);
@@ -648,7 +652,7 @@ void creatureStimulusGene::write(std::ostream& s) const {
 	}
 }
 
-void creatureStimulusGene::read(std::istream& s) {
+void creatureStimulusGene::read(Reader& s) {
 	stim = read8(s);
 	significance = read8(s);
 	sensoryneuron = read8(s);
@@ -669,7 +673,7 @@ void creatureStimulusGene::read(std::istream& s) {
 	silent[3] = ((flags & 128) != 0);
 }
 
-void oldBrainLobeGene::write(std::ostream& s) const {
+void oldBrainLobeGene::write(Writer& s) const {
 	write8(s, x);
 	write8(s, y);
 	write8(s, width);
@@ -686,7 +690,7 @@ void oldBrainLobeGene::write(std::ostream& s) const {
 	s << dendrite2;
 }
 
-void oldBrainLobeGene::read(std::istream& s) {
+void oldBrainLobeGene::read(Reader& s) {
 	x = read8(s);
 	y = read8(s);
 	width = read8(s);
@@ -703,7 +707,7 @@ void oldBrainLobeGene::read(std::istream& s) {
 	s >> dendrite2;
 }
 
-void organGene::write(std::ostream& s) const {
+void organGene::write(Writer& s) const {
 	write8(s, clockrate);
 	write8(s, damagerate);
 	write8(s, lifeforce);
@@ -711,7 +715,7 @@ void organGene::write(std::ostream& s) const {
 	write8(s, atpdamagecoefficient);
 }
 
-void organGene::read(std::istream& s) {
+void organGene::read(Reader& s) {
 	clockrate = read8(s);
 	damagerate = read8(s);
 	lifeforce = read8(s);
@@ -719,7 +723,7 @@ void organGene::read(std::istream& s) {
 	atpdamagecoefficient = read8(s);
 }
 
-std::ostream& operator<<(std::ostream& s, const oldDendriteInfo& i) {
+Writer& operator<<(Writer& s, const oldDendriteInfo& i) {
 	write8(s, i.srclobe);
 	write8(s, i.min);
 	write8(s, i.max);
@@ -749,7 +753,7 @@ std::ostream& operator<<(std::ostream& s, const oldDendriteInfo& i) {
 	return s;
 }
 
-std::istream& operator>>(std::istream& s, oldDendriteInfo& i) {
+Reader& operator>>(Reader& s, oldDendriteInfo& i) {
 	i.srclobe = read8(s);
 	i.min = read8(s);
 	i.max = read8(s);

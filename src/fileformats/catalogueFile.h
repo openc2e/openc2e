@@ -3,9 +3,10 @@
 #include "common/Exception.h"
 
 #include <ghc/filesystem.hpp>
-#include <iosfwd>
 #include <string>
 #include <vector>
+
+class Reader;
 
 class catalogueException : public Exception {
   public:
@@ -32,4 +33,4 @@ struct CatalogueFile {
 
 
 CatalogueFile readCatalogueFile(ghc::filesystem::path);
-CatalogueFile readCatalogueFile(std::istream& in);
+CatalogueFile readCatalogueFile(Reader& in);

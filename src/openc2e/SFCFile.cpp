@@ -37,13 +37,13 @@
 #include "caosScript.h"
 #include "common/Exception.h"
 #include "common/endianlove.h"
+#include "common/io/Reader.h"
 #include "common/macro_stringify.h"
 #include "fileformats/sprImage.h"
 #include "imageManager.h"
 
 #include <cassert>
 #include <fmt/core.h>
-#include <iostream>
 #include <limits.h>
 #include <memory>
 
@@ -80,7 +80,7 @@ SFCFile::~SFCFile() {
 	}
 }
 
-void SFCFile::read(std::istream* i) {
+void SFCFile::read(Reader* i) {
 	ourStream = i;
 
 	mapdata = (MapData*)slurpMFC(TYPE_MAPDATA);
@@ -90,7 +90,7 @@ void SFCFile::read(std::istream* i) {
 	uint8_t x = 0;
 	while (x == 0)
 		x = read8();
-	ourStream->seekg(-1, std::ios::cur);
+	ourStream->seek_relative(-1);
 
 	uint32_t numobjects = read32();
 	for (unsigned int i = 0; i < numobjects; i++) {
@@ -153,8 +153,6 @@ bool validSFCType(unsigned int type, unsigned int reqtype) {
 }
 
 SFCClass* SFCFile::slurpMFC(unsigned int reqtype) {
-	sfccheck(!ourStream->fail());
-
 	// read the pid (this only works up to 0x7ffe, but we'll cope)
 	uint16_t pid = read16();
 

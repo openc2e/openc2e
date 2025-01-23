@@ -16,6 +16,7 @@
 #include "common/StringView.h"
 #include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
+#include "common/io/FileWriter.h"
 #include "common/render/RenderSystem.h"
 #include "objects/ObjectManager.h"
 #include "sdlbackend/SDLBackend.h"
@@ -234,7 +235,7 @@ extern "C" int main(int argc, char** argv) {
 		fmt::print("* Not saving\n");
 	} else {
 		auto sfc = sfc_dump_everything();
-		auto out = g_engine_context.paths->ofstream(PATH_TYPE_MAIN, "World.openc1.sfc");
+		auto out = g_engine_context.paths->create_file(PATH_TYPE_MAIN, "World.openc1.sfc");
 		write_sfc_v1_file(out, sfc);
 		fmt::print("* Saved world to: World.openc1.sfc\n");
 	}

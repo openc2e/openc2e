@@ -20,9 +20,9 @@
 #pragma once
 
 #include "common/Image.h"
+#include "common/io/FileReader.h"
 #include "common/optional.h"
 
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <map>
 #include <string>
@@ -88,7 +88,7 @@ class peFile {
 	};
 
 	fs::path path;
-	std::ifstream file;
+	FileReader file;
 	unsigned int currtype, currname, currlang, currsublang;
 
 	void parseResourcesLevel(peSection& s, unsigned int off, unsigned int level);

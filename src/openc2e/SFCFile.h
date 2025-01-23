@@ -21,7 +21,6 @@
 #define _SFCFILE_H
 
 #include <cstdint>
-#include <iosfwd>
 #include <map>
 #include <string>
 #include <vector>
@@ -33,6 +32,8 @@
  * the base SFCClass type - it seemed best to just use pointers, since
  * ownership is clear. - fuzzie
  */
+
+class Reader;
 
 class SFCClass;
 class MapData;
@@ -56,7 +57,7 @@ class SFCFile {
 	std::vector<SFCClass*> storage;
 	std::map<unsigned int, unsigned int> types;
 
-	std::istream* ourStream;
+	Reader* ourStream;
 
   public:
 	MapData* mapdata;
@@ -72,7 +73,7 @@ class SFCFile {
 
 	SFCFile() {}
 	~SFCFile();
-	void read(std::istream* i);
+	void read(Reader* i);
 	SFCClass* slurpMFC(unsigned int reqtype = 0);
 
 	uint8_t read8();

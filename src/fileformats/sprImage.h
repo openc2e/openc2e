@@ -20,8 +20,8 @@
 #pragma once
 
 #include "common/Image.h"
+#include "common/io/Reader.h"
 
-#include <iosfwd>
 #include <stdint.h>
 #include <vector>
 
@@ -30,5 +30,5 @@ struct SprFileData {
 	std::vector<int32_t> offsets;
 };
 
-MultiImage ReadSprFile(std::istream& in);
-SprFileData ReadSprFileWithMetadata(std::istream& in, int32_t absolute_base, int32_t image_count);
+MultiImage ReadSprFile(Reader& in);
+SprFileData ReadSprFileWithMetadata(Reader& in, int32_t absolute_base, int32_t image_count);

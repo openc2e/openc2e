@@ -20,9 +20,9 @@
 
 #include "common/Exception.h"
 #include "common/endianlove.h"
+#include "common/io/SpanReader.h"
 #include "common/mappedfile.h"
 #include "common/shared_array.h"
-#include "common/spanstream.h"
 #include "mngparser.h"
 
 #include <algorithm>
@@ -55,11 +55,7 @@ MNGFile::MNGFile(std::string n) {
 	name = n;
 
 	mappedfile m(n);
-	spanstream stream(m);
-	if (!stream) {
-		throw MNGFileException("open failed");
-	}
-	stream.exceptions(spanstream::failbit | spanstream::badbit);
+	SpanReader stream(m);
 
 	// Read metavariables from beginning of file
 	uint32_t numsamples = read32le(stream);
@@ -81,7 +77,7 @@ MNGFile::MNGFile(std::string n) {
 
 	// read and decode the MNG script
 	// TODO: warning if scriptoffset isn't in usual place?
-	stream.seekg(scriptoffset);
+	stream.seek_absolute(scriptoffset);
 	std::vector<uint8_t> scrambled_script(scriptlength);
 	stream.read(reinterpret_cast<char*>(scrambled_script.data()), scrambled_script.size());
 	script = mngdecrypt(scrambled_script);
@@ -96,7 +92,7 @@ MNGFile::MNGFile(std::string n) {
 	// read the samples
 	for (uint32_t i = 0; i < numsamples; i++) {
 		// TODO: warning if sample isn't in expected place?
-		stream.seekg(sample_headers[i].position);
+		stream.seek_absolute(sample_headers[i].position);
 		shared_array<uint8_t> data(sample_headers[i].size + 16);
 		memcpy(&data[0], "RIFF", 4);
 		write32le(&data[4], sample_headers[i].size + 4);

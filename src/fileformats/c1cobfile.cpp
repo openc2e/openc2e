@@ -2,12 +2,12 @@
 
 #include "c1defaultpalette.h"
 #include "common/endianlove.h"
+#include "common/io/FileReader.h"
 #include "common/throw_ifnot.h"
 
 #include <cassert>
-#include <fstream>
 
-static std::string read_string(std::istream& in) {
+static std::string read_string(Reader& in) {
 	uint16_t length = read8(in);
 	if (length == 255) {
 		length = read16le(in);
@@ -19,11 +19,11 @@ static std::string read_string(std::istream& in) {
 }
 
 c1cobfile read_c1cobfile(const std::string& path) {
-	std::ifstream in(path, std::ios::binary);
+	FileReader in(path);
 	return read_c1cobfile(in);
 }
 
-c1cobfile read_c1cobfile(std::istream& in) {
+c1cobfile read_c1cobfile(Reader& in) {
 	c1cobfile cob;
 
 	uint16_t version = read16le(in);

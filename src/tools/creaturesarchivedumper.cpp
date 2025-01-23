@@ -1,8 +1,9 @@
 #include "common/endianlove.h"
-#include "common/spanstream.h"
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
+#include "common/io/SpanReader.h"
 
 #include <fmt/format.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <zlib.h>
 
@@ -22,11 +23,11 @@ int main(int argc, char** argv) {
 		exit(1);
 	}
 
-	std::ifstream in(input_path, std::ios::binary);
-	std::vector<uint8_t> data(std::istreambuf_iterator<char>{in}, {});
+	FileReader in(input_path);
+	std::vector<uint8_t> data = in.read_to_end();
 	fmt::print("data size = {}\n", data.size());
 
-	spanstream s(data);
+	SpanReader s(data);
 	std::string magic;
 	magic.resize(CREATURES_ARCHIVE_MAGIC.size());
 	s.read(&magic[0], magic.size());
@@ -55,11 +56,11 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	fmt::print("stream position = {}\n", static_cast<size_t>(s.tellg()));
+	fmt::print("stream position = {}\n", static_cast<size_t>(s.tell()));
 
 	std::vector<uint8_t> decompressed_data(data.size() * 20); // TODO: ???
 	uLongf usize = decompressed_data.size();
-	int r = uncompress((Bytef*)decompressed_data.data(), (uLongf*)&usize, (Bytef*)data.data() + s.tellg(), data.size() - s.tellg());
+	int r = uncompress((Bytef*)decompressed_data.data(), (uLongf*)&usize, (Bytef*)data.data() + s.tell(), data.size() - s.tell());
 	if (r != Z_OK) {
 		std::string o;
 		switch (r) {
@@ -77,6 +78,6 @@ int main(int argc, char** argv) {
 
 	fs::path output_filename = input_path.filename().string() + ".out";
 	fmt::print("writing to {}\n", output_filename.string());
-	std::ofstream out(output_filename, std::ios::binary);
+	FileWriter out(output_filename);
 	out.write((char*)decompressed_data.data(), usize);
 }

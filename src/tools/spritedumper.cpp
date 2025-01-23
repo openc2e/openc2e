@@ -5,7 +5,6 @@
 #include "fileformats/pngImage.h"
 
 #include <fmt/format.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 
 namespace fs = ghc::filesystem;

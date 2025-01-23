@@ -1,8 +1,10 @@
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
+#include "common/readfile.h"
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
 
 #include <fmt/core.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 #include <map>
 #include <string>
@@ -16,9 +18,7 @@ int main(int argc, char** argv) {
 			return 1;
 		}
 
-		std::ifstream f(argv[1]);
-		std::string str((std::istreambuf_iterator<char>(f)),
-			std::istreambuf_iterator<char>());
+		std::string str = readfile(argv[1]);
 
 		fs::path parent_path = fs::path(argv[1]).parent_path();
 
@@ -36,11 +36,7 @@ int main(int argc, char** argv) {
 		}
 
 		fmt::print("Writing output to {:?}\n", output_filename);
-		std::ofstream out(output_filename, std::ios::binary);
-		if (!out) {
-			fmt::print(stderr, "Couldn't open {:?}\n", output_filename);
-			exit(1);
-		}
+		FileWriter out(output_filename);
 		PrayFileWriter writer(out);
 
 		std::map<std::string, std::string> string_tags;
@@ -62,14 +58,8 @@ int main(int argc, char** argv) {
 				fmt::print("Inline block {} \"{}\" from file {:?}\n", event->type, event->name, event->filename);
 
 				// TODO: check in same directory
-				std::ifstream in((parent_path / event->filename).string());
-				if (!in) {
-					fmt::print(stderr, "Couldn't open file {:?}\n", (parent_path / event->filename).string());
-					exit(1);
-				}
-				std::vector<unsigned char> data((std::istreambuf_iterator<char>(in)),
-					std::istreambuf_iterator<char>());
-
+				FileReader in(parent_path / event->filename);
+				auto data = in.read_to_end();
 				writer.writeBlockRawData(event->type, event->name, data);
 
 			} else if (auto* event = res.get_if<PraySourceParser::StringTag>()) {
@@ -77,14 +67,8 @@ int main(int argc, char** argv) {
 
 			} else if (auto* event = res.get_if<PraySourceParser::StringTagFromFile>()) {
 				// TODO: check in same directory
-				std::ifstream in((parent_path / event->filename).string());
-				if (!in) {
-					fmt::print("Couldn't open file {:?}\n", (parent_path / event->filename).string());
-					exit(1);
-				}
-				std::string val((std::istreambuf_iterator<char>(in)),
-					std::istreambuf_iterator<char>());
-
+				FileReader in(parent_path / event->filename);
+				std::string val = readfile(in);
 				string_tags[event->key] = val;
 
 			} else if (auto* event = res.get_if<PraySourceParser::IntegerTag>()) {

@@ -1,20 +1,18 @@
 #include "common/endianlove.h"
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
+#include "common/io/IOException.h"
+#include "common/io/SpanReader.h"
+#include "common/io/WriterFmt.h"
 #include "common/optional.h"
 #include "common/span.h"
-#include "common/spanstream.h"
 #include "fileformats/PrayFileReader.h"
 
 #include <array>
 #include <fmt/core.h>
-#include <fmt/ostream.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 
 namespace fs = ghc::filesystem;
-
-using std::ifstream;
-using std::ofstream;
-using std::vector;
 
 const std::array<std::string, 11> tagblocks = {
 	"AGNT", // C3 agent
@@ -92,18 +90,13 @@ int main(int argc, char** argv) {
 	}
 
 	std::string pray_source_filename = (output_directory / inputfile.stem()).string() + ".txt";
-	std::ofstream pray_source(pray_source_filename);
+	FileWriter pray_source(pray_source_filename);
 	fmt::print("Writing {:?}\n", pray_source_filename);
 	fmt::print(pray_source, "(- praydumper-generated PRAY file from {:?} -)\n", inputfile.filename().string());
 	fmt::print(pray_source, "\n");
 	fmt::print(pray_source, "\"en-GB\"\n");
 
-	std::ifstream in(inputfile.string(), std::ios::binary);
-	if (!in) {
-		fmt::print(stderr, "Error opening file {}\n", inputfile.string());
-		exit(1);
-	}
-
+	FileReader in(inputfile);
 	PrayFileReader file(in);
 
 	for (size_t i = 0; i < file.getNumBlocks(); i++) {
@@ -126,7 +119,7 @@ int main(int argc, char** argv) {
 				if ((name.substr(0, 7) == "Script ") || (name.substr(0, 13) == "Remove script")) {
 					name = file.getBlockName(i) + " - " + name + ".cos";
 					fmt::print("Writing {}\n", (output_directory / name).string());
-					ofstream output(output_directory / name);
+					FileWriter output(output_directory / name);
 					output.write(y.second.c_str(), y.second.size());
 					fmt::print(pray_source, "\"{}\" @ \"{}\"\n", y.first, name);
 				} else {
@@ -139,7 +132,7 @@ int main(int argc, char** argv) {
 				file.getBlockType(i), file.getBlockName(i), file.getBlockName(i));
 
 			fmt::print("Writing {}\n", (output_directory / file.getBlockName(i)).string());
-			ofstream output(output_directory / file.getBlockName(i));
+			FileWriter output(output_directory / file.getBlockName(i));
 			auto buf = file.getBlockRawData(i);
 			output.write((char*)buf.data(), buf.size());
 		}

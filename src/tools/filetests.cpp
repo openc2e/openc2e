@@ -1,9 +1,10 @@
 #include "Catalogue.h"
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
 #include "genome.h"
 
 #include <cassert>
 #include <fmt/core.h>
-#include <fstream>
 #include <typeinfo>
 
 using namespace std;
@@ -13,12 +14,9 @@ using namespace std;
 */
 
 void testGenetics() {
-	ifstream f("/home/fuzzie/creatures3/Genetics/norn.bengal46.gen.brain.gen", std::ios::binary);
-	assert(!f.fail());
-	f >> noskipws;
+	FileReader f("/home/fuzzie/creatures3/Genetics/norn.bengal46.gen.brain.gen");
 
-	ofstream o("/home/fuzzie/test.gen", std::ios::binary);
-	assert(!o.fail());
+	FileWriter o("/home/fuzzie/test.gen");
 	genomeFile g;
 	f >> g;
 	o << g;

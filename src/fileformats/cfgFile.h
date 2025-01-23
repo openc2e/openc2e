@@ -1,9 +1,10 @@
 #pragma once
 
 #include <ghc/filesystem.hpp>
-#include <iosfwd>
 #include <map>
 #include <string>
 
+class Reader;
+
 std::map<std::string, std::string> readcfgfile(ghc::filesystem::path);
-std::map<std::string, std::string> readcfgfile(std::istream& in);
+std::map<std::string, std::string> readcfgfile(Reader& in);

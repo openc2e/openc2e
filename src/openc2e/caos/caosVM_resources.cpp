@@ -24,18 +24,17 @@
 #include "caosScript.h" // PRAY INJT
 #include "caosVM.h"
 #include "common/case_insensitive_filesystem.h"
-#include "common/spanstream.h"
+#include "common/io/FileWriter.h"
 #include "common/throw_ifnot.h"
 #include "prayManager.h"
 
 #include <fmt/core.h>
-#include <fstream>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 
 bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	fs::path (*find_func)(fs::path);
-	std::ofstream (*create_func)(fs::path);
+	FileWriter (*create_func)(fs::path);
 
 	switch (type) {
 		// case 0: find_func = &findMainFile; create_func = &createUserMainFile; directory = ""; break; // main
@@ -100,13 +99,12 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 
 	p->load();
 
-	std::ofstream output = create_func(name);
+	FileWriter output = create_func(name);
 	output.write((char*)p->getBuffer(), p->getSize());
 	// p->unload();
 
 	if (type == 7) {
-		output.flush();
-		output.close();
+		(void)FileWriter(std::move(output)); // flush and close file
 		// TODO: verify it is a catalogue file first, perhaps?
 		catalogue.addFile(findCatalogueFile(name));
 	}

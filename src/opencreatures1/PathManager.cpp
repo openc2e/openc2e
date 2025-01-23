@@ -2,6 +2,7 @@
 
 #include "common/Exception.h"
 #include "common/case_insensitive_filesystem.h"
+#include "common/io/FileWriter.h"
 #include "common/wildcard_match.h"
 
 namespace fs = ghc::filesystem;
@@ -51,7 +52,7 @@ std::vector<fs::path> PathManager::find_path_wildcard(PathType type, const std::
 	return results;
 }
 
-std::ofstream PathManager::ofstream(PathType type, const std::string& name) {
+FileWriter PathManager::create_file(PathType type, const std::string& name) {
 	auto dirname = append_path_type(m_main_dir, type);
-	return case_insensitive_filesystem::ofstream(dirname / name);
+	return case_insensitive_filesystem::create_file(dirname / name);
 }

@@ -1,10 +1,8 @@
 #include "attFile.h"
 
-#include "common/readfile.h"
+#include "common/io/Reader.h"
 
 #include <fmt/core.h>
-#include <iostream>
-
 
 bool _is_space_at(const std::vector<uint8_t>& bytes, size_t p) {
 	if (p >= bytes.size()) {
@@ -54,8 +52,8 @@ bool _skip_newline_at(const std::vector<uint8_t>& bytes, size_t p) {
 	return false;
 }
 
-attFile ReadAttFile(std::istream& in) {
-	std::vector<uint8_t> bytes = readfilebinary(in);
+attFile ReadAttFile(Reader& in) {
+	std::vector<uint8_t> bytes = in.read_to_end();
 
 	attFile att;
 	size_t p = 0;

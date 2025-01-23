@@ -32,7 +32,7 @@
 VoiceData::VoiceData() = default;
 
 // Creatures 1 and 2 store this data in .vce files
-VoiceData::VoiceData(std::istream& in) {
+VoiceData::VoiceData(Reader& in) {
 	// voice files and associated delay
 	for (unsigned int i = 0; i < NUM_VOICE_FILES; i++) {
 		char temp[4];

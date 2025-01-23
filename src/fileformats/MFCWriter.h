@@ -5,18 +5,19 @@
 #include "common/ResizableContainerView.h"
 #include "common/span.h"
 
-#include <iosfwd>
 #include <map>
 #include <memory>
 #include <stdint.h>
 #include <string>
 #include <typeindex>
 
+class Writer;
+
 // Windows MFC serialized data / CArchive serialized data
 
 class MFCWriter {
   public:
-	MFCWriter(std::ostream& out);
+	MFCWriter(Writer& out);
 	~MFCWriter();
 
 	void ascii_dword(const std::string&);
@@ -70,7 +71,7 @@ class MFCWriter {
 
 	void write_object(MFCObject*, std::type_index);
 
-	std::ostream& m_out;
+	Writer& m_out;
 
 	std::map<std::type_index, ClassInfo> m_classregistry;
 	std::map<const MFCObject*, uint16_t> m_pids;

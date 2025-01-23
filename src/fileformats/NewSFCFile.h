@@ -5,10 +5,12 @@
 #include "fileformats/MFCObject.h"
 
 #include <array>
-#include <iosfwd>
 #include <memory>
 #include <string>
 #include <vector>
+
+class Reader;
+class Writer;
 
 namespace sfc {
 
@@ -1128,12 +1130,12 @@ struct EXPFile {
 	std::shared_ptr<CGenomeV1> child_genome;
 };
 
-SFCFile read_sfc_v1_file(std::istream& in);
+SFCFile read_sfc_v1_file(Reader& in);
 SFCFile read_sfc_v1_file(const std::string& path);
-void write_sfc_v1_file(std::ostream& out, SFCFile&);
+void write_sfc_v1_file(Writer& out, SFCFile&);
 void write_sfc_v1_file(const std::string& path, SFCFile&);
 
-EXPFile read_exp_v1_file(std::istream& in);
+EXPFile read_exp_v1_file(Reader& in);
 EXPFile read_exp_v1_file(const std::string& path);
 
 } // namespace sfc

@@ -20,11 +20,10 @@
 #include "blkImage.h"
 
 #include "common/endianlove.h"
+#include "common/io/Reader.h"
 #include "common/throw_ifnot.h"
 
-#include <iostream>
-
-Image ReadBlkFile(std::istream& in) {
+Image ReadBlkFile(Reader& in) {
 	uint32_t flags = read32le(in);
 	bool is_565 = (flags & 0x01);
 	imageformat imgformat = is_565 ? if_rgb565 : if_rgb555;

@@ -20,9 +20,9 @@
 #pragma once
 
 #include "common/Image.h"
+#include "common/io/FileReader.h"
 
 #include <cassert>
-#include <fstream>
 #include <string>
 #include <vector>
 
@@ -31,7 +31,7 @@ class cobBlock;
 class c2cobfile {
   protected:
 	std::string path;
-	std::ifstream file;
+	FileReader file;
 
   public:
 	std::vector<cobBlock*> blocks;
@@ -39,7 +39,7 @@ class c2cobfile {
 	c2cobfile(std::string filepath);
 	~c2cobfile();
 	std::string getPath() { return path; }
-	std::istream& getStream() { return file; }
+	FileReader& getStream() { return file; }
 };
 
 class cobBlock {
@@ -48,7 +48,7 @@ class cobBlock {
 	c2cobfile* parent;
 	unsigned char* buffer;
 
-	std::streampos offset;
+	size_t offset;
 	unsigned int size;
 
   public:
@@ -61,7 +61,7 @@ class cobBlock {
 
 	bool isLoaded() { return loaded; }
 	c2cobfile* getParent() { return parent; }
-	std::streampos getOffset() { return offset; }
+	size_t getOffset() { return offset; }
 	std::string getType() { return type; }
 	unsigned char* getBuffer() {
 		assert(loaded);

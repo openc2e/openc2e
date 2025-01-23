@@ -20,9 +20,10 @@
 #pragma once
 
 #include <array>
-#include <iosfwd>
 #include <stdint.h>
 #include <vector>
+
+class Reader;
 
 class attFile {
   public:
@@ -32,4 +33,4 @@ class attFile {
 	std::vector<uint8_t> extra_data;
 };
 
-attFile ReadAttFile(std::istream& in);
+attFile ReadAttFile(Reader&);

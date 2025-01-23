@@ -23,12 +23,13 @@
 #include "bytecode.h"
 #include "caosScript.h"
 #include "common/demangle.h"
+#include "common/io/Reader.h"
+#include "common/io/Writer.h"
 #include "common/throw_ifnot.h"
 
 #include <cassert>
 #include <climits>
 #include <fmt/core.h>
-#include <iostream>
 #include <memory>
 
 void dumpStack(caosVM* vm) {

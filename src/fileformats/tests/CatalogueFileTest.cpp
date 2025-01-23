@@ -1,6 +1,6 @@
 #include "fileformats/catalogueFile.h"
 
-#include "common/spanstream.h"
+#include "common/io/SpanReader.h"
 
 #include <gtest/gtest.h>
 
@@ -29,7 +29,7 @@ TEST(fileformats, CatalogueFile) {
         "hand"
         "door"
     )";
-	spanstream in(buffer);
+	SpanReader in(buffer);
 
 	auto cat = readCatalogueFile(in);
 
@@ -70,7 +70,7 @@ TEST(fileformats, CatalogueFileEndingCommentWithoutNewline) {
 		TAG "Message Centre Text"
         "My tag"
 # comment )";
-	spanstream in(buffer);
+	SpanReader in(buffer);
 	// expect to not throw
 	readCatalogueFile(in);
 }

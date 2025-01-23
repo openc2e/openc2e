@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common/Image.h"
+#include "common/io/Reader.h"
 
-#include <iosfwd>
-
-MultiImage ReadS16File(std::istream& in);
+MultiImage ReadS16File(Reader& in);

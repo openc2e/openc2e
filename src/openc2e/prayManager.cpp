@@ -22,6 +22,7 @@
 #include "Catalogue.h"
 #include "PathResolver.h"
 #include "common/Exception.h"
+#include "common/io/FileReader.h"
 #include "fileformats/PrayFileReader.h"
 
 #include <cassert>
@@ -43,9 +44,7 @@ void PrayBlock::load() {
 		return;
 	}
 
-	std::ifstream in(filename, std::ios::binary);
-	if (!in)
-		throw Exception(std::string("couldn't open PRAY file \"") + filename + "\"");
+	FileReader in(filename);
 	PrayFileReader file(in);
 
 	for (size_t i = 0; i < file.getNumBlocks(); i++) {
@@ -68,9 +67,7 @@ void PrayBlock::parseTags() {
 		return;
 	}
 
-	std::ifstream in(filename, std::ios::binary);
-	if (!in)
-		throw Exception(std::string("couldn't open PRAY file \"") + filename + "\"");
+	FileReader in(filename);
 	PrayFileReader file(in);
 
 	for (size_t i = 0; i < file.getNumBlocks(); i++) {
@@ -92,9 +89,7 @@ prayManager::~prayManager() {
 }
 
 void prayManager::addFile(const fs::path& filename) {
-	std::ifstream in(filename.string(), std::ios::binary);
-	if (!in)
-		throw Exception(std::string("couldn't open PRAY file \"") + filename.string() + "\"");
+	FileReader in(filename);
 	PrayFileReader f(in);
 
 	for (size_t i = 0; i < f.getNumBlocks(); i++) {

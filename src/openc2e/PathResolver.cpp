@@ -22,6 +22,8 @@
 #include "common/Ascii.h"
 #include "common/Exception.h"
 #include "common/case_insensitive_filesystem.h"
+#include "common/io/FileReader.h"
+#include "common/io/FileWriter.h"
 #include "common/wildcard_match.h"
 
 #include <assert.h>
@@ -204,46 +206,46 @@ fs::path getOtherWorldJournalPath(fs::path) {
 	throw Exception("getOtherWorldJournalPath not implemented");
 }
 
-std::ofstream createUserBackgroundFile(fs::path name) {
+FileWriter createUserBackgroundFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Backgrounds";
 	fs::create_directory(dir);
-	return case_insensitive_filesystem::ofstream(dir / name);
+	return case_insensitive_filesystem::create_file(dir / name);
 }
 
-std::ofstream createUserBodyDataFile(fs::path name) {
+FileWriter createUserBodyDataFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Body Data";
 	fs::create_directory(dir);
-	return case_insensitive_filesystem::ofstream(dir / name);
+	return case_insensitive_filesystem::create_file(dir / name);
 }
 
-std::ofstream createUserCatalogueFile(fs::path name) {
+FileWriter createUserCatalogueFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Catalogue";
 	fs::create_directory(dir);
-	return case_insensitive_filesystem::ofstream(dir / name);
+	return case_insensitive_filesystem::create_file(dir / name);
 }
 
-std::ofstream createUserGeneticsFile(fs::path name) {
+FileWriter createUserGeneticsFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Genetics";
 	fs::create_directory(dir);
-	return case_insensitive_filesystem::ofstream(dir / name);
+	return case_insensitive_filesystem::create_file(dir / name);
 }
 
-std::ofstream createUserImageFile(fs::path name) {
+FileWriter createUserImageFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Images";
 	fs::create_directory(dir);
-	return case_insensitive_filesystem::ofstream(dir / name);
+	return case_insensitive_filesystem::create_file(dir / name);
 }
 
-std::ofstream createUserOverlayDataFile(fs::path name) {
+FileWriter createUserOverlayDataFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Overlay Data";
 	fs::create_directory(dir);
-	return case_insensitive_filesystem::ofstream(dir / name);
+	return case_insensitive_filesystem::create_file(dir / name);
 }
 
-std::ofstream createUserSoundFile(fs::path name) {
+FileWriter createUserSoundFile(fs::path name) {
 	fs::path dir = getUserDataDir() / "Sounds";
 	fs::create_directory(dir);
-	return case_insensitive_filesystem::ofstream(dir / name);
+	return case_insensitive_filesystem::create_file(dir / name);
 }
 
 std::vector<fs::path> findAgentFiles(std::string wild) {
