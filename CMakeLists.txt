@@ -99,6 +99,13 @@ add_library(openc2e-common OBJECT
 	src/common/audio/NullAudioBackend.cpp
 	src/common/backend/Backend.cpp
 	src/common/backend/NullBackend.cpp
+	src/common/io/FileReader.cpp
+	src/common/io/FileWriter.cpp
+	src/common/io/Getline.cpp
+	src/common/io/Scanf.cpp
+	src/common/io/SpanReader.cpp
+	src/common/io/StringWriter.cpp
+	src/common/io/VectorWriter.cpp
 	src/common/render/RenderItemHandle.cpp
 	src/common/render/RenderSystem.cpp
 	src/common/case_insensitive_filesystem.cpp
@@ -119,6 +126,12 @@ target_link_libraries(openc2e-common
 )
 
 add_executable(test_common
+	src/common/io/FileIOTest.cpp
+	src/common/io/GetlineTest.cpp
+	src/common/io/ScanfTest.cpp
+	src/common/io/SpanReaderTest.cpp
+	src/common/io/StringWriterTest.cpp
+	src/common/io/VectorWriterTest.cpp
 	src/common/tests/DemangleTest.cpp
 	src/common/tests/EncodingTest.cpp
 	src/common/tests/EndsWithTest.cpp
@@ -129,7 +142,7 @@ add_executable(test_common
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(test_common PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
-target_link_libraries(test_common openc2e-common gtest_main)
+target_link_libraries(test_common openc2e-common ghc_filesystem gtest_main)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
