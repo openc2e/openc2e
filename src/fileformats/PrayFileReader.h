@@ -26,14 +26,21 @@
 #include <string>
 #include <vector>
 
-class prayFileBlock;
-
 using PrayTagBlock = std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>>;
 
 class PrayFileReader {
   protected:
+	struct prayFileBlock {
+		std::string type;
+		std::string name;
+		size_t offset;
+		uint32_t compressed_size;
+		uint32_t size;
+		uint32_t flags;
+	};
+
 	Reader& stream;
-	std::vector<size_t> block_offsets;
+	std::vector<prayFileBlock> blocks;
 
   public:
 	PrayFileReader(Reader&);

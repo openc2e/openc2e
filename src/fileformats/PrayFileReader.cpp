@@ -40,11 +40,25 @@ PrayFileReader::PrayFileReader(Reader& stream_)
 			break;
 		}
 
-		block_offsets.push_back(stream.tell());
+		prayFileBlock block;
+		block.offset = stream.tell();
 
-		stream.seek_relative(132); // skip type and name
-		uint32_t compressedsize = read32le(stream);
-		stream.seek_relative(8 + compressedsize);
+		char type[5];
+		type[4] = 0;
+		stream.read(type, 4);
+		block.type = type;
+
+		char name[129];
+		name[128] = 0;
+		stream.read(name, 128);
+		block.name = ensure_utf8(name);
+
+		block.compressed_size = read32le(stream);
+		block.size = read32le(stream);
+		block.flags = read32le(stream);
+
+		blocks.push_back(block);
+		stream.seek_relative(block.compressed_size);
 	}
 }
 
@@ -52,38 +66,28 @@ PrayFileReader::~PrayFileReader() {
 }
 
 size_t PrayFileReader::getNumBlocks() {
-	return block_offsets.size();
+	return blocks.size();
 }
 
 std::string PrayFileReader::getBlockType(size_t i) {
-	stream.seek_absolute(block_offsets[i]);
-	char type[5];
-	type[4] = 0;
-	stream.read(type, 4);
-	return type;
+	return blocks[i].type;
 }
 
 std::string PrayFileReader::getBlockName(size_t i) {
-	stream.seek_absolute(block_offsets[i] + 4);
-	char name[129];
-	name[128] = 0;
-	stream.read(name, 128);
-	return ensure_utf8(name);
+	return blocks[i].name;
 }
 
 bool PrayFileReader::getBlockIsCompressed(size_t i) {
-	stream.seek_absolute(block_offsets[i] + 140);
-	uint32_t flags = read32le(stream);
-	return ((flags & 1) == 1);
+	return (blocks[i].flags & 1) == 1;
 }
 
 std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 	std::string name = getBlockName(i);
 
-	stream.seek_absolute(block_offsets[i] + 132);
-	uint32_t compressedsize = read32le(stream);
-	uint32_t size = read32le(stream);
-	uint32_t flags = read32le(stream);
+	stream.seek_absolute(blocks[i].offset + 144);
+	uint32_t compressedsize = blocks[i].compressed_size;
+	uint32_t size = blocks[i].size;
+	uint32_t flags = blocks[i].flags;
 	bool compressed = ((flags & 1) == 1);
 
 	if (!compressed && size != compressedsize)
