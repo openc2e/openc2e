@@ -47,7 +47,6 @@ Future improvements:
 #include "common/backend/BackendTexture.h"
 #include "common/math/Rect.h"
 
-#include <map>
 #include <stdint.h>
 
 // These layer indexes aren't enforced, but are useful so keep them here.
