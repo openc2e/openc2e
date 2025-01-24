@@ -25,13 +25,96 @@
 #include "common/endianlove.h"
 #include "common/io/SpanReader.h"
 
+namespace fs = ghc::filesystem;
+
 /*
  * This isn't a full PE parser, but it manages to extract resources from the
  * .exe files included with both Creatures and Creatures 2.
  */
 
-peFile::peFile(fs::path filepath)
-	: path(filepath), file(filepath) {
+struct peSection {
+	uint32_t vaddr;
+	uint32_t offset;
+};
+
+template <typename F>
+void parseResourceDirectoryTable(Reader& file, F&& f) {
+	(void)read32le(file); // characteristics
+	(void)read32le(file); // timestamp
+	(void)read16le(file); // version_major
+	(void)read16le(file); // version_minor
+	uint16_t nonamedentries = read16le(file);
+	uint16_t noidentries = read16le(file);
+
+	for (unsigned int i = 0; i < nonamedentries + noidentries; i++) {
+		uint32_t name_or_id = read32le(file);
+		uint32_t offset = read32le(file);
+		f(name_or_id, offset);
+	}
+}
+
+void parseResourceSection(Reader& file, const peSection& s, std::vector<resourceInfo>& resources) {
+	// for a given .rsrc section, read: (1) the table of type directories,
+	// (2) the table of name directories, (3) the table of language data
+	// entries, (4) the data entries themselves.
+	// these are typically laid out linearly in the file, which
+	// is why we do each in batches rather than simply recursing.
+
+	struct entry {
+		uint32_t type;
+		uint32_t name;
+		uint32_t lang;
+		uint32_t offset;
+	};
+
+	std::vector<entry> type_entries;
+	std::vector<entry> name_entries;
+	std::vector<entry> language_entries;
+
+	file.seek_absolute(s.offset);
+	parseResourceDirectoryTable(file, [&](auto type, auto offset) {
+		type_entries.push_back({type, 0, 0, offset});
+	});
+
+	for (auto& e : type_entries) {
+		file.seek_absolute(s.offset + (e.offset & 0x7fffffff));
+		parseResourceDirectoryTable(file, [&](auto name, auto offset) {
+			name_entries.push_back({e.type, name, 0, offset});
+		});
+	}
+
+	for (auto& e : name_entries) {
+		file.seek_absolute(s.offset + (e.offset & 0x7fffffff));
+		parseResourceDirectoryTable(file, [&](auto lang, auto offset) {
+			language_entries.push_back({e.type, e.name, lang, offset});
+		});
+	}
+
+	for (auto& e : language_entries) {
+		file.seek_absolute(s.offset + e.offset);
+
+		uint32_t offset = read32le(file);
+		offset += s.offset;
+		offset -= s.vaddr;
+		uint32_t size = read32le(file);
+
+		(void)read32le(file); // codepage, always seems to be zero
+		(void)read32le(file); // reserved
+
+		resourceInfo info;
+		info.type = (PeResourceType)e.type;
+		info.name = e.name;
+		info.lang = (PeLanguage)(e.lang & 0xff);
+		info.sublang = (PeSubLanguage)(e.lang >> 10);
+		info.offset = offset;
+		info.size = size;
+
+		resources.push_back(info);
+	}
+}
+
+peFile::peFile(fs::path path)
+	: file(path) {
 	// check the signature of the file
 	char majic[2];
 	file.read(majic, 2);
@@ -63,7 +146,8 @@ peFile::peFile(fs::path filepath)
 	// skip the optional header
 	file.seek_relative(optionalheadersize);
 
-	std::map<std::string, peSection> sections;
+	// find .rsrc sections
+	std::vector<peSection> sections;
 	for (unsigned int i = 0; i < nosections; i++) {
 		char section_name[9];
 		section_name[8] = 0;
@@ -73,71 +157,18 @@ peFile::peFile(fs::path filepath)
 
 		peSection section;
 		section.vaddr = read32le(file);
-		section.size = read32le(file);
+		(void)read32le(file); // size
 		section.offset = read32le(file);
-		sections[std::string(section_name)] = section;
+
+		if (std::string(section_name) == ".rsrc") {
+			sections.push_back(section);
+		}
 
 		file.seek_relative(16);
 	}
 
-	// parse resources
-	auto si = sections.find(std::string(".rsrc"));
-	if (si == sections.end())
-		return;
-	peSection& s = si->second;
-
-	parseResourcesLevel(s, s.offset, 0);
-}
-
-void peFile::parseResourcesLevel(peSection& s, unsigned int off, unsigned int level) {
-	file.seek_absolute(off + 12);
-
-	uint16_t nonamedentries = read16le(file);
-	uint16_t noidentries = read16le(file);
-
-	for (unsigned int i = 0; i < nonamedentries + noidentries; i++) {
-		uint32_t name = read32le(file);
-		uint32_t offset = read32le(file);
-
-		unsigned int here = file.tell();
-
-		if (level == 0) {
-			currtype = name;
-		} else if (level == 1) {
-			/* we don't check for strings here because we don't care :) */
-			currname = name;
-		} else if (level == 2) {
-			currlang = name & 0xff;
-			currsublang = name >> 10;
-		}
-
-		if (level < 2) {
-			/* another level, more horror */
-
-			parseResourcesLevel(s, s.offset + (offset & 0x7fffffff), level + 1);
-		} else {
-			/* bottom level, file data is here */
-
-			file.seek_absolute(s.offset + offset);
-
-			uint32_t offset = read32le(file);
-			offset += s.offset;
-			offset -= s.vaddr;
-			uint32_t size = read32le(file);
-
-			resourceInfo info;
-			info.type = (PeResourceType)currtype;
-			info.lang = (PeLanguage)currlang;
-			info.sublang = (PeSubLanguage)currsublang;
-			info.name = currname;
-			info.offset = offset;
-			info.size = size;
-
-			// if ((currlang & 0xff) == 0x09) // LANG_ENGLISH
-			resources.push_back(info);
-		}
-
-		file.seek_absolute(here);
+	for (auto& s : sections) {
+		parseResourceSection(file, s, resources);
 	}
 }
 
@@ -172,7 +203,7 @@ optional<resourceInfo> peFile::findResource(
 	return {};
 }
 
-shared_array<uint8_t> peFile::getResourceData(resourceInfo r) {
+shared_array<uint8_t> getResourceData(Reader& file, resourceInfo r) {
 	shared_array<uint8_t> data(r.size);
 	file.seek_absolute(r.offset);
 	file.read((char*)data.data(), r.size);
@@ -186,14 +217,14 @@ Image peFile::getBitmap(uint32_t name) {
 	if (!r)
 		return {};
 
-	auto data = getResourceData(*r);
+	auto data = getResourceData(file, *r);
 	SpanReader ss(data);
 	Image bmp = ReadDibFile(ss);
 	return bmp;
 }
 
 std::vector<std::string> peFile::getResourceStrings(resourceInfo r) {
-	auto data = getResourceData(r);
+	auto data = getResourceData(file, r);
 
 	std::vector<std::string> strings;
 

@@ -24,11 +24,8 @@
 #include "common/optional.h"
 
 #include <ghc/filesystem.hpp>
-#include <map>
 #include <string>
 #include <vector>
-
-namespace fs = ghc::filesystem;
 
 enum PeResourceType {
 	PE_RESOURCETYPE_CURSOR = 1,
@@ -81,21 +78,10 @@ class resourceInfo {
 
 class peFile {
   protected:
-	struct peSection {
-		uint32_t vaddr;
-		uint32_t offset;
-		uint32_t size;
-	};
-
-	fs::path path;
 	FileReader file;
-	unsigned int currtype, currname, currlang, currsublang;
-
-	void parseResourcesLevel(peSection& s, unsigned int off, unsigned int level);
-	shared_array<uint8_t> getResourceData(resourceInfo);
 
   public:
-	peFile(fs::path filepath);
+	peFile(ghc::filesystem::path);
 	~peFile();
 
 	optional<resourceInfo> findResource(PeResourceType type, PeLanguage lang, uint32_t name);
