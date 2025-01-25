@@ -50,6 +50,6 @@ class PrayFileReader {
 	std::string getBlockType(size_t index);
 	std::string getBlockName(size_t index);
 	bool getBlockIsCompressed(size_t index);
-	std::vector<unsigned char> getBlockRawData(size_t index);
+	std::vector<uint8_t> getBlockRawData(size_t index);
 	PrayTagBlock getBlockTags(size_t i);
 };

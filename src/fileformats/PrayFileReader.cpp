@@ -81,7 +81,7 @@ bool PrayFileReader::getBlockIsCompressed(size_t i) {
 	return (blocks[i].flags & 1) == 1;
 }
 
-std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
+std::vector<uint8_t> PrayFileReader::getBlockRawData(size_t i) {
 	std::string name = getBlockName(i);
 
 	stream.seek_absolute(blocks[i].offset + 144);
@@ -93,11 +93,11 @@ std::vector<unsigned char> PrayFileReader::getBlockRawData(size_t i) {
 	if (!compressed && size != compressedsize)
 		throw Exception("Size doesn't match compressed size for uncompressed block.");
 
-	std::vector<unsigned char> buffer(size);
+	std::vector<uint8_t> buffer(size);
 
 	if (compressed) {
 		// TODO: check pray_uncompress_sanity_check
-		std::vector<unsigned char> src(compressedsize);
+		std::vector<uint8_t> src(compressedsize);
 		try {
 			stream.read(src);
 		} catch (const IOException&) {

@@ -32,37 +32,14 @@ PrayBlock::PrayBlock() {
 }
 
 PrayBlock::PrayBlock(const std::string& filename_, const std::string& type_, const std::string& name_, bool compressed_)
-	: loaded(false), tagsloaded(false), buffer(), compressed(compressed_),
+	: tagsloaded(false), compressed(compressed_),
 	  size(0), compressedsize(0), filename(filename_), type(type_), name(name_) {
 }
 
 PrayBlock::~PrayBlock() {
 }
 
-void PrayBlock::load() {
-	if (loaded) {
-		return;
-	}
-
-	FileReader in(filename);
-	PrayFileReader file(in);
-
-	for (size_t i = 0; i < file.getNumBlocks(); i++) {
-		if (!(file.getBlockType(i) == type && file.getBlockName(i) == name)) {
-			continue;
-		}
-		loaded = true;
-		buffer = file.getBlockRawData(i);
-		size = buffer.size();
-		return;
-	}
-
-	throw Exception("Couldn't load " + type + " block '" + name + "' from file '" + filename + "'");
-}
-
 void PrayBlock::parseTags() {
-	load(); // TODO: don't double read
-
 	if (tagsloaded) {
 		return;
 	}
@@ -79,6 +56,28 @@ void PrayBlock::parseTags() {
 		integerValues = tags.first;
 		stringValues = tags.second;
 		return;
+	}
+
+	throw Exception("Couldn't load " + type + " block '" + name + "' from file '" + filename + "'");
+}
+
+bool PrayBlock::isCompressed() const {
+	return compressed;
+}
+
+bool PrayBlock::isLoaded() const {
+	return tagsloaded;
+}
+
+std::vector<uint8_t> PrayBlock::getBuffer() {
+	FileReader in(filename);
+	PrayFileReader file(in);
+
+	for (size_t i = 0; i < file.getNumBlocks(); i++) {
+		if (!(file.getBlockType(i) == type && file.getBlockName(i) == name)) {
+			continue;
+		}
+		return file.getBlockRawData(i);
 	}
 
 	throw Exception("Couldn't load " + type + " block '" + name + "' from file '" + filename + "'");

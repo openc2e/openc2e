@@ -29,9 +29,7 @@ namespace fs = ghc::filesystem;
 
 class PrayBlock {
   protected:
-	bool loaded;
 	bool tagsloaded;
-	std::vector<unsigned char> buffer;
 
 	size_t offset;
 	bool compressed;
@@ -47,7 +45,6 @@ class PrayBlock {
 	PrayBlock& operator=(const PrayBlock&) = delete;
 	PrayBlock& operator=(PrayBlock&&) = default;
 	~PrayBlock();
-	void load();
 	void parseTags();
 
 	std::string type;
@@ -55,16 +52,9 @@ class PrayBlock {
 	std::map<std::string, std::string> stringValues;
 	std::map<std::string, uint32_t> integerValues;
 
-	bool isCompressed() { return compressed; }
-	bool isLoaded() { return loaded; }
-	unsigned char* getBuffer() {
-		assert(loaded);
-		return buffer.data();
-	}
-	unsigned int getSize() {
-		assert(loaded);
-		return size;
-	}
+	bool isCompressed() const;
+	bool isLoaded() const;
+	std::vector<uint8_t> getBuffer();
 };
 
 class prayManager {

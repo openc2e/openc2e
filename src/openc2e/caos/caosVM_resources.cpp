@@ -97,11 +97,8 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 		return true;
 	}
 
-	p.load();
-
 	FileWriter output = create_func(name);
-	output.write((char*)p.getBuffer(), p.getSize());
-	// p.unload();
+	output.write(p.getBuffer());
 
 	if (type == 7) {
 		(void)FileWriter(std::move(output)); // flush and close file
