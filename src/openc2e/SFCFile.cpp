@@ -87,10 +87,9 @@ void SFCFile::read(Reader* i) {
 	sfccheck(mapdata);
 
 	// TODO: hackery to seek to the next bit
-	uint8_t x = 0;
-	while (x == 0)
-		x = read8();
-	ourStream->seek_relative(-1);
+	while (i->peek_byte() == 0) {
+		(void)read8();
+	}
 
 	uint32_t numobjects = read32();
 	for (unsigned int i = 0; i < numobjects; i++) {
