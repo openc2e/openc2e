@@ -21,26 +21,25 @@
 
 #include "common/io/Reader.h"
 
-#include <cstdint>
 #include <map>
+#include <stddef.h>
+#include <stdint.h>
 #include <string>
 #include <vector>
 
 using PrayTagBlock = std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>>;
 
+struct PrayBlockMetadata {
+	std::string type;
+	std::string name;
+	size_t offset;
+	bool is_compressed;
+};
+
 class PrayFileReader {
   protected:
-	struct prayFileBlock {
-		std::string type;
-		std::string name;
-		size_t offset;
-		uint32_t compressed_size;
-		uint32_t size;
-		uint32_t flags;
-	};
-
 	Reader& stream;
-	std::vector<prayFileBlock> blocks;
+	std::vector<PrayBlockMetadata> blocks;
 
   public:
 	PrayFileReader(Reader&);
@@ -53,3 +52,7 @@ class PrayFileReader {
 	std::vector<uint8_t> getBlockRawData(size_t index);
 	PrayTagBlock getBlockTags(size_t i);
 };
+
+std::vector<PrayBlockMetadata> readPrayMetadata(Reader&);
+std::vector<uint8_t> readPrayBlockRawData(Reader&, const PrayBlockMetadata&);
+PrayTagBlock readPrayBlockTags(Reader&, const PrayBlockMetadata&);

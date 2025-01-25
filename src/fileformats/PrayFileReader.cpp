@@ -28,8 +28,9 @@
 #include <cstring>
 #include <zlib.h>
 
-PrayFileReader::PrayFileReader(Reader& stream_)
-	: stream(stream_) {
+std::vector<PrayBlockMetadata> readPrayMetadata(Reader& stream) {
+	std::vector<PrayBlockMetadata> blocks;
+
 	char majic[4];
 	stream.read(majic, 4);
 	if (strncmp(majic, "PRAY", 4) != 0)
@@ -40,7 +41,7 @@ PrayFileReader::PrayFileReader(Reader& stream_)
 			break;
 		}
 
-		prayFileBlock block;
+		PrayBlockMetadata block;
 		block.offset = stream.tell();
 
 		char type[5];
@@ -53,13 +54,20 @@ PrayFileReader::PrayFileReader(Reader& stream_)
 		stream.read(name, 128);
 		block.name = ensure_utf8(name);
 
-		block.compressed_size = read32le(stream);
-		block.size = read32le(stream);
-		block.flags = read32le(stream);
+		uint32_t compressed_size = read32le(stream);
+		(void)read32le(stream); // size
+		uint32_t flags = read32le(stream);
+		block.is_compressed = flags & 1;
 
 		blocks.push_back(block);
-		stream.seek_relative(block.compressed_size);
+		stream.seek_relative(compressed_size);
 	}
+	return blocks;
+}
+
+PrayFileReader::PrayFileReader(Reader& stream_)
+	: stream(stream_) {
+	blocks = readPrayMetadata(stream);
 }
 
 PrayFileReader::~PrayFileReader() {
@@ -78,17 +86,32 @@ std::string PrayFileReader::getBlockName(size_t i) {
 }
 
 bool PrayFileReader::getBlockIsCompressed(size_t i) {
-	return (blocks[i].flags & 1) == 1;
+	return blocks[i].is_compressed;
 }
 
-std::vector<uint8_t> PrayFileReader::getBlockRawData(size_t i) {
-	std::string name = getBlockName(i);
+std::vector<uint8_t> readPrayBlockRawData(Reader& stream, const PrayBlockMetadata& block) {
+	stream.seek_absolute(block.offset);
 
-	stream.seek_absolute(blocks[i].offset + 144);
-	uint32_t compressedsize = blocks[i].compressed_size;
-	uint32_t size = blocks[i].size;
-	uint32_t flags = blocks[i].flags;
+	char type[5];
+	type[4] = 0;
+	stream.read(type, 4);
+	if (type != block.type) {
+		throw Exception(fmt::format("Block type {:?} doesn't match expected type {:?}", type, block.type));
+	}
+
+	char name_[129];
+	name_[128] = 0;
+	stream.read(name_, 128);
+	std::string name = ensure_utf8(name_);
+	if (name != block.name) {
+		throw Exception(fmt::format("Block name {:?} doesn't match expected name {:?}", name, block.name));
+	}
+
+	uint32_t compressedsize = read32le(stream);
+	uint32_t size = read32le(stream);
+	uint32_t flags = read32le(stream);
 	bool compressed = ((flags & 1) == 1);
+	// we could check is_compressed against the passed-in block metadata, but it doesn't really matter
 
 	if (!compressed && size != compressedsize)
 		throw Exception("Size doesn't match compressed size for uncompressed block.");
@@ -129,6 +152,10 @@ std::vector<uint8_t> PrayFileReader::getBlockRawData(size_t i) {
 	return buffer;
 }
 
+std::vector<uint8_t> PrayFileReader::getBlockRawData(size_t i) {
+	return readPrayBlockRawData(stream, blocks[i]);
+}
+
 static std::string tagStringRead(Reader& in) {
 	unsigned int len = read32le(in);
 
@@ -137,13 +164,11 @@ static std::string tagStringRead(Reader& in) {
 	return data;
 }
 
-std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> PrayFileReader::getBlockTags(size_t i) {
-	std::string name = getBlockName(i);
-
+PrayTagBlock readPrayBlockTags(Reader& r, const PrayBlockMetadata& block) {
 	std::map<std::string, uint32_t> integerValues;
 	std::map<std::string, std::string> stringValues;
 
-	auto buffer = getBlockRawData(i);
+	auto buffer = readPrayBlockRawData(r, block);
 	SpanReader s(buffer);
 
 	try {
@@ -169,12 +194,16 @@ std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> P
 			}
 		}
 	} catch (const IOException&) {
-		throw Exception("Stream failure reading tags from PRAY block \"" + name + "\"");
+		throw Exception("Stream failure reading tags from PRAY block \"" + block.name + "\"");
 	}
 
 	if (s.has_data_left()) {
-		throw Exception("Didn't read whole block while reading tags from PRAY block \"" + name + "\"");
+		throw Exception("Didn't read whole block while reading tags from PRAY block \"" + block.name + "\"");
 	}
 
 	return {integerValues, stringValues};
+}
+
+std::pair<std::map<std::string, uint32_t>, std::map<std::string, std::string>> PrayFileReader::getBlockTags(size_t i) {
+	return readPrayBlockTags(stream, blocks[i]);
 }
