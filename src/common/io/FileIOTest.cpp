@@ -48,11 +48,7 @@ TEST(File, file_write_read_flush_read) {
 	FileReader r(fname());
 	// no data until flushed
 	EXPECT_FALSE(r.has_data_left());
-
 	w.flush();
-
-	// reset file end-of-file marker - or should we just getc/ungetc every time? hmm.
-	r.seek_absolute(0);
 	EXPECT_TRUE(r.has_data_left());
 }
 
@@ -127,10 +123,25 @@ TEST(File, file_read_to_end_tell) {
 	EXPECT_EQ(f.tell(), 11);
 }
 
-TEST(File, file_seek_tell) {
+TEST(File, file_seek_absolute_tell) {
 	FileWriter(fname()).write("hello world");
 	FileReader f(fname());
 	f.seek_absolute(6);
+	EXPECT_EQ(f.tell(), 6);
+}
+
+TEST(File, file_seek_relative_forward_tell) {
+	FileWriter(fname()).write("hello world");
+	FileReader f(fname());
+	f.seek_relative(6);
+	EXPECT_EQ(f.tell(), 6);
+}
+
+TEST(File, file_seek_relative_backward_tell) {
+	FileWriter(fname()).write("hello world");
+	FileReader f(fname());
+	(void)f.read_to_end();
+	f.seek_relative(-5);
 	EXPECT_EQ(f.tell(), 6);
 }
 

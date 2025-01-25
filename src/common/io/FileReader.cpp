@@ -77,29 +77,26 @@ std::vector<uint8_t> FileReader::read_to_end() {
 			path_.string()));
 	}
 
-#ifdef _WIN32
-	int64_t pos = _ftelli64(ptr_);
-#else
-	// TODO: define _FILE_OFFSET_BITS=64 on Linux?
-	int64_t pos = ftello(ptr_);
-#endif
-	if (pos < 0) {
-		throw IOException(fmt::format("tell() failed for file {:?}: {}",
-			path_.string(), errno_message()));
+	static_assert(sizeof(size_t) >= sizeof(int64_t), "positive int64_t can fit into size_t");
+	// static_cast is safe because sb.st_size is non-negative and can fit into a size_t
+	if (static_cast<size_t>(sb.st_size) < pos_) {
+		throw IOException(fmt::format(
+			"stat.st_size < pos_ for file {:?}", path_.string()));
 	}
 
-	auto remaining = sb.st_size - pos;
-	if (remaining < 0) {
-		throw IOException(fmt::format(
-			"stat.st_size - tell() was negative for file {:?}", path_.string()));
-	}
-	static_assert(sizeof(size_t) >= sizeof(int64_t), "positive int64_t can fit into size_t");
-	std::vector<uint8_t> buf(static_cast<size_t>(remaining)); // TODO: don't initialize vector members
+	// static_cast is safe as above
+	// unsigned subtraction is safe because sb.st_size >= pos_;
+	auto remaining = static_cast<size_t>(sb.st_size) - pos_;
+	std::vector<uint8_t> buf(remaining); // TODO: don't initialize vector members
 	do_read(buf.data(), buf.size());
 	return buf;
 }
 
 void FileReader::seek_absolute(size_t n) {
+	if (n == pos_) {
+		return;
+	}
+
 	// some static asserts to make sure the size check is well-formed
 	static_assert(std::numeric_limits<int64_t>::max() >= 0, "max(int64_t) >= 0");
 	static_assert(sizeof(size_t) >= sizeof(int64_t), "positive int64_t can fit into size_t");
@@ -116,41 +113,41 @@ void FileReader::seek_absolute(size_t n) {
 		throw IOException(fmt::format("seek() failed for file {:?}: {}",
 			path_.string(), errno_message()));
 	}
+	pos_ = n;
 }
 
-void FileReader::seek_relative(int64_t n) {
-#ifdef _WIN32
-	int ret = _fseeki64(ptr_, n, SEEK_CUR);
-#else
-	// TODO: define _FILE_OFFSET_BITS=64 on Linux?
-	static_assert(sizeof(off_t) >= sizeof(int64_t), "int64_t can fit into an off_t");
-	int ret = fseeko(ptr_, static_cast<off_t>(n), SEEK_CUR);
-#endif
-	if (ret != 0) {
-		throw IOException(fmt::format("seek() failed for file {:?}: {}",
-			path_.string(), errno_message()));
+void FileReader::seek_relative(int64_t off) {
+	// do these calcs because we want to track pos_ manually. once we're doing that,
+	// we might as well just call seek_absolute() with the final position anyways
+	// (and avoids a syscall on certain implementations of fseek(SEEK_CUR) which
+	// call tell() and fseek(SEEK_SET) under the hood).
+	static_assert(sizeof(size_t) >= sizeof(int64_t), "positive int64_t can fit into size_t");
+	if (off >= 0) {
+		// static_cast is safe because off is positive and fits into size_t.
+		return seek_absolute(static_cast<size_t>(off) + pos_);
+	} else if (off < 0) {
+		// -(off + 1) is safe because it's guaranteed to fit into an off_t (we
+		// don't use the simpler -off because it might be the minimum value,
+		// which can't fit into a positive).
+		// static_cast is safe because -(off + 1) is positive and fits into size_t.
+		// off_negated is mathematically: -(off + 1) + 1 = -off - 1 + 1 = -off.
+		size_t off_negated = static_cast<size_t>(-(off + 1)) + 1;
+		if (off_negated > pos_) {
+			throw IOException(fmt::format("seek_relative() would end up in a negative offset for file {:?}",
+				path_.string()));
+		}
+		// subtraction is safe because we know off_negated <= pos so the result
+		// is positive or zero.
+		return seek_absolute(pos_ - off_negated);
 	}
 }
 
 size_t FileReader::tell() const {
-#ifdef _WIN32
-	int64_t pos = _ftelli64(ptr_);
-#else
-	// TODO: define _FILE_OFFSET_BITS=64 on Linux?
-	int64_t pos = ftello(ptr_);
-#endif
-	if (pos < 0) {
-		throw IOException(fmt::format("tell() failed for file {:?}: {}",
-			path_.string(), errno_message()));
-	}
-	static_assert(sizeof(size_t) >= sizeof(int64_t), "positive int64_t can fit into a size_t");
-	return static_cast<size_t>(pos);
+	return pos_;
 }
 
 bool FileReader::has_data_left() {
-	if (feof(ptr_) != 0) {
-		return false;
-	}
+	clearerr(ptr_); // reset eof marker, in case file has been written to since last time we checked.
 	int c;
 	c = fgetc(ptr_);
 	ungetc(c, ptr_);
@@ -183,6 +180,7 @@ uint8_t FileReader::peek_byte() {
 
 void FileReader::do_read(uint8_t* out, size_t n) {
 	size_t bytes_read = fread(out, 1, n, ptr_);
+	pos_ += bytes_read;
 	if (bytes_read != n) {
 		// TODO: handle EINTR
 		if (ferror(ptr_) != 0) {

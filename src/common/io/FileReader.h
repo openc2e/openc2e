@@ -23,14 +23,17 @@ Couple things to note:
   the entire thing in one go, rather than mucking about with
   iterators or what have you.
 
-And a wish for future improvements:
+- tell() does not actually make a syscall, as FileReader tracks
+  its position manually. This may give incorrect results for
+  special files or when sending file descriptors to other processes!
+  Luckily we don't do any of that. Cheap tell() is useful for
+  reading different file types (especially sprites, and especially
+  C16 sprites which check offsets for each line).
 
-- Cheap tell() and cheap seek()'s if we're already at the correct
-  position. This would require tracking the current file position
-  manually, but gives us the ability to skip making a syscall. This
-  comes up when reading certain file types (especially sprites),
-  which contain offsets we seek around to but are almost always
-  laid out linearly anyways.
+- Because position is tracked manually, seek() is also cheap (in
+  fact, a no-op) if we're already at the correct position.
+
+And a wish for future improvements:
 
 - Cheap seek()'s if that position is already in the underlying
   buffer. We have a number of files where we jumo forward to skip
@@ -85,4 +88,5 @@ class FileReader final : public Reader {
 
 	ghc::filesystem::path path_;
 	FILE* ptr_ = nullptr;
+	size_t pos_ = 0;
 };
