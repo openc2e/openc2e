@@ -20,26 +20,21 @@
 #ifndef PRAYMANAGER_H
 #define PRAYMANAGER_H
 
+#include "fileformats/PrayFileReader.h"
+
 #include <cassert>
 #include <ghc/filesystem.hpp>
 #include <map>
 #include <string>
 
-namespace fs = ghc::filesystem;
-
 class PrayBlock {
   protected:
 	bool tagsloaded;
-
-	size_t offset;
-	bool compressed;
-	unsigned int size, compressedsize;
-
-	std::string filename;
+	ghc::filesystem::path filename;
 
   public:
 	PrayBlock();
-	PrayBlock(const std::string& filename, const std::string& type, const std::string& name, bool is_compressed);
+	PrayBlock(const ghc::filesystem::path& filename, PrayBlockMetadata);
 	PrayBlock(const PrayBlock&) = delete;
 	PrayBlock(PrayBlock&&) = default;
 	PrayBlock& operator=(const PrayBlock&) = delete;
@@ -47,8 +42,7 @@ class PrayBlock {
 	~PrayBlock();
 	void parseTags();
 
-	std::string type;
-	std::string name;
+	PrayBlockMetadata metadata;
 	std::map<std::string, std::string> stringValues;
 	std::map<std::string, uint32_t> integerValues;
 
@@ -59,7 +53,7 @@ class PrayBlock {
 
 class prayManager {
   protected:
-	void addFile(const fs::path&);
+	void addFile(const ghc::filesystem::path&);
 
   public:
 	std::map<std::string, PrayBlock> blocks;

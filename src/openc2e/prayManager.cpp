@@ -28,12 +28,13 @@
 #include <cassert>
 #include <ghc/filesystem.hpp>
 
+namespace fs = ghc::filesystem;
+
 PrayBlock::PrayBlock() {
 }
 
-PrayBlock::PrayBlock(const std::string& filename_, const std::string& type_, const std::string& name_, bool compressed_)
-	: tagsloaded(false), compressed(compressed_),
-	  size(0), compressedsize(0), filename(filename_), type(type_), name(name_) {
+PrayBlock::PrayBlock(const fs::path& filename_, PrayBlockMetadata metadata_)
+	: tagsloaded(false), filename(filename_), metadata(metadata_) {
 }
 
 PrayBlock::~PrayBlock() {
@@ -45,24 +46,13 @@ void PrayBlock::parseTags() {
 	}
 
 	FileReader in(filename);
-	PrayFileReader file(in);
-
-	for (size_t i = 0; i < file.getNumBlocks(); i++) {
-		if (!(file.getBlockType(i) == type && file.getBlockName(i) == name)) {
-			continue;
-		}
-		tagsloaded = true;
-		auto tags = file.getBlockTags(i);
-		integerValues = tags.first;
-		stringValues = tags.second;
-		return;
-	}
-
-	throw Exception("Couldn't load " + type + " block '" + name + "' from file '" + filename + "'");
+	auto tags = readPrayBlockTags(in, metadata);
+	integerValues = tags.first;
+	stringValues = tags.second;
 }
 
 bool PrayBlock::isCompressed() const {
-	return compressed;
+	return metadata.is_compressed;
 }
 
 bool PrayBlock::isLoaded() const {
@@ -71,16 +61,7 @@ bool PrayBlock::isLoaded() const {
 
 std::vector<uint8_t> PrayBlock::getBuffer() {
 	FileReader in(filename);
-	PrayFileReader file(in);
-
-	for (size_t i = 0; i < file.getNumBlocks(); i++) {
-		if (!(file.getBlockType(i) == type && file.getBlockName(i) == name)) {
-			continue;
-		}
-		return file.getBlockRawData(i);
-	}
-
-	throw Exception("Couldn't load " + type + " block '" + name + "' from file '" + filename + "'");
+	return readPrayBlockRawData(in, metadata);
 }
 
 
@@ -89,13 +70,14 @@ prayManager::~prayManager() {
 
 void prayManager::addFile(const fs::path& filename) {
 	FileReader in(filename);
-	PrayFileReader f(in);
 
-	for (size_t i = 0; i < f.getNumBlocks(); i++) {
-		if (blocks.find(f.getBlockName(i)) != blocks.end()) // garr, block conflict
+	auto metadata = readPrayMetadata(in);
+
+	for (auto& m : metadata) {
+		if (blocks.find(m.name) != blocks.end()) // garr, block conflict
 			continue;
-		//assert(blocks.find(f.getBlockName(i)) == blocks.end());
-		blocks[f.getBlockName(i)] = PrayBlock(filename.string(), f.getBlockType(i), f.getBlockName(i), f.getBlockIsCompressed(i));
+		//assert(blocks.find(m.name) == blocks.end());
+		blocks[m.name] = PrayBlock(filename, m);
 	}
 }
 

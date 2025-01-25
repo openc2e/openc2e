@@ -86,8 +86,8 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	}
 
 	PrayBlock& p = i->second;
-	if (p.type != "FILE") {
-		fmt::print("PRAY FILE: block {} is {} not FILE\n", name, p.type);
+	if (p.metadata.type != "FILE") {
+		fmt::print("PRAY FILE: block {} is {} not FILE\n", name, p.metadata.type);
 		// TODO: correct behaviour? possibly not..
 		return false;
 	}
@@ -175,7 +175,7 @@ std::string findBlock(std::string type, std::string last, bool forward, bool loo
 
 	// Loop through all the blocks.
 	while (true) {
-		if (i->second.type == type) {
+		if (i->second.metadata.type == type) {
 			currblock = &i->second;
 
 			// Store the first block if we didn't already find one, for possible use later.
@@ -184,10 +184,10 @@ std::string findBlock(std::string type, std::string last, bool forward, bool loo
 
 			// If this is the resource we want, grab it!
 			if (foundblock)
-				return currblock->name;
+				return currblock->metadata.name;
 
 			// If this is the resource we're looking for, make a note to grab the next one.
-			if (last == currblock->name)
+			if (last == currblock->metadata.name)
 				foundblock = true;
 		}
 
@@ -203,9 +203,9 @@ std::string findBlock(std::string type, std::string last, bool forward, bool loo
 	}
 
 	if (foundblock && loop)
-		return firstblock->name; // loop around to first-found block
+		return firstblock->metadata.name; // loop around to first-found block
 	else if (!foundblock && currblock)
-		return firstblock->name; // default to first-found block (XXX this is in direct opposition to what CAOS docs say!)
+		return firstblock->metadata.name; // default to first-found block (XXX this is in direct opposition to what CAOS docs say!)
 
 	return ""; // yarr, failure.
 }
@@ -281,7 +281,7 @@ void v_PRAY_COUN(caosVM* vm) {
 
 	unsigned int count = 0;
 	for (auto& block : world.praymanager->blocks)
-		if (block.second.type == type)
+		if (block.second.metadata.type == type)
 			count++;
 
 	vm->result.setInt(count);
