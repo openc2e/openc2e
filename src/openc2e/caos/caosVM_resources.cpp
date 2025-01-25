@@ -79,15 +79,15 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 		return true;
 	}
 
-	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, PrayBlock>::iterator i = world.praymanager->blocks.find(name);
 	if (i == world.praymanager->blocks.end()) {
 		fmt::print("PRAY FILE: couldn't find block {}\n");
 		return false;
 	}
 
-	PrayBlock* p = i->second.get();
-	if (p->type != "FILE") {
-		fmt::print("PRAY FILE: block {} is {} not FILE\n", name, p->type);
+	PrayBlock& p = i->second;
+	if (p.type != "FILE") {
+		fmt::print("PRAY FILE: block {} is {} not FILE\n", name, p.type);
 		// TODO: correct behaviour? possibly not..
 		return false;
 	}
@@ -97,11 +97,11 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 		return true;
 	}
 
-	p->load();
+	p.load();
 
 	FileWriter output = create_func(name);
-	output.write((char*)p->getBuffer(), p->getSize());
-	// p->unload();
+	output.write((char*)p.getBuffer(), p.getSize());
+	// p.unload();
 
 	if (type == 7) {
 		(void)FileWriter(std::move(output)); // flush and close file
@@ -113,23 +113,23 @@ bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 }
 
 int prayInstallDeps(std::string name, bool actually_install) {
-	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, PrayBlock>::iterator i = world.praymanager->blocks.find(name);
 	THROW_IFNOT(i != world.praymanager->blocks.end());
 
-	PrayBlock* p = i->second.get();
-	p->parseTags();
+	PrayBlock& p = i->second;
+	p.parseTags();
 
 	std::map<std::string, uint32_t>::iterator j;
-	j = p->integerValues.find("Agent Type");
+	j = p.integerValues.find("Agent Type");
 	// previously errored when this didn't exist, but some community-created
 	// agent files don't have it
-	if (j != p->integerValues.end()) {
+	if (j != p.integerValues.end()) {
 		// I have no idea what this is, so let's just error out when it's not zero, pending fix. - fuzzie
 		THROW_IFNOT(j->second == 0);
 	}
 
-	j = p->integerValues.find("Dependency Count");
-	if (j == p->integerValues.end()) {
+	j = p.integerValues.find("Dependency Count");
+	if (j == p.integerValues.end()) {
 		return -2;
 	}
 	int nodeps = j->second;
@@ -138,14 +138,14 @@ int prayInstallDeps(std::string name, bool actually_install) {
 	for (int z = 1; z <= nodeps; z++) {
 		std::string depcatname = fmt::format("Dependency Category {}", z);
 		std::string depname = fmt::format("Dependency {}", z);
-		j = p->integerValues.find(depcatname);
-		if (j == p->integerValues.end()) {
+		j = p.integerValues.find(depcatname);
+		if (j == p.integerValues.end()) {
 			return (-2 - nodeps - z);
 		}
 		int depcat = j->second;
 		THROW_IFNOT(depcat >= 0 && depcat <= 11);
-		std::map<std::string, std::string>::iterator k = p->stringValues.find(depname);
-		if (k == p->stringValues.end()) {
+		std::map<std::string, std::string>::iterator k = p.stringValues.find(depname);
+		if (k == p.stringValues.end()) {
 			return (-2 - z);
 		}
 		std::string dep = k->second;
@@ -168,7 +168,7 @@ std::string findBlock(std::string type, std::string last, bool forward, bool loo
 		return ""; // We definitely can't find anything in that case!
 
 	// Where do we start?
-	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i;
+	std::map<std::string, PrayBlock>::iterator i;
 	if (forward)
 		i = world.praymanager->blocks.begin();
 	else {
@@ -178,8 +178,8 @@ std::string findBlock(std::string type, std::string last, bool forward, bool loo
 
 	// Loop through all the blocks.
 	while (true) {
-		if (i->second->type == type) {
-			currblock = i->second.get();
+		if (i->second.type == type) {
+			currblock = &i->second;
 
 			// Store the first block if we didn't already find one, for possible use later.
 			if (!firstblock)
@@ -225,15 +225,15 @@ void v_PRAY_AGTI(caosVM* vm) {
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
 
-	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(resource);
+	std::map<std::string, PrayBlock>::iterator i = world.praymanager->blocks.find(resource);
 	THROW_IFNOT(i != world.praymanager->blocks.end());
 
-	PrayBlock* p = i->second.get();
-	p->parseTags();
-	if (p->integerValues.find(tag) == p->integerValues.end())
+	PrayBlock& p = i->second;
+	p.parseTags();
+	if (p.integerValues.find(tag) == p.integerValues.end())
 		vm->result.setInt(_default);
 	else
-		vm->result.setInt(p->integerValues[tag]);
+		vm->result.setInt(p.integerValues[tag]);
 }
 
 /**
@@ -248,15 +248,15 @@ void v_PRAY_AGTS(caosVM* vm) {
 	VM_PARAM_STRING(tag)
 	VM_PARAM_STRING(resource)
 
-	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(resource);
+	std::map<std::string, PrayBlock>::iterator i = world.praymanager->blocks.find(resource);
 	THROW_IFNOT(i != world.praymanager->blocks.end());
 
-	PrayBlock* p = i->second.get();
-	p->parseTags();
-	if (p->stringValues.find(tag) == p->stringValues.end())
+	PrayBlock& p = i->second;
+	p.parseTags();
+	if (p.stringValues.find(tag) == p.stringValues.end())
 		vm->result.setString(_default);
 	else
-		vm->result.setString(p->stringValues[tag]);
+		vm->result.setString(p.stringValues[tag]);
 }
 
 /**
@@ -284,7 +284,7 @@ void v_PRAY_COUN(caosVM* vm) {
 
 	unsigned int count = 0;
 	for (auto& block : world.praymanager->blocks)
-		if (block.second->type == type)
+		if (block.second.type == type)
 			count++;
 
 	vm->result.setInt(count);
@@ -389,14 +389,14 @@ void v_PRAY_INJT(caosVM* vm) {
 	}
 
 	// Now grab the relevant block..
-	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, PrayBlock>::iterator i = world.praymanager->blocks.find(name);
 	THROW_IFNOT(i != world.praymanager->blocks.end());
-	PrayBlock* p = i->second.get();
-	p->parseTags();
+	PrayBlock& p = i->second;
+	p.parseTags();
 
 	// .. grab the script count ..
-	std::map<std::string, uint32_t>::iterator j = p->integerValues.find("Script Count");
-	if (j == p->integerValues.end()) {
+	std::map<std::string, uint32_t>::iterator j = p.integerValues.find("Script Count");
+	if (j == p.integerValues.end()) {
 		vm->result.setInt(-3); // TODO: this isn't really a dependency fail, what do I do here?
 		return;
 	}
@@ -407,8 +407,8 @@ void v_PRAY_INJT(caosVM* vm) {
 	for (int z = 1; z <= noscripts; z++) {
 		// First, retrieve the script.
 		std::string scriptname = fmt::format("Script {}", z);
-		std::map<std::string, std::string>::iterator k = p->stringValues.find(scriptname);
-		if (k == p->stringValues.end()) {
+		std::map<std::string, std::string>::iterator k = p.stringValues.find(scriptname);
+		if (k == p.stringValues.end()) {
 			vm->result.setInt(-1);
 			report->setString(scriptname);
 			return;
@@ -530,14 +530,14 @@ void c_PRAY_REFR(caosVM*) {
 void v_PRAY_TEST(caosVM* vm) {
 	VM_PARAM_STRING(name)
 
-	std::map<std::string, std::unique_ptr<PrayBlock> >::iterator i = world.praymanager->blocks.find(name);
+	std::map<std::string, PrayBlock>::iterator i = world.praymanager->blocks.find(name);
 	if (i == world.praymanager->blocks.end())
 		vm->result.setInt(0);
 	else {
-		PrayBlock* p = i->second.get();
-		if (p->isLoaded())
+		PrayBlock& p = i->second;
+		if (p.isLoaded())
 			vm->result.setInt(1);
-		else if (p->isCompressed())
+		else if (p.isCompressed())
 			vm->result.setInt(3);
 		else
 			vm->result.setInt(2);

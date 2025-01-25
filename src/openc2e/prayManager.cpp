@@ -96,7 +96,7 @@ void prayManager::addFile(const fs::path& filename) {
 		if (blocks.find(f.getBlockName(i)) != blocks.end()) // garr, block conflict
 			continue;
 		//assert(blocks.find(f.getBlockName(i)) == blocks.end());
-		blocks[f.getBlockName(i)] = std::unique_ptr<PrayBlock>(new PrayBlock(filename.string(), f.getBlockType(i), f.getBlockName(i), f.getBlockIsCompressed(i)));
+		blocks[f.getBlockName(i)] = PrayBlock(filename.string(), f.getBlockType(i), f.getBlockName(i), f.getBlockIsCompressed(i));
 	}
 }
 

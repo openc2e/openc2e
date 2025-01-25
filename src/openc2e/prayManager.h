@@ -42,6 +42,10 @@ class PrayBlock {
   public:
 	PrayBlock();
 	PrayBlock(const std::string& filename, const std::string& type, const std::string& name, bool is_compressed);
+	PrayBlock(const PrayBlock&) = delete;
+	PrayBlock(PrayBlock&&) = default;
+	PrayBlock& operator=(const PrayBlock&) = delete;
+	PrayBlock& operator=(PrayBlock&&) = default;
 	~PrayBlock();
 	void load();
 	void parseTags();
@@ -68,7 +72,7 @@ class prayManager {
 	void addFile(const fs::path&);
 
   public:
-	std::map<std::string, std::unique_ptr<PrayBlock> > blocks;
+	std::map<std::string, PrayBlock> blocks;
 
 	~prayManager();
 
