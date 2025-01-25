@@ -97,6 +97,14 @@ void FileReader::seek_absolute(size_t n) {
 		return;
 	}
 
+	if (n < pos_) {
+		// Warn on backwards seeks. Most of the time, it's more efficient to read a file
+		// forwards-only, and this likely represents some weird logic that can be cleaned up.
+		fmt::print("WARNING: Backwards seek on file {} (-{})\n",
+			path_.string(),
+			pos_ - n);
+	}
+
 	// some static asserts to make sure the size check is well-formed
 	static_assert(std::numeric_limits<int64_t>::max() >= 0, "max(int64_t) >= 0");
 	static_assert(sizeof(size_t) >= sizeof(int64_t), "positive int64_t can fit into size_t");
