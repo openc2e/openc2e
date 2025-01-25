@@ -45,8 +45,11 @@ static MultiImage ReadPrototypeSprFile(Reader& in, int numframes, uint32_t first
 	}
 
 	for (int i = 0; i < numframes; i++) {
-		// TODO: don't seek
-		in.seek_absolute(offsets[i]);
+		if (offsets[i] != in.tell()) {
+			// we don't care about offsets but the official engine probably does
+			fmt::print("WARNING: SPR image offset in header was {} but file position is actually {}\n",
+				offsets[i], in.tell());
+		}
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
 		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
 	}
@@ -79,15 +82,16 @@ SprFileData ReadSprFileWithMetadata(Reader& in, int32_t absolute_base, int32_t i
 		images[i].colorkey = Color{0, 0, 0, 255};
 	}
 
-	// skip remaining metadata
-	for (uint16_t i = 0; i < total_image_count - absolute_base - image_count; i++) {
-		in.seek_relative(8 * absolute_base);
-	}
+	// skip remaining metadata and images
+	in.seek_absolute(offsets[0]);
 
 	// now read actual data
 	for (int32_t i = 0; i < image_count; i++) {
-		// TODO: don't seek if possible, it can be slower than just reading linearly
-		in.seek_absolute(offsets[i]);
+		if (static_cast<uint32_t>(offsets[i]) != in.tell()) {
+			// we don't care about offsets but the official engine does
+			fmt::print("WARNING: SPR image offset in header was {} but file position is actually {}\n",
+				offsets[i], in.tell());
+		}
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
 		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
 	}
@@ -128,8 +132,11 @@ MultiImage ReadSprFile(Reader& in) {
 	// }
 
 	for (int i = 0; i < numframes; i++) {
-		// TODO: don't seek
-		in.seek_absolute(offsets[i]);
+		if (offsets[i] != in.tell()) {
+			// we don't care about offsets but the official engine does
+			fmt::print("WARNING: SPR image offset in header was {} but file position is actually {}\n",
+				offsets[i], in.tell());
+		}
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height);
 		in.read(reinterpret_cast<char*>(images[i].data.data()), images[i].width * images[i].height);
 	}

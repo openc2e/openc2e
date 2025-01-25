@@ -53,22 +53,21 @@ MultiImage ReadC16File(Reader& in) {
 		}
 	}
 
-	// track position manually because ifstreams implementations often call seek
-	// on the underlying file even when we're already at the right position!
-	size_t curpos = in.tell();
-
-	// todo: we assume the file format is valid here. we shouldn't.
+	// then, read the image data.
 	for (size_t i = 0; i < numframes; i++) {
 		images[i].data = shared_array<uint8_t>(images[i].width * images[i].height * 2);
 		uint16_t* bufferpos = (uint16_t*)images[i].data.data();
 		for (int j = 0; j < images[i].height; j++) {
-			if (lineoffsets[i][j] != curpos) {
-				// TODO: log warning?
-				in.seek_absolute(lineoffsets[i][j]);
+			if (lineoffsets[i][j] != in.tell()) {
+				// TODO: log warning? we don't care but the official engine uses the
+				// overall image offset to find the actual sprites, and uses the line
+				// offsets for transparency lookups.
+				fmt::print("WARNING: C16 line offset in header was {} but file position is actually {}\n",
+					lineoffsets[i][j], in.tell());
 			}
 			while (true) {
 				uint16_t tag = read16le(in);
-				curpos += 2;
+				// TODO: check that this actually matches the correct line length
 				if (tag == 0)
 					break;
 				bool transparentrun = ((tag & 0x0001) == 0);
@@ -77,13 +76,11 @@ MultiImage ReadC16File(Reader& in) {
 					memset((char*)bufferpos, 0, (runlength * 2));
 				} else {
 					readmany16le(in, bufferpos, runlength);
-					curpos += 2 * runlength;
 				}
 				bufferpos += runlength;
 			}
 		}
 		uint16_t endofimagemarker = read16le(in);
-		curpos += 2;
 		THROW_IFNOT(endofimagemarker == 0);
 	}
 

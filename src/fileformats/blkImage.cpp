@@ -48,7 +48,11 @@ Image ReadBlkFile(Reader& in) {
 	shared_array<uint8_t> buffer(totalwidth * totalheight * 2);
 
 	for (auto i = 0; i < numsprites; ++i) {
-		// TODO: make sure we're at the correct offset
+		if (offsets[i] != in.tell()) {
+			// we don't care about offsets but the official engine does
+			fmt::print("WARNING: BLK image offset in header was {} but file position is actually {}\n",
+				offsets[i], in.tell());
+		}
 		auto x = i / height_blocks;
 		auto y = i % height_blocks;
 		for (auto blocky = 0; blocky < 128; ++blocky) {

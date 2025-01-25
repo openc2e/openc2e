@@ -24,7 +24,11 @@ MultiImage ReadS16File(Reader& in) {
 	}
 
 	for (unsigned int i = 0; i < numframes; i++) {
-		// TODO: make sure we're at the correct offset
+		if (offsets[i] != in.tell()) {
+			// we don't care about offsets but the official engine does
+			fmt::print("WARNING: S16 image offset in header was {} but file position is actually {}\n",
+				offsets[i], in.tell());
+		}
 		images[i].data = shared_array<uint8_t>(2 * images[i].width * images[i].height);
 		readmany16le(in, (uint16_t*)images[i].data.data(), images[i].width * images[i].height);
 	}
