@@ -1,5 +1,5 @@
 #include "common/io/FileReader.h"
-#include "fileformats/NewSFCFile.h"
+#include "fileformats/sfc/SFCFile.h"
 
 #include <fmt/core.h>
 

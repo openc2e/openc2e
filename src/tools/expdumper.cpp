@@ -1,6 +1,15 @@
 #include "common/backtrace.h"
 #include "common/io/FileReader.h"
-#include "fileformats/NewSFCFile.h"
+#include "fileformats/sfc/Body.h"
+#include "fileformats/sfc/CBiochemistry.h"
+#include "fileformats/sfc/CBrain.h"
+#include "fileformats/sfc/CGallery.h"
+#include "fileformats/sfc/CGenome.h"
+#include "fileformats/sfc/CInstinct.h"
+#include "fileformats/sfc/Creature.h"
+#include "fileformats/sfc/EXPFile.h"
+#include "fileformats/sfc/Limb.h"
+#include "fileformats/sfc/SimpleObject.h"
 
 #include <fmt/core.h>
 

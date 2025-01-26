@@ -18,6 +18,7 @@
 #include "common/backtrace.h"
 #include "common/io/FileWriter.h"
 #include "common/render/RenderSystem.h"
+#include "fileformats/sfc/SFCFile.h"
 #include "objects/ObjectManager.h"
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"

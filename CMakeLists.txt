@@ -163,7 +163,6 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/MFCWriter.cpp
 	src/fileformats/mngfile.cpp
 	src/fileformats/mngparser.cpp
-	src/fileformats/NewSFCFile.cpp
 	src/fileformats/paletteFile.cpp
 	src/fileformats/peFile.cpp
 	src/fileformats/pngImage.cpp
@@ -175,6 +174,8 @@ add_library(openc2e-fileformats STATIC
 	src/fileformats/strFile.cpp
 	src/fileformats/verticalbarFile.cpp
 	src/fileformats/ImageUtils.cpp
+	src/fileformats/sfc/EXPFile.cpp
+	src/fileformats/sfc/SFCFile.cpp
 )
 target_include_directories(openc2e-fileformats PRIVATE src/fileformats)
 target_link_libraries(openc2e-fileformats
