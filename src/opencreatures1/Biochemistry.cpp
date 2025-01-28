@@ -11,7 +11,9 @@ const uint32_t EVERY[32] = {
 	0,
 	0,
 	0,
-	// these are all powers of two minus one
+	// these are all powers of two minus one, e.g. Mersenne numbers.
+	// likely because a modulus operation on a power of two can be represented
+	// as a much cheaper bitwise "AND" operation with the power of two minus one.
 	1,
 	3,
 	7,
@@ -71,15 +73,39 @@ const float MULTIPLIERS[32] = {
 	0.9749908447265625,
 	0.9999847412109375};
 
-
 uint8_t decay_chemical(uint8_t concentration, uint8_t rate, uint32_t current_biotick) {
 	// TODO: this might be faster to keep in the header so the compiler can inline it
+	return decay_chemical_n_ticks(concentration, rate, current_biotick, 1);
+}
+
+uint8_t decay_chemical_n_ticks(uint8_t concentration, uint8_t rate, uint32_t start_biotick, uint32_t n) {
+	// this function basically exists just for testing. otherwise, testing the super large decay rates
+	// can take a while.
+
 	// TODO: move shifted rate into the ChemicalState itself, and only serialize as 0-255 ?
 	rate >>= 3;
+	const auto every = EVERY[rate];
+	const auto mul = MULTIPLIERS[rate];
+	uint32_t biotick = start_biotick;
 
-	auto every = EVERY[rate];
-	if ((current_biotick & every) == every) {
-		return static_cast<uint8_t>(concentration * MULTIPLIERS[rate]);
+	while (biotick < start_biotick + n) {
+		if ((biotick & every) == every) {
+			concentration = static_cast<uint8_t>(concentration * mul);
+			biotick++;
+		} else {
+			if (n == 1) {
+				// special-case for n=1, a failure to match means we're done for this tick.
+				// otherwise the compiler won't optimize this loop out.
+				break;
+			}
+			// advance to next biotick that matches the bitmask
+			// while ((biotick & every) != every) biotick++;
+			// wait! that's really slow for large masks. we can do this more quickly
+			// by exploiting a property of our specific bitmasks, which are all Mersenne
+			// numbers, e.g. they only have trailing 1s in binary. the next number up that
+			// matches the mask is simply: current_number | mask.
+			biotick = biotick | every;
+		}
 	}
 	return concentration;
 }

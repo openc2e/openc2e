@@ -23,4 +23,5 @@ struct ChemicalReaction {
 };
 
 uint8_t decay_chemical(uint8_t concentration, uint8_t rate, uint32_t current_biotick);
+uint8_t decay_chemical_n_ticks(uint8_t concentration, uint8_t rate, uint32_t start_biotick, uint32_t n);
 void run_chemical_reaction(ChemicalStates& chemicals, const ChemicalReaction& rxn, uint32_t current_biotick);

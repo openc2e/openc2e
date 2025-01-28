@@ -43,24 +43,70 @@ constexpr struct DecayTest {
 };
 
 
-TEST(Biochemistry, decay) {
+TEST(Biochemistry, decay_half_lives_and_zero_lives) {
 	for (auto t : decay_tests) {
 		uint8_t concentration = 255;
 		uint8_t previous_concentration = concentration;
 		uint32_t biotick = 0;
-		while (biotick < t.half_life_in_bioticks) {
-			previous_concentration = concentration;
-			concentration = decay_chemical(concentration, t.rate, biotick++);
-		}
+
+		previous_concentration = concentration;
+		concentration = decay_chemical_n_ticks(concentration, t.rate, biotick, t.half_life_in_bioticks);
+		biotick += t.half_life_in_bioticks;
 		EXPECT_LE((int)concentration, 127);
 		EXPECT_EQ((int)concentration, (int)t.value_after_half_life);
-		while (biotick < t.zero_life_in_bioticks) {
+
+		if (biotick < t.zero_life_in_bioticks) {
+			concentration = decay_chemical_n_ticks(concentration, t.rate, biotick, t.zero_life_in_bioticks - 1 - biotick);
 			previous_concentration = concentration;
-			concentration = decay_chemical(concentration, t.rate, biotick++);
+			biotick += t.zero_life_in_bioticks - 1 - biotick;
+			concentration = decay_chemical_n_ticks(concentration, t.rate, biotick, 1);
+			biotick += 1;
 		}
 		EXPECT_GT((int)previous_concentration, 0);
 		EXPECT_EQ((int)concentration, 0);
-		printf("[       OK ] rate %i\n", t.rate);
+	}
+}
+
+TEST(Biochemistry, decay_curve_16) {
+	// test a simple decay curve that decays every biotick
+	const uint8_t rate = 16;
+	const uint8_t concentrations[] = {
+		113, 50, 22, 9, 4, 1, 0};
+
+	uint8_t concentration = 255;
+	for (uint32_t biotick = 0; biotick < sizeof(concentrations); biotick++) {
+		concentration = decay_chemical(concentration, rate, biotick);
+		EXPECT_EQ((int)concentration, (int)concentrations[biotick]);
+	}
+}
+
+TEST(Biochemistry, decay_curve_72) {
+	// test a more complex decay curve that only decays on certain bioticks
+	const uint8_t rate = 72;
+	const uint8_t concentrations[] = {
+		255, 255, 255, 248, 248, 248, 248, 241, 241, 241, 241, 234, 234, 234, 234, 228, 228, 228, 228,
+		222, 222, 222, 222, 216, 216, 216, 216, 210, 210, 210, 210, 204, 204, 204, 204, 198, 198, 198,
+		198, 193, 193, 193, 193, 188, 188, 188, 188, 183, 183, 183, 183, 178, 178, 178, 178, 173, 173,
+		173, 173, 168, 168, 168, 168, 163, 163, 163, 163, 158, 158, 158, 158, 154, 154, 154, 154, 150,
+		150, 150, 150, 146, 146, 146, 146, 142, 142, 142, 142, 138, 138, 138, 138, 134, 134, 134, 134,
+		130, 130, 130, 130, 126, 126, 126, 126, 122, 122, 122, 122, 118, 118, 118, 118, 115, 115, 115,
+		115, 112, 112, 112, 112, 109, 109, 109, 109, 106, 106, 106, 106, 103, 103, 103, 103, 100, 100,
+		100, 100, 97, 97, 97, 97, 94, 94, 94, 94, 91, 91, 91, 91, 88, 88, 88, 88, 85, 85, 85, 85, 82,
+		82, 82, 82, 79, 79, 79, 79, 77, 77, 77, 77, 75, 75, 75, 75, 73, 73, 73, 73, 71, 71, 71, 71, 69,
+		69, 69, 69, 67, 67, 67, 67, 65, 65, 65, 65, 63, 63, 63, 63, 61, 61, 61, 61, 59, 59, 59, 59, 57,
+		57, 57, 57, 55, 55, 55, 55, 53, 53, 53, 53, 51, 51, 51, 51, 49, 49, 49, 49, 47, 47, 47, 47, 45,
+		45, 45, 45, 43, 43, 43, 43, 41, 41, 41, 41, 39, 39, 39, 39, 38, 38, 38, 38, 37, 37, 37, 37, 36,
+		36, 36, 36, 35, 35, 35, 35, 34, 34, 34, 34, 33, 33, 33, 33, 32, 32, 32, 32, 31, 31, 31, 31, 30,
+		30, 30, 30, 29, 29, 29, 29, 28, 28, 28, 28, 27, 27, 27, 27, 26, 26, 26, 26, 25, 25, 25, 25, 24,
+		24, 24, 24, 23, 23, 23, 23, 22, 22, 22, 22, 21, 21, 21, 21, 20, 20, 20, 20, 19, 19, 19, 19, 18,
+		18, 18, 18, 17, 17, 17, 17, 16, 16, 16, 16, 15, 15, 15, 15, 14, 14, 14, 14, 13, 13, 13, 13, 12,
+		12, 12, 12, 11, 11, 11, 11, 10, 10, 10, 10, 9, 9, 9, 9, 8, 8, 8, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5,
+		5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 0};
+
+	uint8_t concentration = 255;
+	for (uint32_t biotick = 0; biotick < sizeof(concentrations); biotick++) {
+		concentration = decay_chemical(concentration, rate, biotick);
+		EXPECT_EQ((int)concentration, (int)concentrations[biotick]);
 	}
 }
 
