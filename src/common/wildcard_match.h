@@ -3,7 +3,7 @@
 #include "Ascii.h"
 #include "StringView.h"
 
-bool wildcard_match_ignore_case(StringView pattern, StringView value) {
+inline bool wildcard_match_ignore_case(StringView pattern, StringView value) {
 	while (true) {
 		if (pattern.empty() && value.empty()) {
 			return true;
