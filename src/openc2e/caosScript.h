@@ -92,11 +92,11 @@ class script {
 
 	caosOp getOp(int idx) const {
 		assert(idx >= 0);
-		return (size_t)idx >= ops.size() ? caosOp(CAOS_DIE, -1, -1) : ops[idx];
+		return (size_t)idx >= ops.size() ? caosOp(CAOS_DIE, -1, -1) : ops[(size_t)idx];
 	}
 
 	int scriptLength() const {
-		return ops.size();
+		return (int)ops.size();
 	}
 
 	caosValue getConstant(int idx) const {
@@ -104,11 +104,11 @@ class script {
 			throw caosException(
 				fmt::format("Internal error: const {} out of range", idx));
 		}
-		return consts[idx];
+		return consts[(size_t)idx];
 	}
 
 	std::map<std::string, int> gsub;
-	int getNextIndex() { return ops.size(); }
+	int getNextIndex() { return (int)ops.size(); }
 	// add op as the next opcode
 	script(const Dialect* v, const std::string& fn,
 		int fmly_, int gnus_, int spcs_, int scrp_);
@@ -123,7 +123,7 @@ class script {
 
 	int newRelocation() {
 		assert(!linked);
-		int idx = relocations.size();
+		int idx = (int)relocations.size();
 		relocations.push_back(0);
 		return -idx;
 	}
@@ -132,17 +132,17 @@ class script {
 		assert(!linked);
 		assert(r < 0);
 		r = -r;
-		assert(relocations[r] == 0);
+		assert(relocations[(size_t)r] == 0);
 		// check for a loop
 		int i = p;
 		while (i < 0) {
 			i = -i;
 			if (i == r)
 				throw Exception("relocation loop found");
-			i = relocations[i];
+			i = relocations[(size_t)i];
 		}
 
-		relocations[r] = p;
+		relocations[(size_t)r] = p;
 	}
 
 	// fix relocation r to point to the next op to be emitted
