@@ -60,7 +60,7 @@ class World {
 	std::vector<caosVM*> vmpool;
 
   public:
-	int vmpool_size() const { return vmpool.size(); }
+	size_t vmpool_size() const { return vmpool.size(); }
 	bool quitting, saving, paused;
 
 	std::unique_ptr<Map> map;
