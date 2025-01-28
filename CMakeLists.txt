@@ -451,10 +451,10 @@ enable_testing()
 include(GoogleTest)
 include(Openc2eOutputOnTestFailure)
 
-gtest_discover_tests(test_openc2e)
-gtest_discover_tests(test_opencreatures1)
-gtest_discover_tests(test_common)
-gtest_discover_tests(test_fileformats)
+gtest_discover_tests(test_openc2e DISCOVERY_TIMEOUT 30)
+gtest_discover_tests(test_opencreatures1 DISCOVERY_TIMEOUT 30)
+gtest_discover_tests(test_common DISCOVERY_TIMEOUT 30)
+gtest_discover_tests(test_fileformats DISCOVERY_TIMEOUT 30)
 
 # Generated files
 file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/openc2e/caos/caosVM_*.cpp)
