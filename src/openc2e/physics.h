@@ -120,16 +120,16 @@ class Line {
 	Point pointAtX(double x) const {
 		assert(type != VERTICAL);
 		if (type == NORMAL)
-			return Point(x, (x - start.x) * slope + start.y);
+			return Point(static_cast<float>(x), static_cast<float>((x - start.x) * slope + start.y));
 		else
-			return Point(x, start.y);
+			return Point(static_cast<float>(x), start.y);
 	}
 	Point pointAtY(double y) const {
 		assert(type != HORIZONTAL);
 		if (type == NORMAL)
-			return Point((y - start.y) / slope + start.x, y);
+			return Point(static_cast<float>((y - start.y) / slope + start.x), static_cast<float>(y));
 		else
-			return Point(start.x, y);
+			return Point(start.x, static_cast<float>(y));
 	}
 
 	bool containsX(double x) const {
