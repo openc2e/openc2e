@@ -22,7 +22,7 @@ static CobManager s_object_injector;
 static bool s_agent_injector_open = false;
 
 static void DrawAgentPreview(Texture& texture) {
-	ImVec2 size = ImVec2(std::max<float>(300, ImGui::GetWindowContentRegionWidth()), 211);
+	ImVec2 size = ImVec2(std::max<float>(300, ImGui::GetContentRegionAvail().x), 211);
 	ImDrawList* drawlist = ImGui::GetWindowDrawList();
 	ImVec2 p = ImGui::GetCursorScreenPos();
 	// should be approx 300 x 170. Alima.bmp is 312 x 211

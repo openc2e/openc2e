@@ -23,8 +23,8 @@
 #include "common/NumericCast.h"
 #include "common/backend/Keycodes.h"
 #include "common/creaturesImage.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_sdlrenderer.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_sdlrenderer2.h"
 
 #include <array>
 #include <cassert>
@@ -50,18 +50,18 @@ static void ImGuiInit(SDL_Window* window, SDL_Renderer* renderer) {
 	if (!ImGui_ImplSDL2_InitForSDLRenderer(window, renderer)) {
 		throw Exception("Couldn't initialize ImGui SDL2");
 	}
-	if (!ImGui_ImplSDLRenderer_Init(renderer)) {
+	if (!ImGui_ImplSDLRenderer2_Init(renderer)) {
 		throw Exception("Couldn't initialize ImGui SDLRenderer");
 	}
 
 	// fix for imgui#4768
 	{
-		ImGui_ImplSDLRenderer_DestroyFontsTexture();
-		ImGui_ImplSDLRenderer_Data* bd = ImGui_ImplSDLRenderer_GetBackendData();
+		ImGui_ImplSDLRenderer2_DestroyFontsTexture();
+		ImGui_ImplSDLRenderer2_Data* bd = ImGui_ImplSDLRenderer2_GetBackendData();
 		unsigned char* pixels;
 		int width, height;
 		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-		bd->FontTexture = SDL_CreateTexture(bd->SDLRenderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width, height);
+		bd->FontTexture = SDL_CreateTexture(bd->Renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STATIC, width, height);
 		if (bd->FontTexture == nullptr) {
 			throw Exception("Couldn't create ImGui font texture");
 		}
@@ -630,7 +630,7 @@ void SDLBackend::run(std::function<bool()> update_callback) {
 		}
 		last_frame_end = SDL_GetTicks();
 
-		ImGui_ImplSDLRenderer_NewFrame();
+		ImGui_ImplSDLRenderer2_NewFrame();
 		ImGui_ImplSDL2_NewFrame();
 		ImGui::NewFrame();
 
@@ -640,7 +640,7 @@ void SDLBackend::run(std::function<bool()> update_callback) {
 		}
 
 		ImGui::Render();
-		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
 
 		SDL_RenderPresent(renderer);
 	}

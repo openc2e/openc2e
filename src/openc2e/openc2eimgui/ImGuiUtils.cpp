@@ -79,16 +79,14 @@ bool ImageButton(TextureRect tex, bool enabled) {
 
 	// ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
 	// ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
-	ImGui::PushID(fmt::format("{}_{}_{}_{}_{}", tex.parent.as<uintptr_t>(), tex.x, tex.y, tex.w, tex.h).c_str());
 	bool ret = ImGui::ImageButton(
+		fmt::format("{}_{}_{}_{}_{}", tex.parent.as<uintptr_t>(), tex.x, tex.y, tex.w, tex.h).c_str(),
 		tex.parent.as<ImTextureID>(),
 		ImVec2(tex.w, tex.h),
 		ImVec2(tex.x * 1.0 / tex.parent.width, tex.y * 1.0 / tex.parent.height),
 		ImVec2((tex.x + tex.w) * 1.0 / tex.parent.width, (tex.y + tex.h) * 1.0 / tex.parent.height),
-		-1, // padding
 		ImVec4(0, 0, 0, 0), // bgcolor
 		tint);
-	ImGui::PopID();
 	// ImGui::PopStyleColor();
 	// ImGui::PopStyleColor();
 

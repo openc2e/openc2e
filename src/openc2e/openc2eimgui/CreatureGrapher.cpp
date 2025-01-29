@@ -66,21 +66,21 @@ void DrawCreatureGrapher() {
 			1,
 			ImVec2(320, 200));
 
-		float content_width = ImGui::GetWindowContentRegionWidth();
+		float content_width = ImGui::GetContentRegionAvail().x;
 
-		if (ImGui::ListBoxHeader("##Creature Grapher - Chemical Groups", ImVec2(content_width / 2, 0))) {
+		if (ImGui::BeginListBox("##Creature Grapher - Chemical Groups", ImVec2(content_width / 2, 0))) {
 			for (auto g : enumerate(s_chemical_names_manager.getChemicalGroups())) {
 				if (ImGui::Selectable(g.second.first.c_str(), g.first == s_selected_chemical_group)) {
 					s_selected_chemical_group = g.first;
 				}
 			}
-			ImGui::ListBoxFooter();
+			ImGui::EndListBox();
 		}
 
 		ImGui::SameLine();
 
 
-		if (ImGui::ListBoxHeader("##Creature Grapher - Chemicals", ImVec2(content_width / 2, 0))) {
+		if (ImGui::BeginListBox("##Creature Grapher - Chemicals", ImVec2(content_width / 2, 0))) {
 			auto& group = s_chemical_names_manager.getChemicalGroups()[s_selected_chemical_group];
 			auto& chemical_names = s_chemical_names_manager.getChemicalNames();
 
@@ -90,7 +90,7 @@ void DrawCreatureGrapher() {
 				}
 			}
 
-			ImGui::ListBoxFooter();
+			ImGui::EndListBox();
 		}
 
 		ImGui::End();
