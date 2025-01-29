@@ -4,6 +4,7 @@
 #include "common/backend/BackendTexture.h"
 #include "common/math/Rect.h"
 
+#include <stdint.h>
 #include <string>
 #include <vector>
 

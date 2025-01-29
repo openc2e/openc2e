@@ -2,19 +2,14 @@
 #include "C1SoundManager.h"
 #include "EngineContext.h"
 #include "ImageManager.h"
-#include "MacroCommands.h"
 #include "MacroManager.h"
-#include "MapManager.h"
 #include "MessageManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
-#include "Renderable.h"
 #include "SFCSerialization.h"
-#include "Scriptorium.h"
 #include "ViewportManager.h"
 #include "common/OptionsParser.h"
 #include "common/StringView.h"
-#include "common/backend/Keycodes.h"
 #include "common/backtrace.h"
 #include "common/io/FileWriter.h"
 #include "common/render/RenderSystem.h"
@@ -29,7 +24,6 @@
 #include "common/WindowsRegistry.h"
 #endif
 
-#include <SDL.h>
 #include <chrono>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>

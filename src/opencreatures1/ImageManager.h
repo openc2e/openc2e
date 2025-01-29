@@ -5,7 +5,9 @@
 #include "opencreatures1/ImageGallery.h"
 
 #include <map>
-#include <memory>
+#include <stdint.h>
+#include <string>
+
 
 class ImageManager {
   public:

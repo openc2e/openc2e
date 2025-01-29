@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/SlotMap.h"
 #include "common/audio/AudioChannel.h"
 #include "common/audio/AudioState.h"
 #include "common/math/Rect.h"

@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Scriptorium.h"
 #include "objects/ObjectHandle.h"
+
+#include <string>
+#include <vector>
 
 /*
 

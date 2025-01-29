@@ -1,14 +1,12 @@
 #pragma once
 
 
-#include "common/NumericCast.h"
 #include "common/math/Rect.h"
-#include "common/render/RenderSystem.h"
+#include "common/render/RenderItemHandle.h"
 #include "opencreatures1/ImageGallery.h"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <string>
-#include <vector>
 
 class Renderable {
   public:

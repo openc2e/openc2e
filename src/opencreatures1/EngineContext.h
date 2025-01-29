@@ -2,8 +2,6 @@
 
 #include "common/HeapValue.h"
 
-#include <memory>
-
 class EngineContext {
   public:
 	// singleton, instantiated at bottom of file

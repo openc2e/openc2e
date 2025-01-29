@@ -2,6 +2,7 @@
 
 #include "ObjectManager.h"
 #include "common/Ascii.h"
+#include "common/render/RenderSystem.h"
 
 static bool world_has_at_least_one_creature() {
 	for (auto* obj : *g_engine_context.objects) {

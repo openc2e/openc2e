@@ -2,6 +2,8 @@
 
 #include "C1ControlledSound.h"
 #include "C1SoundManager.h"
+#include "Macro.h"
+#include "MacroContext.h"
 #include "MessageManager.h"
 #include "common/Random.h"
 #include "objects/Blackboard.h"

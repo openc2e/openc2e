@@ -1,6 +1,5 @@
 #include "MapManager.h"
 
-#include "EngineContext.h"
 #include "common/NumericCast.h"
 #include "common/render/RenderSystem.h"
 

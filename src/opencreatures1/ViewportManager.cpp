@@ -1,6 +1,11 @@
 #include "ViewportManager.h"
 
 #include "C1SoundManager.h"
+#include "EngineContext.h"
+#include "common/NumericCast.h"
+#include "common/backend/Backend.h"
+#include "common/backend/BackendEvent.h"
+#include "common/backend/Keycodes.h"
 #include "common/render/RenderSystem.h"
 
 constexpr float VIEWPORT_SCALE = 1.0f;

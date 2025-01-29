@@ -1,12 +1,8 @@
 #pragma once
 
 #include "C1ControlledSound.h"
-#include "common/audio/AudioChannel.h"
 
 #include <chrono>
-#include <memory>
-
-class PathManager;
 
 class C1MusicManager {
   public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MacroManager.h"
+class MacroContext;
 
 namespace MacroCommands {
 

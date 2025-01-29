@@ -1,12 +1,8 @@
 #pragma once
 
-#include "EngineContext.h"
-#include "common/NumericCast.h"
-#include "common/backend/Backend.h"
-#include "common/backend/Keycodes.h"
+#include <stdint.h>
 
-#include <cmath>
-#include <memory>
+struct BackendEvent;
 
 static constexpr int CREATURES1_WORLD_WIDTH = 8352;
 static constexpr int CREATURES1_WORLD_HEIGHT = 1200;

@@ -1,13 +1,11 @@
 #include "MessageManager.h"
 
 #include "EngineContext.h"
-#include "MacroManager.h"
-#include "Scriptorium.h"
 #include "common/Exception.h"
+#include "fmt/format.h"
 #include "objects/Object.h"
 #include "objects/ObjectHandle.h"
 #include "objects/ObjectManager.h"
-#include "objects/ObjectNames.h"
 
 void MessageManager::tick() {
 	for (auto& m : m_immediate_message_queue) {

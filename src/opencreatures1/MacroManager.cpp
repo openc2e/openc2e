@@ -1,5 +1,6 @@
 #include "MacroManager.h"
 
+#include "Scriptorium.h"
 #include "common/Exception.h"
 #include "objects/Object.h"
 #include "objects/ObjectManager.h"

@@ -48,12 +48,8 @@ using AgentRVFunc = ObjectHandle (*)(MacroContext&, Macro&);
 using IntegerRVFunc = int32_t (*)(MacroContext&, Macro&);
 using LValueFunc = void (*)(const MacroContext&, const Macro&, int32_t value);
 
-class EventManager;
 class Object;
-class ObjectManager;
 class Renderable;
-class RenderableManager;
-class C1SoundManager;
 
 class MacroError : public Exception {
 	using Exception::Exception;
