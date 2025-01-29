@@ -155,7 +155,7 @@ void draw_imgui_bottombar() {
 }
 
 void draw_imgui_rightclick_menu() {
-	if (ImGui::GetIO().MouseClicked[0] && ImGui::GetIO().KeyMods & ImGuiModFlags_Super) {
+	if (ImGui::GetIO().MouseClicked[0] && ImGui::IsKeyDown(ImGuiMod_Shortcut)) {
 		ImGui::OpenPopup("Menu");
 	}
 	if (ImGui::BeginPopup("Menu")) {

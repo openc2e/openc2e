@@ -46,7 +46,7 @@ void Update() {
 		Openc2eImgui::DrawC2Toolbar();
 		Openc2eImgui::DrawC2StatusBar();
 	}
-	if (ImGui::GetIO().MouseClicked[0] && ImGui::GetIO().KeyMods & ImGuiModFlags_Super) {
+	if (ImGui::GetIO().MouseClicked[0] && ImGui::IsKeyDown(ImGuiMod_Shortcut)) {
 		ImGui::OpenPopup("Menu");
 	}
 	if (ImGui::BeginPopup("Menu")) {
