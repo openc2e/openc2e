@@ -27,13 +27,13 @@ class Texture {
 	}
 
 	template <typename T>
-	T* as() {
-		return reinterpret_cast<T*>(ptr.get());
+	T as() {
+		return reinterpret_cast<T>(ptr.get());
 	}
 
 	template <typename T>
-	const T* as() const {
-		return reinterpret_cast<const T*>(ptr.get());
+	T as() const {
+		return reinterpret_cast<T>(const_cast<const void*>(ptr.get()));
 	}
 
 	std::shared_ptr<void> ptr;

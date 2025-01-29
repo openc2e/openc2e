@@ -271,7 +271,7 @@ Texture SDLBackend::createTexture(int32_t width, int32_t height) {
 		throw Exception(fmt::format("error creating texture: {}", SDL_GetError()));
 	}
 	// enable alpha blending
-	SDL_SetTextureBlendMode(tex.as<SDL_Texture>(), SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(tex.as<SDL_Texture*>(), SDL_BLENDMODE_BLEND);
 	return tex;
 }
 
@@ -350,7 +350,7 @@ void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image
 
 	// convert surface to texture format
 	uint32_t tex_format;
-	SDL_QueryTexture(tex.as<SDL_Texture>(), &tex_format, nullptr, nullptr, nullptr);
+	SDL_QueryTexture(tex.as<SDL_Texture*>(), &tex_format, nullptr, nullptr, nullptr);
 	std::unique_ptr<SDL_Surface, SDLSurfaceDeleter> converted{
 		SDL_ConvertSurfaceFormat(surf.get(), tex_format, 0)};
 	assert(converted);
@@ -361,7 +361,7 @@ void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image
 	rect.y = location.y;
 	rect.w = location.width;
 	rect.h = location.height;
-	if (SDL_UpdateTexture(tex.as<SDL_Texture>(), location == Rect2i{} ? nullptr : &rect,
+	if (SDL_UpdateTexture(tex.as<SDL_Texture*>(), location == Rect2i{} ? nullptr : &rect,
 			converted->pixels, converted->pitch) != 0) {
 		throw Exception(fmt::format("error updating texture: {}", SDL_GetError()));
 	};
@@ -412,7 +412,7 @@ void SDLRenderTarget::renderTexture(const Texture& tex_, Rect2i src, Rect2f dest
 		return;
 	}
 
-	SDL_Texture* tex = const_cast<SDL_Texture*>(tex_.as<SDL_Texture>());
+	SDL_Texture* tex = const_cast<Texture&>(tex_).as<SDL_Texture*>();
 	assert(tex);
 
 	SDL_SetTextureAlphaMod(tex, options.alpha);
