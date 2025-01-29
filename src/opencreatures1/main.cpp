@@ -150,8 +150,9 @@ void draw_imgui_bottombar() {
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 	if (ImGui::Begin("BottomBar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
 		ImGui::Text("opencreatures1 - %i fps", get_fps());
+		ImGui::End();
 	}
-	ImGui::PopStyleVar(ImGuiStyleVar_WindowBorderSize);
+	ImGui::PopStyleVar();
 }
 
 void draw_imgui_rightclick_menu() {
