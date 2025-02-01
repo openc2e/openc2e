@@ -797,3 +797,25 @@ TEST(NumericCast, float_to_int64) {
 	value = 9223370937343148032.000000f;
 	EXPECT_EQ(numeric_cast<int64_t>(value), 9223370937343148032ll);
 }
+
+TEST(NumericCast, int32_to_float) {
+	int32_t value;
+	value = -16777217;
+	EXPECT_THROW(numeric_cast<float>(value), std::overflow_error);
+	value = -16777216;
+	EXPECT_EQ(static_cast<int32_t>(numeric_cast<float>(value)), -16777216);
+	value = 16777216;
+	EXPECT_EQ(static_cast<int32_t>(numeric_cast<float>(value)), 16777216);
+	value = 16777217;
+	EXPECT_THROW(numeric_cast<float>(value), std::overflow_error);
+}
+
+TEST(NumericCast, uint32_to_float) {
+	uint32_t value;
+	value = 0;
+	EXPECT_EQ(static_cast<uint32_t>(numeric_cast<float>(value)), 0);
+	value = 16777216;
+	EXPECT_EQ(static_cast<uint32_t>(numeric_cast<float>(value)), 16777216);
+	value = 16777217;
+	EXPECT_THROW(numeric_cast<float>(value), std::overflow_error);
+}

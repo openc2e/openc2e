@@ -44,6 +44,15 @@ constexpr inline auto numeric_cast(From value)
 template <typename To, typename From>
 constexpr inline auto numeric_cast(From value)
 	-> std::enable_if_t<std::is_floating_point<To>::value && std::is_integral<From>::value, To> {
-	// converting integers to floating point is always safe (though not necessarily exact)
+	// float usually has 24 digits, double has 53 digits. any integer size smaller than that should be fine.
+	if (std::numeric_limits<To>::digits >= std::numeric_limits<From>::digits) {
+		return static_cast<To>(value);
+	}
+
+	// would lose precision
+	if (value > (1 << std::numeric_limits<To>::digits) ||
+		(std::is_signed<From>::value && value < 0 && value < -(1 << std::numeric_limits<To>::digits))) {
+		throw std::overflow_error{"bad numeric_cast"};
+	}
 	return static_cast<To>(value);
 }
