@@ -77,12 +77,12 @@ def find_implementation(name, lines):
         break
 
     function_definition = re.search(
-        "^\s*void ([cv]_[A-Za-z0-9_]+)\s*\(", lines[p]
+        r"^\s*void ([cv]_[A-Za-z0-9_]+)\s*\(", lines[p]
     )
     if function_definition:
         return function_definition.group(1)
 
-    caos_lvalue = re.search("^\s*CAOS_LVALUE(_[A-Z_]+)?\(([A-Za-z0-9_]+)\s*,", lines[p])
+    caos_lvalue = re.search(r"^\s*CAOS_LVALUE(_[A-Z_]+)?\(([A-Za-z0-9_]+)\s*,", lines[p])
     if caos_lvalue:
         return "v_" + caos_lvalue.group(2)
 
