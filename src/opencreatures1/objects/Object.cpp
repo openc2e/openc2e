@@ -341,7 +341,7 @@ void Object::set_position(float newx, float newy) {
 	}
 
 	// TODO: replace this with get_position and a Vector2?
-	if (main_part->get_x() == newx && main_part->get_y() == newy) {
+	if (main_part->x() == newx && main_part->y() == newy) {
 		return;
 	}
 
@@ -350,8 +350,8 @@ void Object::set_position(float newx, float newy) {
 		for (size_t i = 1; i < comp->parts.size(); ++i) {
 			Renderable& p = comp->parts[i].renderable;
 
-			float relx = p.get_x() - main_part->get_x();
-			float rely = p.get_y() - main_part->get_y();
+			float relx = p.x() - main_part->x();
+			float rely = p.y() - main_part->y();
 
 			p.set_position(newx + relx, newy + rely);
 		}
@@ -379,7 +379,7 @@ void Object::add_position(float xdiff, float ydiff) {
 	if (xdiff == 0 && ydiff == 0) {
 		return;
 	}
-	set_position(main_part->get_x() + xdiff, main_part->get_y() + ydiff);
+	set_position(main_part->x() + xdiff, main_part->y() + ydiff);
 }
 
 int32_t Object::get_z_order() const {
@@ -388,7 +388,7 @@ int32_t Object::get_z_order() const {
 		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
 
-	return main_part->get_z_order();
+	return main_part->z_order();
 }
 
 Rect2i Object::get_bbox() const {
@@ -397,7 +397,7 @@ Rect2i Object::get_bbox() const {
 		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
 
-	return Rect2i{numeric_cast<int32_t>(main_part->get_x()), numeric_cast<int32_t>(main_part->get_y()), main_part->width(), main_part->height()};
+	return Rect2i{numeric_cast<int32_t>(main_part->x()), numeric_cast<int32_t>(main_part->y()), main_part->width(), main_part->height()};
 }
 
 Renderable* Object::get_renderable_for_part(int32_t partnum) {

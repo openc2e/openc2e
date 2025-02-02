@@ -11,24 +11,24 @@
 class Renderable {
   public:
 	void set_gallery(const ImageGallery& gallery);
-	const ImageGallery& get_gallery() const;
+	const ImageGallery& gallery() const;
 
 	void set_base(int base);
-	int32_t get_base() const { return base; }
+	int32_t base() const;
 
 	void set_pose(int pose);
-	int32_t get_pose() const;
+	int32_t pose() const;
 
 	void set_position(float x, float y);
-	float get_x() const;
-	float get_y() const;
+	float x() const;
+	float y() const;
 	void set_z_order(int32_t z);
-	int32_t get_z_order() const;
+	int32_t z_order() const;
 
 	bool has_animation() const;
 	void set_animation(uint8_t animation_frame_, std::string animation_string_);
-	uint8_t get_animation_frame() const { return animation_frame; }
-	const std::string& get_animation_string() const { return animation_string; }
+	uint8_t animation_frame() const;
+	const std::string& animation_string() const;
 	void update_animation();
 	void clear_animation();
 
@@ -41,26 +41,15 @@ class Renderable {
 	int32_t frame() const;
 	void update_renderitem();
 
-	ImageGallery gallery;
-	int32_t base = 0;
-	int32_t pose = 0;
-	float x = 0;
-	float y = 0;
-	int32_t z = 0;
+	ImageGallery gallery_;
+	int32_t base_ = 0;
+	int32_t pose_ = 0;
+	float x_ = 0;
+	float y_ = 0;
+	int32_t z_ = 0;
 	bool has_animation_ = false;
-	uint8_t animation_frame = 0; // only if has_animation is true
-	std::string animation_string; // only if has_animation is true
+	uint8_t animation_frame_ = 0; // only if has_animation is true
+	std::string animation_string_; // only if has_animation is true
 
-	RenderItemHandle renderitem;
+	RenderItemHandle renderitem_;
 };
-
-inline std::string format_as(const Renderable& r) {
-	if (r.has_animation()) {
-		return fmt::format(
-			"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation={} anim_index={}>",
-			r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name, r.animation_string, r.animation_frame);
-	}
-	return fmt::format(
-		"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation=false>",
-		r.x, r.y, r.z, r.gallery.absolute_base, r.base, r.pose, r.gallery.name);
-}

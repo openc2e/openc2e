@@ -361,7 +361,7 @@ void Command_MVBY(MacroContext& ctx, Macro& m) {
 	if (ctx.debug) {
 		fmt::print("did a mvby  x={} y={} cls=({}, {}, {}) spr={}!\n",
 			xdiff, ydiff, ctx.get_targ(m)->family, ctx.get_targ(m)->genus,
-			ctx.get_targ(m)->species, ctx.get_targ_part(m)->get_gallery().name);
+			ctx.get_targ(m)->species, ctx.get_targ_part(m)->gallery().name);
 	}
 
 	ctx.read_command_separator(m);
@@ -811,7 +811,7 @@ int32_t IntegerRV_POSE(MacroContext& ctx, Macro& m) {
 		printf("WARN called POSE on Creature, not implemented\n");
 		return 0;
 	}
-	return ctx.get_targ_part(m)->get_pose();
+	return ctx.get_targ_part(m)->pose();
 }
 
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {

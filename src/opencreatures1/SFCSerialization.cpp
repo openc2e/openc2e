@@ -202,17 +202,17 @@ std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r, const st
 		// so we can share gallery between all parts on a compound object / creature
 		entity->gallery = gallery;
 	} else {
-		entity->gallery = sfc_dump_gallery(r.get_gallery());
+		entity->gallery = sfc_dump_gallery(r.gallery());
 	}
-	entity->sprite_pose_plus_base = numeric_cast<uint8_t>(r.get_pose() + r.get_base());
-	entity->sprite_base = numeric_cast<uint8_t>(r.get_base());
-	entity->z_order = r.get_z_order();
-	entity->x = numeric_cast<int32_t>(r.get_x());
-	entity->y = numeric_cast<int32_t>(r.get_y());
+	entity->sprite_pose_plus_base = numeric_cast<uint8_t>(r.pose() + r.base());
+	entity->sprite_base = numeric_cast<uint8_t>(r.base());
+	entity->z_order = r.z_order();
+	entity->x = numeric_cast<int32_t>(r.x());
+	entity->y = numeric_cast<int32_t>(r.y());
 	entity->has_animation = r.has_animation();
 	if (entity->has_animation) {
-		entity->animation_frame = r.get_animation_frame(); // only if has_animation is true
-		entity->animation_string = r.get_animation_string();
+		entity->animation_frame = r.animation_frame(); // only if has_animation is true
+		entity->animation_string = r.animation_string();
 	}
 
 	return entity;

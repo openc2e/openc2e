@@ -5,70 +5,74 @@
 #include "common/NumericCast.h"
 #include "common/render/RenderSystem.h"
 
-void Renderable::Renderable::set_position(float x_, float y_) {
+void Renderable::Renderable::set_position(float x, float y) {
 	// TODO: better way of handling world wrap?
-	if (x_ >= CREATURES1_WORLD_WIDTH) {
-		x_ -= CREATURES1_WORLD_WIDTH;
-	} else if (x_ < 0) {
-		x_ += CREATURES1_WORLD_WIDTH;
+	if (x >= CREATURES1_WORLD_WIDTH) {
+		x -= CREATURES1_WORLD_WIDTH;
+	} else if (x < 0) {
+		x += CREATURES1_WORLD_WIDTH;
 	}
 
-	x = x_;
-	y = y_;
+	x_ = x;
+	y_ = y;
 	update_renderitem();
 }
 
-void Renderable::set_z_order(int32_t z_) {
-	z = z_;
+void Renderable::set_z_order(int32_t z) {
+	z_ = z;
 	update_renderitem();
 }
 
-float Renderable::get_x() const {
-	return x;
+float Renderable::x() const {
+	return x_;
 }
-float Renderable::get_y() const {
-	return y;
-}
-
-int32_t Renderable::get_z_order() const {
-	return z;
+float Renderable::y() const {
+	return y_;
 }
 
-void Renderable::set_base(int part_sprite_base_) {
-	base = part_sprite_base_;
+int32_t Renderable::z_order() const {
+	return z_;
 }
 
-void Renderable::set_gallery(const ImageGallery& gallery_) {
-	gallery = gallery_;
+void Renderable::set_base(int part_sprite_base) {
+	base_ = part_sprite_base;
+}
+
+int32_t Renderable::base() const {
+	return base_;
+}
+
+void Renderable::set_gallery(const ImageGallery& gallery) {
+	gallery_ = gallery;
 	update_renderitem();
 }
 
-const ImageGallery& Renderable::get_gallery() const {
-	return gallery;
+const ImageGallery& Renderable::gallery() const {
+	return gallery_;
 }
 
 int32_t Renderable::frame() const {
-	return base + pose;
+	return base_ + pose_;
 }
 
 int32_t Renderable::width() const {
-	if (!gallery) {
+	if (!gallery_) {
 		return 0;
 	}
-	return gallery.width(frame());
+	return gallery_.width(frame());
 }
 
 int32_t Renderable::height() const {
-	if (!gallery) {
+	if (!gallery_) {
 		return 0;
 	}
-	return gallery.height(frame());
+	return gallery_.height(frame());
 }
 
-void Renderable::set_animation(uint8_t animation_frame_, std::string animation_string_) {
+void Renderable::set_animation(uint8_t animation_frame, std::string animation_string) {
 	has_animation_ = true;
-	animation_frame = animation_frame_;
-	animation_string = animation_string_;
+	animation_frame_ = animation_frame;
+	animation_string_ = animation_string;
 
 	// Change the sprite index immediately, because some scripts are written poorly and will
 	// stop their animations on their next tick anyways. We assume that this has been called
@@ -85,14 +89,22 @@ void Renderable::set_animation(uint8_t animation_frame_, std::string animation_s
 	update_animation();
 }
 
+uint8_t Renderable::animation_frame() const {
+	return animation_frame_;
+}
+
+const std::string& Renderable::animation_string() const {
+	return animation_string_;
+}
+
 bool Renderable::has_animation() const {
 	return has_animation_;
 }
 
 void Renderable::clear_animation() {
 	has_animation_ = false;
-	animation_frame = 0;
-	animation_string = {};
+	animation_frame_ = 0;
+	animation_string_ = {};
 }
 
 void Renderable::update_animation() {
@@ -100,7 +112,7 @@ void Renderable::update_animation() {
 		return;
 	}
 
-	if (animation_frame >= animation_string.size()) {
+	if (animation_frame_ >= animation_string_.size()) {
 		// already done
 		// TODO: are we on the correct frame already?
 		clear_animation();
@@ -110,33 +122,44 @@ void Renderable::update_animation() {
 	// some objects in Eden.sfc start at the 'R' character, so set frame
 	// before incrementing.
 	// TODO: assert isdigit
-	if (animation_string[animation_frame] == 'R') {
-		animation_frame = 0;
+	if (animation_string_[animation_frame_] == 'R') {
+		animation_frame_ = 0;
 	}
-	set_pose(animation_string[animation_frame] - '0');
-	animation_frame += 1;
+	set_pose(animation_string_[animation_frame_] - '0');
+	animation_frame_ += 1;
 }
 
-void Renderable::set_pose(int sprite_index_) {
-	pose = sprite_index_;
+void Renderable::set_pose(int sprite_index) {
+	pose_ = sprite_index;
 	update_renderitem();
 }
 
-int32_t Renderable::get_pose() const {
-	return pose;
+int32_t Renderable::pose() const {
+	return pose_;
 }
 
 void Renderable::update_renderitem() {
-	if (!gallery) {
-		renderitem = {};
+	if (!gallery_) {
+		renderitem_ = {};
 		return;
 	}
-	if (!renderitem) {
-		renderitem = get_rendersystem()->render_item_create(LAYER_OBJECTS);
+	if (!renderitem_) {
+		renderitem_ = get_rendersystem()->render_item_create(LAYER_OBJECTS);
 	}
 
-	get_rendersystem()->render_item_set_texture(renderitem,
-		gallery.texture,
-		gallery.texture_locations[numeric_cast<size_t>(frame())]);
-	get_rendersystem()->render_item_set_position(renderitem, static_cast<float>(x), static_cast<float>(y), z);
+	get_rendersystem()->render_item_set_texture(renderitem_,
+		gallery_.texture,
+		gallery_.texture_locations[numeric_cast<size_t>(frame())]);
+	get_rendersystem()->render_item_set_position(renderitem_, x_, y_, z_);
+}
+
+std::string format_as(const Renderable& r) {
+	if (r.has_animation()) {
+		return fmt::format(
+			"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation={} anim_index={}>",
+			r.x_, r.y_, r.z_, r.gallery_.absolute_base, r.base_, r.pose_, r.gallery_.name, r.animation_string_, r.animation_frame_);
+	}
+	return fmt::format(
+		"<Renderable x={} y={} z={} abba={} base={} pose={} gallery={} animation=false>",
+		r.x_, r.y_, r.z_, r.gallery_.absolute_base, r.base_, r.pose_, r.gallery_.name);
 }
