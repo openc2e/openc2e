@@ -20,6 +20,8 @@
 #include "common/Ranges.h"
 #include "fileformats/sfc/Object.h"
 
+#include <cmath>
+
 static bool world_has_at_least_one_creature() {
 	for (auto* obj : *g_engine_context.objects) {
 		if (obj->as_creature()) {
@@ -160,6 +162,11 @@ void Object::handle_mesg_activate1(Message msg) {
 			as_lift()->next_or_current_floor++;
 		}
 
+		if (as_vehicle()) {
+			// truncate fixed point position
+			set_position(std::trunc(get_bbox().x), std::trunc(get_bbox().y));
+		}
+
 		actv = ACTV_ACTIVE1;
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE1);
 		return;
@@ -204,6 +211,11 @@ void Object::handle_mesg_activate2(Message msg) {
 			as_lift()->next_or_current_floor--;
 		}
 
+		if (as_vehicle()) {
+			// truncate fixed point position
+			set_position(std::trunc(get_bbox().x), std::trunc(get_bbox().y));
+		}
+
 		actv = ACTV_ACTIVE2;
 		g_engine_context.macros->queue_script(msg.from, this->uid, SCRIPT_ACTIVATE2);
 		return;
@@ -241,10 +253,11 @@ void Object::handle_mesg_deactivate(Message msg) {
 			return;
 		}
 		if (as_vehicle()) {
-			// TODO: truncate fixed point position?
 			// stop!
 			as_vehicle()->xvel = 0;
 			as_vehicle()->yvel = 0;
+			// truncate fixed point position
+			set_position(std::trunc(get_bbox().x), std::trunc(get_bbox().y));
 		}
 
 		actv = ACTV_INACTIVE;
@@ -297,9 +310,9 @@ void Object::set_position(float newx, float newy) {
 }
 
 void Object::add_position(float xdiff, float ydiff) {
-	// TODO: if the object's current x-position is 100.1 and the x-diff is 5 (low-
-	// precision), do we move it to 105.1 or 105? e.g. should we lose the
-	// high-precision part of the current position? This is only relevant to Vehicles.
+	// TODO: if the object's current x-position is 100.1 and the x-diff is 5, do we move
+	// it to 105.1 or 105? e.g. should we lose the high-precision part of the current position?
+	// This is only relevant to Vehicles.
 
 	// TODO: is using get_bbox() correct?
 	set_position(get_bbox().x + xdiff, get_bbox().y + ydiff);
@@ -381,6 +394,9 @@ void Object::tick() {
 				// stop!
 				as_vehicle()->xvel = 0;
 				as_vehicle()->yvel = 0;
+				// truncate any fractional position
+				// TODO: does this result in the correct y position? should we just set it to the next_floor_y + height?
+				set_position(std::trunc(get_bbox().x), std::trunc(get_bbox().y));
 				if (actv != ACTV_INACTIVE) {
 					actv = ACTV_INACTIVE;
 					g_engine_context.macros->queue_script(this, this, SCRIPT_DEACTIVATE);
