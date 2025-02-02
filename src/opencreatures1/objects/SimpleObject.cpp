@@ -3,6 +3,13 @@
 #include "SFCSerialization.h"
 #include "fileformats/sfc/SimpleObject.h"
 
+const DullPart* SimpleObject::get_part(int32_t partnum) const {
+	if (partnum == 0) {
+		return &part;
+	}
+	return nullptr;
+}
+
 void SimpleObject::serialize(SFCContext& ctx, sfc::SimpleObjectV1* simp) {
 	if (ctx.is_storing()) {
 		simp->part = sfc_dump_entity(part);

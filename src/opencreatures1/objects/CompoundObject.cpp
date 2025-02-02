@@ -4,6 +4,13 @@
 #include "fileformats/sfc/CompoundObject.h"
 #include "fileformats/sfc/Entity.h"
 
+const DullPart* CompoundObject::get_part(int32_t partnum) const {
+	if (partnum >= 0 && numeric_cast<size_t>(partnum) < parts.size()) {
+		return &parts[numeric_cast<size_t>(partnum)];
+	}
+	return nullptr;
+}
+
 void CompoundObject::serialize(SFCContext& ctx, sfc::CompoundObjectV1* comp) {
 	if (ctx.is_storing()) {
 		for (auto& part : parts) {

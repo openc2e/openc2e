@@ -16,5 +16,6 @@ struct SimpleObject : Object {
 	std::array<int8_t, 3> click_bhvr;
 	uint8_t touch_bhvr;
 
+	const DullPart* get_part(int32_t) const override;
 	void serialize(SFCContext&, sfc::SimpleObjectV1*);
 };

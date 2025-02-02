@@ -3,6 +3,13 @@
 #include "SFCSerialization.h"
 #include "fileformats/sfc/Scenery.h"
 
+const DullPart* Scenery::get_part(int32_t partnum) const {
+	if (partnum == 0) {
+		return &part;
+	}
+	return nullptr;
+}
+
 void Scenery::serialize(SFCContext& ctx, sfc::SceneryV1* scen) {
 	if (ctx.is_storing()) {
 		scen->part = sfc_dump_entity(part);

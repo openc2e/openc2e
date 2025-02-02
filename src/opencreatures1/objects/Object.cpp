@@ -393,25 +393,6 @@ DullPart* Object::get_part(int32_t partnum) {
 	return const_cast<DullPart*>(const_cast<const Object*>(this)->get_part(partnum));
 }
 
-const DullPart* Object::get_part(int32_t partnum) const {
-	if (as_scenery()) {
-		if (partnum == 0) {
-			return &as_scenery()->part;
-		}
-	} else if (as_simple_object()) {
-		if (partnum == 0) {
-			return &as_simple_object()->part;
-		}
-	} else if (as_compound_object()) {
-		auto idx = numeric_cast<uint32_t>(partnum);
-		if (idx >= as_compound_object()->parts.size()) {
-			return {};
-		}
-		return &as_compound_object()->parts[idx];
-	}
-	return nullptr;
-}
-
 void Object::vehicle_grab_passengers() {
 	if (world_has_at_least_one_creature()) {
 		printf("WARNING: vehicle_grab_passengers not implemented\n");

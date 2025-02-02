@@ -125,7 +125,7 @@ class Object {
 	int32_t get_z_order() const;
 	Rect2f get_bbox() const;
 	DullPart* get_part(int32_t partnum);
-	const DullPart* get_part(int32_t partnum) const;
+	virtual const DullPart* get_part(int32_t partnum) const = 0;
 
 	void stim_shou();
 	void stim_sign();

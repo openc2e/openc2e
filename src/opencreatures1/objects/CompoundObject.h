@@ -31,5 +31,6 @@ struct CompoundObject : Object {
 	std::array<Rect2i, 6> hotspots;
 	std::array<int32_t, 6> functions_to_hotspots;
 
+	const DullPart* get_part(int32_t) const override;
 	void serialize(SFCContext&, sfc::CompoundObjectV1*);
 };
