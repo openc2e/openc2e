@@ -32,5 +32,6 @@ struct CompoundObject : Object {
 	std::array<int32_t, 6> functions_to_hotspots;
 
 	const DullPart* get_part(int32_t) const override;
+	void handle_left_click(float, float) override;
 	void serialize(SFCContext&, sfc::CompoundObjectV1*);
 };

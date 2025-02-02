@@ -109,7 +109,7 @@ class Object {
 	const Blackboard* as_blackboard() const;
 	const Creature* as_creature() const;
 
-	void handle_left_click(float relx, float rely);
+	virtual void handle_left_click(float relx, float rely) = 0;
 
 	void handle_mesg_activate1(Message);
 	void handle_mesg_activate2(Message);

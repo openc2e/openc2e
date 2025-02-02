@@ -10,6 +10,10 @@ const DullPart* Scenery::get_part(int32_t partnum) const {
 	return nullptr;
 }
 
+void Scenery::handle_left_click(float, float) {
+	throw Exception("handle_left_click called on Scenery, this shouldn't happen");
+}
+
 void Scenery::serialize(SFCContext& ctx, sfc::SceneryV1* scen) {
 	if (ctx.is_storing()) {
 		scen->part = sfc_dump_entity(part);
