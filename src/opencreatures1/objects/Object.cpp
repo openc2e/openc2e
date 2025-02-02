@@ -397,7 +397,7 @@ Rect2i Object::get_bbox() const {
 		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
 
-	return main_part->get_bbox();
+	return Rect2i{numeric_cast<int32_t>(main_part->get_x()), numeric_cast<int32_t>(main_part->get_y()), main_part->width(), main_part->height()};
 }
 
 Renderable* Object::get_renderable_for_part(int32_t partnum) {

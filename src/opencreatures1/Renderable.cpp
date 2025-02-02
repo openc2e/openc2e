@@ -47,17 +47,6 @@ const ImageGallery& Renderable::get_gallery() const {
 	return gallery;
 }
 
-Rect2i Renderable::get_bbox() const {
-	Rect2i r;
-	// TODO: should we actually trunc these high-precision coordinates? This only
-	// matters for vehicles.
-	r.x = numeric_cast<int32_t>(x);
-	r.width = width();
-	r.y = numeric_cast<int32_t>(y);
-	r.height = height();
-	return r;
-}
-
 int32_t Renderable::frame() const {
 	return base + pose;
 }

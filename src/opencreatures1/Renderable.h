@@ -34,7 +34,6 @@ class Renderable {
 
 	int32_t width() const;
 	int32_t height() const;
-	Rect2i get_bbox() const;
 
   private:
 	friend std::string format_as(const Renderable& r);
