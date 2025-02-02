@@ -128,12 +128,11 @@ int32_t get_fps() {
 		rendertimeptr = 0;
 	}
 	time_of_last_render = n;
-	float avgtime = 0;
+	decltype(rendertimes)::value_type avgtime = 0;
 	for (auto t : rendertimes) {
 		avgtime += t;
 	}
-	avgtime /= rendertimes.size();
-	return static_cast<int32_t>(std::round(1000 / avgtime));
+	return 60000 / avgtime;
 }
 
 void draw_imgui_bottombar() {
