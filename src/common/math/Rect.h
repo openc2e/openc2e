@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/NumericCast.h"
+
 #include <fmt/core.h>
 #include <stdint.h>
 
@@ -50,10 +52,10 @@ struct Rect2f {
 	Rect2f(float x_, float y_, float width_, float height_)
 		: x(x_), y(y_), width(width_), height(height_) {}
 	Rect2f(Rect2i other)
-		: x(other.x),
-		  y(other.y),
-		  width(other.width),
-		  height(other.height) {}
+		: x(numeric_cast<float>(other.x)),
+		  y(numeric_cast<float>(other.y)),
+		  width(numeric_cast<float>(other.width)),
+		  height(numeric_cast<float>(other.height)) {}
 
 	float right() const { return x + width; }
 	float bottom() const { return y + height; }
