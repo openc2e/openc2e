@@ -49,7 +49,7 @@ using IntegerRVFunc = int32_t (*)(MacroContext&, Macro&);
 using LValueFunc = void (*)(const MacroContext&, const Macro&, int32_t value);
 
 class Object;
-class Renderable;
+class DullPart;
 
 class MacroError : public Exception {
 	using Exception::Exception;
@@ -81,7 +81,7 @@ class MacroContext {
 	Object* get_ownr(const Macro&) const;
 	Object* maybe_get_ownr(const Macro&) const;
 	Object* get_targ(const Macro&) const;
-	Renderable* get_targ_part(const Macro&) const;
+	DullPart* get_targ_part(const Macro&) const;
 	void set_targ(Macro&, ObjectHandle);
 
 	bool try_get_variable(const Macro&, Token varname, int32_t* value) const;

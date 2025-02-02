@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "common/math/Rect.h"
 #include "common/render/RenderItemHandle.h"
 #include "opencreatures1/ImageGallery.h"
@@ -8,14 +7,14 @@
 #include <fmt/format.h>
 #include <string>
 
-class Renderable {
+class DullPart {
   public:
-	Renderable(); // TODO: null part? shouldn't allow this
+	DullPart(); // TODO: null part? shouldn't allow this
 
 	// the order of arguments here matches the CAOS command PAT: DULL, except that
 	// coordinates are expected as world-absolute instead of relative to the object.
-	Renderable(const ImageGallery& gallery, int32_t sprite_base, float x, float y, int32_t z);
-	// Renderable(Renderable&&) = default;
+	DullPart(const ImageGallery& gallery, int32_t sprite_base, float x, float y, int32_t z);
+	// DullPart(DullPart&&) = default;
 
 	const ImageGallery& gallery() const;
 
@@ -41,7 +40,7 @@ class Renderable {
 	void clear_animation();
 
   private:
-	friend std::string format_as(const Renderable& r);
+	friend std::string format_as(const DullPart& r);
 
 	int32_t frame() const;
 	void update_renderitem();

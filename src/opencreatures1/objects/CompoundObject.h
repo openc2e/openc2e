@@ -1,7 +1,7 @@
 #pragma once
 
+#include "DullPart.h"
 #include "Object.h"
-#include "Renderable.h"
 #include "common/math/Rect.h"
 
 #include <array>
@@ -12,7 +12,7 @@ namespace sfc {
 struct CompoundObjectV1;
 };
 
-struct CompoundPart : Renderable {
+struct CompoundPart : DullPart {
 	int32_t relx;
 	int32_t rely;
 };

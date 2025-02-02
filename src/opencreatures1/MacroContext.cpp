@@ -70,12 +70,12 @@ void MacroContext::set_targ(Macro& m, ObjectHandle new_targ) {
 	m.targ = new_targ;
 }
 
-Renderable* MacroContext::get_targ_part(const Macro& m) const {
-	auto* renderable = get_targ(m)->get_renderable_for_part(m.part);
-	if (!renderable) {
+DullPart* MacroContext::get_targ_part(const Macro& m) const {
+	auto* part = get_targ(m)->get_part(m.part);
+	if (!part) {
 		throw Exception("part is not a valid part reference");
 	}
-	return renderable;
+	return part;
 }
 
 void MacroContext::read_command_separator(Macro& m) {

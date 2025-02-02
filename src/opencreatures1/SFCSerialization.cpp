@@ -1,12 +1,12 @@
 #include "SFCSerialization.h"
 
 #include "C1SoundManager.h"
+#include "DullPart.h"
 #include "EngineContext.h"
 #include "ImageManager.h"
 #include "MacroManager.h"
 #include "MapManager.h"
 #include "PointerManager.h"
-#include "Renderable.h"
 #include "Scriptorium.h"
 #include "ViewportManager.h"
 #include "common/Ranges.h"
@@ -172,7 +172,7 @@ static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gal
 	return sfc;
 }
 
-Renderable sfc_load_renderable(const sfc::EntityV1* part) {
+DullPart sfc_load_entity(const sfc::EntityV1* part) {
 	if (part->x >= CREATURES1_WORLD_WIDTH) {
 		throw Exception(fmt::format("Expected x to be between [0, {}), but got {}", CREATURES1_WORLD_WIDTH, part->x));
 	}
@@ -187,7 +187,7 @@ Renderable sfc_load_renderable(const sfc::EntityV1* part) {
 		ImageManager::IMAGE_SPR);
 
 
-	Renderable r(gallery, part->sprite_base, part->x, part->y, part->z_order);
+	DullPart r(gallery, part->sprite_base, part->x, part->y, part->z_order);
 	r.set_pose(part->sprite_pose_plus_base - part->sprite_base);
 	if (part->has_animation) {
 		r.set_animation(part->animation_frame, part->animation_string);
@@ -195,7 +195,7 @@ Renderable sfc_load_renderable(const sfc::EntityV1* part) {
 	return r;
 }
 
-std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r, const std::shared_ptr<sfc::CGalleryV1>& gallery) {
+std::shared_ptr<sfc::EntityV1> sfc_dump_entity(const DullPart& r, const std::shared_ptr<sfc::CGalleryV1>& gallery) {
 	auto entity = std::make_shared<sfc::EntityV1>();
 	if (gallery) {
 		// so we can share gallery between all parts on a compound object / creature

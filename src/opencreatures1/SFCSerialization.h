@@ -5,7 +5,7 @@
 #include <memory>
 
 class Object;
-class Renderable;
+class DullPart;
 
 namespace sfc {
 struct CGalleryV1;
@@ -26,5 +26,5 @@ class SFCContext {
 
 void sfc_load_everything(const sfc::SFCFile&);
 sfc::SFCFile sfc_dump_everything();
-Renderable sfc_load_renderable(const sfc::EntityV1*);
-std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable&, const std::shared_ptr<sfc::CGalleryV1>& = {});
+DullPart sfc_load_entity(const sfc::EntityV1*);
+std::shared_ptr<sfc::EntityV1> sfc_dump_entity(const DullPart&, const std::shared_ptr<sfc::CGalleryV1>& = {});

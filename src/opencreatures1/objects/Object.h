@@ -1,12 +1,12 @@
 #pragma once
 
 #include "C1ControlledSound.h"
+#include "DullPart.h"
 #include "EngineContext.h"
 #include "MessageManager.h"
 #include "ObjectHandle.h"
 #include "ObjectNames.h"
 #include "PointerManager.h"
-#include "Renderable.h"
 #include "common/Exception.h"
 #include "common/StaticSet.h"
 #include "common/StaticVector.h"
@@ -124,8 +124,8 @@ class Object {
 
 	int32_t get_z_order() const;
 	Rect2f get_bbox() const;
-	Renderable* get_renderable_for_part(int32_t partnum);
-	const Renderable* get_renderable_for_part(int32_t partnum) const;
+	DullPart* get_part(int32_t partnum);
+	const DullPart* get_part(int32_t partnum) const;
 
 	void stim_shou();
 	void stim_sign();

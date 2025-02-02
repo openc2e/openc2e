@@ -1,14 +1,14 @@
 #pragma once
 
+#include "DullPart.h"
 #include "Object.h"
-#include "Renderable.h"
 
 namespace sfc {
 struct SceneryV1;
 }
 
 struct Scenery : Object {
-	Renderable part;
+	DullPart part;
 
 	void serialize(SFCContext&, sfc::SceneryV1*);
 };

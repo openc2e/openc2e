@@ -370,7 +370,7 @@ void Object::add_position(float xdiff, float ydiff) {
 }
 
 int32_t Object::get_z_order() const {
-	auto* main_part = get_renderable_for_part(0);
+	auto* main_part = get_part(0);
 	if (!main_part) {
 		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
@@ -379,7 +379,7 @@ int32_t Object::get_z_order() const {
 }
 
 Rect2f Object::get_bbox() const {
-	auto* main_part = get_renderable_for_part(0);
+	auto* main_part = get_part(0);
 	if (!main_part) {
 		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
@@ -389,11 +389,11 @@ Rect2f Object::get_bbox() const {
 	return Rect2f{main_part->x(), main_part->y(), numeric_cast<float>(main_part->width()), numeric_cast<float>(main_part->height())};
 }
 
-Renderable* Object::get_renderable_for_part(int32_t partnum) {
-	return const_cast<Renderable*>(const_cast<const Object*>(this)->get_renderable_for_part(partnum));
+DullPart* Object::get_part(int32_t partnum) {
+	return const_cast<DullPart*>(const_cast<const Object*>(this)->get_part(partnum));
 }
 
-const Renderable* Object::get_renderable_for_part(int32_t partnum) const {
+const DullPart* Object::get_part(int32_t partnum) const {
 	if (as_scenery()) {
 		if (partnum == 0) {
 			return &as_scenery()->part;
@@ -444,7 +444,7 @@ void Object::tick() {
 
 	// animation updates
 	for (int32_t partno = 0; true; ++partno) {
-		auto* r = get_renderable_for_part(partno);
+		auto* r = get_part(partno);
 		if (!r) {
 			break;
 		}

@@ -448,9 +448,9 @@ void Command_POSE(MacroContext& ctx, Macro& m) {
 		return;
 	}
 
-	auto* renderable = ctx.get_targ_part(m);
-	renderable->clear_animation();
-	renderable->set_pose(pose);
+	auto* part = ctx.get_targ_part(m);
+	part->clear_animation();
+	part->set_pose(pose);
 }
 
 void Command_REPE(MacroContext& ctx, Macro& m) {

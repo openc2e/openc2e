@@ -8,7 +8,7 @@ void CompoundObject::serialize(SFCContext& ctx, sfc::CompoundObjectV1* comp) {
 	if (ctx.is_storing()) {
 		for (auto& part : parts) {
 			sfc::CompoundPartV1 sfcpart;
-			sfcpart.entity = sfc_dump_renderable(part, comp->gallery);
+			sfcpart.entity = sfc_dump_entity(part, comp->gallery);
 			if (!comp->gallery) {
 				comp->gallery = sfcpart.entity->gallery;
 			}
@@ -24,7 +24,7 @@ void CompoundObject::serialize(SFCContext& ctx, sfc::CompoundObjectV1* comp) {
 		for (auto& cp : comp->parts) {
 			// TODO: make sure cp.x and cp.y match calculated relative position?
 			CompoundPart part;
-			static_cast<Renderable&>(part) = sfc_load_renderable(cp.entity.get());
+			static_cast<DullPart&>(part) = sfc_load_entity(cp.entity.get());
 			part.relx = cp.relx;
 			part.rely = cp.rely;
 			parts.push_back(std::move(part));
