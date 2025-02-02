@@ -8,6 +8,10 @@
 #include <stdint.h>
 #include <string>
 
+namespace sfc {
+struct BlackboardV1;
+}
+
 struct Blackboard : CompoundObject {
 	struct BlackboardWord {
 		uint32_t value = 0;
@@ -32,4 +36,6 @@ struct Blackboard : CompoundObject {
 	void blackboard_disable_edit();
 	void blackboard_emit_eyesight(int32_t word_index);
 	void blackboard_emit_earshot(int32_t word_index);
+
+	void serialize(SFCContext&, sfc::BlackboardV1*);
 };

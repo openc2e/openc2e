@@ -14,6 +14,11 @@
 
 #include <array>
 
+class SFCContext;
+namespace sfc {
+struct ObjectV1;
+}
+
 enum MovementStatus {
 	MOVEMENT_AUTONOMOUS = 0,
 	MOVEMENT_MOUSEDRIVEN = 1,
@@ -132,6 +137,8 @@ class Object {
 	void vehicle_drop_passengers();
 
 	void tick();
+
+	void serialize(SFCContext&, sfc::ObjectV1*);
 };
 
 inline std::string format_as(const Object& o) {

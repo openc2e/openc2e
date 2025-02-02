@@ -2,6 +2,7 @@
 
 #include "Blackboard.h"
 #include "Bubble.h"
+#include "C1SoundManager.h"
 #include "CallButton.h"
 #include "CompoundObject.h"
 #include "Creature.h"
@@ -10,12 +11,14 @@
 #include "MessageManager.h"
 #include "ObjectManager.h"
 #include "PointerTool.h"
+#include "SFCSerialization.h"
 #include "Scenery.h"
 #include "SimpleObject.h"
 #include "Vehicle.h"
 #include "common/Ascii.h"
 #include "common/NumericCast.h"
 #include "common/Ranges.h"
+#include "fileformats/sfc/Object.h"
 
 static bool world_has_at_least_one_creature() {
 	for (auto* obj : *g_engine_context.objects) {
@@ -554,5 +557,62 @@ void Object::creature_stim_disappoint() {
 void Object::creature_stim_writ() {
 	if (as_creature()) {
 		printf("WARNING: creature_stim_writ not implemented\n");
+	}
+}
+
+void Object::serialize(SFCContext& ctx, sfc::ObjectV1* p) {
+	if (ctx.is_storing()) {
+		p->species = species;
+		p->genus = genus;
+		p->family = family;
+		p->movement_status = movement_status;
+		p->attr = attr;
+		p->limit = limit;
+		p->carrier = ctx.dump_object(g_engine_context.objects->try_get(carrier)).get();
+		p->actv = actv;
+		if (p->gallery == nullptr) {
+			throw Exception("Expected gallery to be non-null by this point, it should have been"
+							" set by a serialization function for a more specialized object type");
+		}
+		p->tick_value = tick_value;
+		p->ticks_since_last_tick_event = ticks_since_last_tick_event;
+		p->objp = ctx.dump_object(g_engine_context.objects->try_get(objp)).get();
+		if (current_sound.get_looping()) {
+			p->current_sound = current_sound.get_name();
+		}
+		p->obv0 = obv0;
+		p->obv1 = obv1;
+		p->obv2 = obv2;
+		// TODO: I think we can skip scripts here, since they'll be loaded from the global
+		// scriptorium anyways?
+		// p->scripts = scripts;
+	} else {
+		species = p->species;
+		genus = p->genus;
+		family = p->family;
+		movement_status = MovementStatus(p->movement_status);
+		attr = p->attr;
+		limit = p->limit;
+		carrier = ctx.load_object(p->carrier);
+		actv = ActiveFlag(p->actv);
+		// creaturesImage sprite;
+		tick_value = p->tick_value;
+		ticks_since_last_tick_event = p->ticks_since_last_tick_event;
+		// Set the sound later, once we've loaded the object's position from its Entities
+		// current_sound = p->current_sound;
+		objp = ctx.load_object(p->objp);
+		obv0 = p->obv0;
+		obv1 = p->obv1;
+		obv2 = p->obv2;
+
+		// do this _after_ loading the SimpleObject or CompoundObject data,
+		// since only then do we know the object's position / bounding box
+		// TODO: should probably somewhere else? like global initialization after everything's been loaded?
+		if (!p->current_sound.empty()) {
+			// these won't be audible immediately, since the SoundManager thinks
+			// they're out of hearing range. once the game starts and the
+			// listener viewport gets set these will start being audible.
+			current_sound = g_engine_context.sounds->play_controlled_sound(p->current_sound, get_bbox(), true);
+		}
 	}
 }

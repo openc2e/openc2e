@@ -1,8 +1,11 @@
 #include "Blackboard.h"
 
+#include "ImageManager.h"
 #include "ObjectManager.h"
+#include "SFCSerialization.h"
 #include "common/Ascii.h"
 #include "common/render/RenderSystem.h"
+#include "fileformats/sfc/Blackboard.h"
 
 static bool world_has_at_least_one_creature() {
 	for (auto* obj : *g_engine_context.objects) {
@@ -62,4 +65,31 @@ void Blackboard::blackboard_emit_earshot(int32_t word_index) {
 	if (world_has_at_least_one_creature()) {
 		printf("WARNING: blackboard_emit_earshot %i not implemented\n", word_index);
 	}
+}
+
+void Blackboard::serialize(SFCContext& ctx, sfc::BlackboardV1* bbd) {
+	if (ctx.is_storing()) {
+		bbd->background_color = background_color;
+		bbd->chalk_color = chalk_color;
+		bbd->alias_color = alias_color;
+		bbd->text_x_position = text_x_position;
+		bbd->text_y_position = text_y_position;
+		for (size_t i = 0; i < bbd->words.size(); ++i) {
+			bbd->words[i].value = words[i].value;
+			bbd->words[i].text = words[i].text;
+		}
+	} else {
+		background_color = bbd->background_color;
+		chalk_color = bbd->chalk_color;
+		alias_color = bbd->alias_color;
+		text_x_position = bbd->text_x_position;
+		text_y_position = bbd->text_y_position;
+		for (size_t i = 0; i < bbd->words.size(); ++i) {
+			auto& word = bbd->words[i];
+			words[i].value = word.value;
+			words[i].text = word.text;
+		}
+		charset_sprite = g_engine_context.images->get_charset_dta(bbd->background_color, bbd->chalk_color, bbd->alias_color);
+	}
+	CompoundObject::serialize(ctx, bbd);
 }

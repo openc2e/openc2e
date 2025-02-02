@@ -35,36 +35,36 @@
 
 #include <fmt/ranges.h>
 
-struct SFCLoader {
+struct SFCLoader : SFCContext {
 	SFCLoader(sfc::SFCFile& sfc_)
 		: sfc(sfc_) {}
 	void load_everything();
 
 	void load_objects_and_sceneries();
 
-	ObjectHandle load_object(sfc::ObjectV1* p);
-	std::shared_ptr<sfc::ObjectV1> dump_object(Object*) {
+	ObjectHandle load_object(sfc::ObjectV1* p) override;
+	std::shared_ptr<sfc::ObjectV1> dump_object(Object*) override {
 		throw Exception("Can't call dump_object on a SFCLoader");
 	}
 
-	constexpr bool is_loading() const { return true; }
-	constexpr bool is_storing() const { return false; }
+	bool is_loading() const override { return true; }
+	bool is_storing() const override { return false; }
 
 	sfc::SFCFile& sfc;
 	std::map<const sfc::ObjectV1*, ObjectHandle> sfc_object_mapping;
 };
 
-struct SFCSerializer {
-	std::shared_ptr<sfc::ObjectV1> dump_object(Object*);
-	ObjectHandle load_object(sfc::ObjectV1*) {
+struct SFCSerializer : SFCContext {
+	std::shared_ptr<sfc::ObjectV1> dump_object(Object*) override;
+	ObjectHandle load_object(sfc::ObjectV1*) override {
 		throw Exception("Can't call load_object on a SFCSerializer");
 	}
 
 	sfc::SFCFile sfc;
 	std::map<Object*, std::shared_ptr<sfc::ObjectV1>> sfc_object_mapping;
 
-	constexpr bool is_loading() const { return false; }
-	constexpr bool is_storing() const { return true; }
+	bool is_loading() const override { return false; }
+	bool is_storing() const override { return true; }
 };
 
 template <typename Ctx>
@@ -172,7 +172,7 @@ static std::shared_ptr<sfc::CGalleryV1> sfc_dump_gallery(const ImageGallery& gal
 	return sfc;
 }
 
-static Renderable sfc_load_renderable(const sfc::EntityV1* part) {
+Renderable sfc_load_renderable(const sfc::EntityV1* part) {
 	if (part->x >= CREATURES1_WORLD_WIDTH) {
 		throw Exception(fmt::format("Expected x to be between [0, {}), but got {}", CREATURES1_WORLD_WIDTH, part->x));
 	}
@@ -196,7 +196,7 @@ static Renderable sfc_load_renderable(const sfc::EntityV1* part) {
 	return r;
 }
 
-static std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r, const std::shared_ptr<sfc::CGalleryV1>& gallery = {}) {
+std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r, const std::shared_ptr<sfc::CGalleryV1>& gallery) {
 	auto entity = std::make_shared<sfc::EntityV1>();
 	if (gallery) {
 		// so we can share gallery between all parts on a compound object / creature
@@ -218,292 +218,6 @@ static std::shared_ptr<sfc::EntityV1> sfc_dump_renderable(const Renderable& r, c
 	return entity;
 }
 
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::ObjectV1* p, Object* obj) {
-	if (ctx.is_storing()) {
-		p->species = obj->species;
-		p->genus = obj->genus;
-		p->family = obj->family;
-		p->movement_status = obj->movement_status;
-		p->attr = obj->attr;
-		p->limit = obj->limit;
-		p->carrier = ctx.dump_object(g_engine_context.objects->try_get(obj->carrier)).get();
-		p->actv = obj->actv;
-		if (p->gallery == nullptr) {
-			throw Exception("Expected gallery to be non-null by this point, it should have been"
-							" set by a serialization function for a more specialized object type");
-		}
-		p->tick_value = obj->tick_value;
-		p->ticks_since_last_tick_event = obj->ticks_since_last_tick_event;
-		p->objp = ctx.dump_object(g_engine_context.objects->try_get(obj->objp)).get();
-		if (obj->current_sound.get_looping()) {
-			p->current_sound = obj->current_sound.get_name();
-		}
-		p->obv0 = obj->obv0;
-		p->obv1 = obj->obv1;
-		p->obv2 = obj->obv2;
-		// TODO: I think we can skip scripts here, since they'll be loaded from the global
-		// scriptorium anyways?
-		// p->scripts = obj->scripts;
-	} else {
-		obj->species = p->species;
-		obj->genus = p->genus;
-		obj->family = p->family;
-		obj->movement_status = MovementStatus(p->movement_status);
-		obj->attr = p->attr;
-		obj->limit = p->limit;
-		obj->carrier = ctx.load_object(p->carrier);
-		obj->actv = ActiveFlag(p->actv);
-		// creaturesImage sprite;
-		obj->tick_value = p->tick_value;
-		obj->ticks_since_last_tick_event = p->ticks_since_last_tick_event;
-		// Set the sound later, once we've loaded the object's position from its Entities
-		// obj->current_sound = p->current_sound;
-		obj->objp = ctx.load_object(p->objp);
-		obj->obv0 = p->obv0;
-		obj->obv1 = p->obv1;
-		obj->obv2 = p->obv2;
-
-		// do this _after_ loading the SimpleObject or CompoundObject data,
-		// since only then do we know the object's position / bounding box
-		// TODO: should probably somewhere else? like global initialization after everything's been loaded?
-		if (!p->current_sound.empty()) {
-			// these won't be audible immediately, since the SoundManager thinks
-			// they're out of hearing range. once the game starts and the
-			// listener viewport gets set these will start being audible.
-			obj->current_sound = g_engine_context.sounds->play_controlled_sound(p->current_sound, obj->get_bbox(), true);
-		}
-	}
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::SceneryV1* scen, Scenery* obj) {
-	if (ctx.is_storing()) {
-		scen->part = sfc_dump_renderable(obj->part);
-		static_cast<sfc::ObjectV1*>(scen)->gallery = scen->part->gallery;
-	} else {
-		obj->part = sfc_load_renderable(scen->part.get());
-	}
-	serialize_object(ctx, static_cast<sfc::ObjectV1*>(scen), static_cast<Object*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::SimpleObjectV1* simp, SimpleObject* obj) {
-	if (ctx.is_storing()) {
-		simp->part = sfc_dump_renderable(obj->part);
-		static_cast<sfc::ObjectV1*>(simp)->gallery = simp->part->gallery;
-		simp->z_order = obj->z_order;
-		simp->click_bhvr = obj->click_bhvr;
-		simp->touch_bhvr = obj->touch_bhvr;
-	} else {
-		obj->part = sfc_load_renderable(simp->part.get());
-		obj->z_order = simp->z_order;
-		obj->click_bhvr = simp->click_bhvr;
-		obj->touch_bhvr = simp->touch_bhvr;
-	}
-	serialize_object(ctx, static_cast<sfc::ObjectV1*>(simp), static_cast<Object*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::BubbleV1* bub, Bubble* obj) {
-	if (ctx.is_storing()) {
-	} else {
-		fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type: Bubble\n", obj->family, obj->genus, obj->species);
-	}
-	serialize_object(ctx, static_cast<sfc::SimpleObjectV1*>(bub), static_cast<SimpleObject*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::CallButtonV1* cbtn, CallButton* obj) {
-	if (ctx.is_storing()) {
-		// CallButtonV1
-		cbtn->lift = dynamic_cast<sfc::LiftV1*>(
-			ctx.dump_object(g_engine_context.objects->try_get(obj->lift)).get());
-		cbtn->floor = obj->floor;
-	} else {
-		obj->lift = ctx.load_object(cbtn->lift);
-		obj->floor = cbtn->floor;
-	}
-	serialize_object(ctx, static_cast<sfc::SimpleObjectV1*>(cbtn), static_cast<SimpleObject*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::PointerToolV1* pntr, PointerTool* obj) {
-	if (ctx.is_storing()) {
-		pntr->relx = obj->relx;
-		pntr->rely = obj->rely;
-		pntr->bubble = dynamic_cast<sfc::BubbleV1*>(
-			ctx.dump_object(g_engine_context.objects->try_get(obj->bubble)).get());
-		pntr->text = obj->text;
-	} else {
-		obj->relx = pntr->relx;
-		obj->rely = pntr->rely;
-		obj->bubble = ctx.load_object(pntr->bubble);
-		obj->text = pntr->text;
-		g_engine_context.pointer->m_pointer_tool = obj->uid;
-	}
-	serialize_object(ctx, static_cast<sfc::SimpleObjectV1*>(pntr), static_cast<SimpleObject*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::CompoundObjectV1* comp, CompoundObject* obj) {
-	if (ctx.is_storing()) {
-		for (auto& part : obj->parts) {
-			sfc::CompoundPartV1 sfcpart;
-			sfcpart.entity = sfc_dump_renderable(part.renderable, comp->gallery);
-			if (!comp->gallery) {
-				comp->gallery = sfcpart.entity->gallery;
-			}
-			sfcpart.x = part.x;
-			sfcpart.y = part.y;
-			comp->parts.push_back(sfcpart);
-		}
-		for (size_t i = 0; i < comp->hotspots.size(); ++i) {
-			comp->hotspots[i] = obj->hotspots[i];
-		}
-		comp->functions_to_hotspots = obj->functions_to_hotspots;
-	} else {
-		for (auto& cp : comp->parts) {
-			obj->parts.emplace_back();
-			obj->parts.back().renderable = sfc_load_renderable(cp.entity.get());
-			obj->parts.back().x = cp.x;
-			obj->parts.back().y = cp.y;
-		}
-		for (size_t i = 0; i < obj->hotspots.size(); ++i) {
-			obj->hotspots[i] = comp->hotspots[i];
-		}
-		obj->functions_to_hotspots = comp->functions_to_hotspots;
-	}
-	serialize_object(ctx, static_cast<sfc::ObjectV1*>(comp), static_cast<Object*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::VehicleV1* veh, Vehicle* obj) {
-	// recurse before the Vehicle logic (unlike the other functions) because
-	// we need to adjust the parts' position based on the vehicle's fixed point 24.8 position.
-	serialize_object(ctx, static_cast<sfc::CompoundObjectV1*>(veh), static_cast<CompoundObject*>(obj));
-
-	if (ctx.is_storing()) {
-		// TODO: round or truncate velocity? does it matter?
-		veh->x_times_256 = numeric_cast<int32_t>(obj->parts[0].renderable.get_x() * 256);
-		veh->y_times_256 = numeric_cast<int32_t>(obj->parts[0].renderable.get_y() * 256);
-		veh->xvel_times_256 = numeric_cast<int32_t>(obj->xvel * 256);
-		veh->yvel_times_256 = numeric_cast<int32_t>(obj->yvel * 256);
-		veh->cabin = obj->cabin;
-		veh->bump = obj->bump;
-	} else {
-		// need the compound parts to already be defined
-		obj->xvel = veh->xvel_times_256 / 256.f;
-		obj->yvel = veh->yvel_times_256 / 256.f;
-		if (obj->parts.empty()) {
-			throw Exception("Expected compound parts to be non-null by this point, they should have"
-							" been loaded by the CompoundObject serialization logic");
-		}
-		auto obj_x = obj->parts[0].renderable.get_x();
-		auto obj_y = obj->parts[0].renderable.get_y();
-		auto veh_x = veh->x_times_256 / 256.f;
-		auto veh_y = veh->y_times_256 / 256.f;
-		if (obj_x != veh_x || obj_y != veh_y) {
-			fmt::print("INFO [SFCLoader] Object {} {} {} position {}, {} adjusted for VehicleData {}, {}\n", obj->family, obj->genus, obj->species, obj_x, obj_y, veh_x, veh_y);
-			auto diff_x = veh_x - obj_x;
-			auto diff_y = veh_y - obj_y;
-			// All parts need to be adjusted, not just the main one. If only the main one
-			// changes, things start to get weird — look at the cable car buttons after
-			// multiple load/save cycles whilst activating the buttons. They seem to "shimmy"
-			// up and down (classic floating point issue) and eventually drift after enough
-			// serialization cycles.
-			for (auto& cp : obj->parts) {
-				cp.renderable.set_position(cp.renderable.get_x() + diff_x, cp.renderable.get_y() + diff_y);
-			}
-		}
-		obj->cabin = veh->cabin;
-		obj->bump = veh->bump;
-	}
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::LiftV1* lift, Lift* obj) {
-	if (ctx.is_storing()) {
-		lift->num_floors = numeric_cast<int32_t>(obj->floors.size());
-		lift->next_or_current_floor = obj->next_or_current_floor;
-
-		// Would like to do this based on index w/in the serialized array, but
-		// we're not guaranteed to have the CallButtons serialized by this point...
-		// Since CallButtons have a pointer to their parent Lift, we might start
-		// serializing a CallButton and immediately switch to serializing the Lift,
-		// without fleshing out the CallButton struct until the Lift is finished.
-		lift->current_call_button = index_if(obj->activated_call_buttons, [&](auto& handle) {
-			auto* cb = g_engine_context.objects->try_get(handle);
-			return cb && cb->as_call_button()->floor == lift->next_or_current_floor;
-		});
-
-		lift->delay_ticks_divided_by_32 = 0; // TODO
-		for (size_t i = 0; i < obj->floors.size(); ++i) {
-			lift->floors[i] = obj->floors[i];
-		}
-		for (auto it : enumerate(obj->activated_call_buttons)) {
-			lift->activated_call_buttons[it.first] = dynamic_cast<sfc::CallButtonV1*>(
-				ctx.dump_object(g_engine_context.objects->try_get(it.second)).get());
-		}
-	} else {
-		obj->next_or_current_floor = lift->next_or_current_floor;
-		// unneeded
-		// obj->current_call_button = lift->current_call_button;
-		// TODO
-		// obj->delay_ticks_divided_by_32 = lift->delay_ticks_divided_by_32;
-		if (lift->delay_ticks_divided_by_32 != 0) {
-			fmt::print("WARN [SFCLoader] Unsupported: LiftData.delay_ticks_divided_by_32 = {}\n", lift->delay_ticks_divided_by_32);
-		}
-		for (size_t i = 0; i < numeric_cast<size_t>(lift->num_floors); ++i) {
-			// printf("lift->floors[i] y %i call_button %p\n", lift->floors[i].y, lift->floors[i].call_button);
-			obj->floors.push_back(lift->floors[i]);
-		}
-		for (auto* cb : lift->activated_call_buttons) {
-			if (auto&& handle = ctx.load_object(cb)) {
-				obj->activated_call_buttons.insert(handle);
-			}
-		}
-	}
-	serialize_object(ctx, static_cast<sfc::VehicleV1*>(lift), static_cast<Vehicle*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::BlackboardV1* bbd, Blackboard* obj) {
-	if (ctx.is_storing()) {
-		bbd->background_color = obj->background_color;
-		bbd->chalk_color = obj->chalk_color;
-		bbd->alias_color = obj->alias_color;
-		bbd->text_x_position = obj->text_x_position;
-		bbd->text_y_position = obj->text_y_position;
-		for (size_t i = 0; i < bbd->words.size(); ++i) {
-			bbd->words[i].value = obj->words[i].value;
-			bbd->words[i].text = obj->words[i].text;
-		}
-	} else {
-		obj->background_color = bbd->background_color;
-		obj->chalk_color = bbd->chalk_color;
-		obj->alias_color = bbd->alias_color;
-		obj->text_x_position = bbd->text_x_position;
-		obj->text_y_position = bbd->text_y_position;
-		for (size_t i = 0; i < bbd->words.size(); ++i) {
-			auto& word = bbd->words[i];
-			obj->words[i].value = word.value;
-			obj->words[i].text = word.text;
-		}
-		obj->charset_sprite = g_engine_context.images->get_charset_dta(bbd->background_color, bbd->chalk_color, bbd->alias_color);
-	}
-	serialize_object(ctx, static_cast<sfc::CompoundObjectV1*>(bbd), static_cast<CompoundObject*>(obj));
-}
-
-template <typename Ctx>
-static void serialize_object(Ctx&& ctx, sfc::CreatureV1* crea, Creature* obj) {
-	if (ctx.is_storing()) {
-	} else {
-		fmt::print("WARN [SFCLoader] Object {} {} {} unsupported type Creature\n", obj->family, obj->genus, obj->species);
-	}
-	serialize_object(ctx, static_cast<sfc::ObjectV1*>(crea), static_cast<Object*>(obj));
-}
-
 template <typename T, typename U>
 static bool create_engine_object(SFCLoader* ctx, sfc::ObjectV1* p) {
 	if (typeid(*p) != typeid(T)) {
@@ -512,7 +226,7 @@ static bool create_engine_object(SFCLoader* ctx, sfc::ObjectV1* p) {
 	ObjectHandle handle = g_engine_context.objects->add<U>();
 	ctx->sfc_object_mapping[p] = handle;
 	auto* obj = g_engine_context.objects->try_get(handle);
-	serialize_object(*ctx, static_cast<T*>(p), static_cast<U*>(obj));
+	static_cast<U*>(obj)->serialize(*ctx, static_cast<T*>(p));
 	return true;
 }
 
@@ -539,7 +253,10 @@ ObjectHandle SFCLoader::load_object(sfc::ObjectV1* p) {
 	} else if (create_engine_object<sfc::VehicleV1, Vehicle>(this, p)) {
 	} else if (create_engine_object<sfc::LiftV1, Lift>(this, p)) {
 	} else if (create_engine_object<sfc::BlackboardV1, Blackboard>(this, p)) {
-	} else if (create_engine_object<sfc::CreatureV1, Creature>(this, p)) {
+		// } else if (create_engine_object<sfc::CreatureV1, Creature>(this, p)) {
+	} else if (typeid(*p) == typeid(sfc::CreatureV1)) {
+		fmt::print("WARN [SFCLoader] Unsupported type: Creature\n");
+		return {};
 	} else {
 		throw Exception("Unknown object type");
 	}
@@ -653,7 +370,7 @@ bool dump_engine_object(SFCSerializer* ctx, Object* p) {
 	}
 	auto obj = std::make_shared<T>();
 	ctx->sfc_object_mapping[p] = obj;
-	serialize_object(*ctx, obj.get(), static_cast<U*>(p));
+	static_cast<U*>(p)->serialize(*ctx, obj.get());
 
 	if (p->as_scenery()) {
 		ctx->sfc.sceneries.push_back(std::dynamic_pointer_cast<sfc::SceneryV1>(obj));
