@@ -89,7 +89,6 @@ find_package(Threads REQUIRED) # stupid GCC needs explicit flags to use std::thr
 link_libraries(Threads::Threads)
 
 include_directories(BEFORE
-	${GEN}
 	${SRC}/src
 )
 
@@ -479,9 +478,6 @@ add_custom_command(
 	WORKING_DIRECTORY ${SRC})
 
 add_custom_target(docs ALL DEPENDS ${BIN}/caosdocs.html)
-add_custom_target(generated DEPENDS
-	${GEN}/cmddata.cpp
-)
 
 install(FILES
 	AUTHORS
