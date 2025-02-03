@@ -26,6 +26,10 @@ int32_t rand_int32(int32_t min, int32_t max) {
 	return std::uniform_int_distribution<int32_t>(min, max)(default_rng());
 }
 
+uint32_t rand_uint32() {
+	return std::uniform_int_distribution<uint32_t>()(default_rng());
+}
+
 uint32_t rand_uint32(uint32_t min, uint32_t max) {
 	return std::uniform_int_distribution<uint32_t>(min, max)(default_rng());
 }
