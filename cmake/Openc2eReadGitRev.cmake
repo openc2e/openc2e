@@ -12,13 +12,6 @@ set_property(
     "${CMAKE_CURRENT_SOURCE_DIR}/.git/HEAD"
     "${CMAKE_CURRENT_SOURCE_DIR}/.git/packed-refs"
 )
-file(GLOB head_ref_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/.git/refs/head/*")
-file(GLOB tag_ref_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/.git/refs/tags/*")
-set_property(
-	DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    ${head_ref_files}
-    ${tag_ref_files}
-)
 
 # read .git/HEAD
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/.git/HEAD" head_contents)

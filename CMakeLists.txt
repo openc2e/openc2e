@@ -485,7 +485,8 @@ gtest_discover_tests(test_common DISCOVERY_TIMEOUT 30)
 gtest_discover_tests(test_fileformats DISCOVERY_TIMEOUT 30)
 
 # Generated files
-file(GLOB CAOSVM_FILES CMAKE_CONFIGURE_DEPENDS ${SRC}/src/openc2e/caos/caosVM_*.cpp)
+get_target_property(CAOSVM_FILES openc2e_core SOURCES)
+list(FILTER CAOSVM_FILES INCLUDE REGEX "^src/openc2e/caos/caosVM_.*\.cpp$")
 add_custom_command(
 	OUTPUT ${GEN}/commandinfo.json
 	COMMAND ${CMAKE_COMMAND} -E make_directory "${GEN}"
