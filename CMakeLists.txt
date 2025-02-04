@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.3)
 project(openc2e)
 
+cmake_policy(SET CMP0101 NEW)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(SRC "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -37,9 +39,23 @@ if (OPENC2E_PROFILE_ALLOCATION)
 	add_definitions("-DPROFILE_ALLOCATION_COUNT -DPROFILE_ALLOCATION_THREAD_SAFE")
 endif()
 
+# Turn off warnings for external dependencies
+set(original_c_flags "${CMAKE_C_FLAGS}")
+set(original_cxx_flags "${CMAKE_CXX_FLAGS}")
+if (MSVC)
+	string(REGEX REPLACE "/W[^ ]+" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+	string(REGEX REPLACE "/W[^ ]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	string(APPEND CMAKE_C_FLAGS " /w")
+	string(APPEND CMAKE_CXX_FLAGS " /w")
+else()
+string(REGEX REPLACE "-W[^ ]+" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+string(REGEX REPLACE "-W[^ ]+" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	string(APPEND CMAKE_C_FLAGS " -w")
+	string(APPEND CMAKE_CXX_FLAGS " -w")
+endif()
+
 # Find / include dependencies
 find_package(Python REQUIRED)
-
 if(WIN32)
 	add_subdirectory(externals/zlib EXCLUDE_FROM_ALL)
 else()
@@ -71,6 +87,10 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for 
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/imgui EXCLUDE_FROM_ALL)
 add_subdirectory(externals/nativefiledialog EXCLUDE_FROM_ALL)
+
+# turn warnings back on
+set(CMAKE_C_FLAGS "${original_c_flags}")
+set(CMAKE_CXX_FLAGS "${original_cxx_flags}")
 
 # Pass flags to the compiler
 if(WIN32)
@@ -117,7 +137,7 @@ add_library(openc2e-common OBJECT
 	src/common/WindowsRegistry.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(openc2e-common PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+	target_compile_options(openc2e-common BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_link_libraries(openc2e-common
 	PUBLIC fmt
@@ -139,7 +159,7 @@ add_executable(test_common
 	src/common/tests/WildcardTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(test_common PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+	target_compile_options(test_common BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_link_libraries(test_common openc2e-common ghc_filesystem gtest_main)
 
@@ -190,7 +210,7 @@ add_executable(test_fileformats
 	src/fileformats/tests/PrayTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(test_fileformats PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+	target_compile_options(test_fileformats BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_link_libraries(test_fileformats openc2e-fileformats gtest_main)
 
@@ -353,7 +373,7 @@ add_library(opencreatures1_core STATIC
 	src/opencreatures1/objects/ObjectNames.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(opencreatures1_core PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+	target_compile_options(opencreatures1_core BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_include_directories(opencreatures1_core PUBLIC src/opencreatures1)
 target_link_libraries(opencreatures1_core PUBLIC
@@ -367,7 +387,7 @@ add_executable(opencreatures1
 	src/opencreatures1/main.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(opencreatures1 PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+	target_compile_options(opencreatures1 BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_link_libraries(opencreatures1 opencreatures1_core openc2e_sdlbackend)
 
@@ -377,7 +397,7 @@ add_executable(test_opencreatures1
 	src/opencreatures1/tests/ScriptoriumTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	target_compile_options(test_opencreatures1 PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
+	target_compile_options(test_opencreatures1 BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_link_libraries(test_opencreatures1 opencreatures1_core gtest_main)
 
