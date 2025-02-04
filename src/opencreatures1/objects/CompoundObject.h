@@ -12,10 +12,9 @@ namespace sfc {
 struct CompoundObjectV1;
 };
 
-struct CompoundPart {
-	Renderable renderable;
-	int32_t x;
-	int32_t y;
+struct CompoundPart : Renderable {
+	int32_t relx;
+	int32_t rely;
 };
 
 enum HotspotFunction {

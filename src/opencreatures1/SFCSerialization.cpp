@@ -180,16 +180,15 @@ Renderable sfc_load_renderable(const sfc::EntityV1* part) {
 		throw Exception(fmt::format("Expected y to be between [0, {}), but got {}", CREATURES1_WORLD_HEIGHT, part->y));
 	}
 
-	Renderable r;
-	r.set_position(part->x, part->y);
-	r.set_z_order(part->z_order);
-	r.set_base(part->sprite_base);
-	r.set_pose(part->sprite_pose_plus_base - part->sprite_base);
-	r.set_gallery(g_engine_context.images->get_image(
+	auto gallery = g_engine_context.images->get_image(
 		part->gallery->filename,
 		part->gallery->absolute_base,
 		numeric_cast<int32_t>(part->gallery->images.size()),
-		ImageManager::IMAGE_SPR));
+		ImageManager::IMAGE_SPR);
+
+
+	Renderable r(gallery, part->sprite_base, part->x, part->y, part->z_order);
+	r.set_pose(part->sprite_pose_plus_base - part->sprite_base);
 	if (part->has_animation) {
 		r.set_animation(part->animation_frame, part->animation_string);
 	}

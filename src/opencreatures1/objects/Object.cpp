@@ -335,30 +335,23 @@ void Object::set_position(float newx, float newy) {
 	// is 100 (low-precision), should we actually move it? do we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.
 
-	auto* main_part = get_renderable_for_part(0);
-	if (!main_part) {
-		throw_exception("Tried to move an object without any parts: {}", *this);
-	}
-
-	// TODO: replace this with get_position and a Vector2?
-	if (main_part->x() == newx && main_part->y() == newy) {
+	// TODO: is this correct?
+	if (get_bbox().x == newx && get_bbox().y == newy) {
 		return;
 	}
 
-	// update compound parts
-	if (auto* comp = as_compound_object()) {
-		for (size_t i = 1; i < comp->parts.size(); ++i) {
-			Renderable& p = comp->parts[i].renderable;
-
-			float relx = p.x() - main_part->x();
-			float rely = p.y() - main_part->y();
-
-			p.set_position(newx + relx, newy + rely);
+	// update object position
+	if (as_scenery()) {
+		as_scenery()->part.set_position(newx, newy);
+	} else if (as_simple_object()) {
+		as_simple_object()->part.set_position(newx, newy);
+	} else if (as_compound_object()) {
+		for (auto& p : as_compound_object()->parts) {
+			p.set_position(newx + p.relx, newy + p.rely);
 		}
+	} else {
+		throw Exception("set_position not implemented for non-scenery, non-simpleobject, non-compoundobject");
 	}
-
-	// now set main part position
-	main_part->set_position(newx, newy);
 
 	// update any controlled sound
 	if (current_sound) {
@@ -372,14 +365,8 @@ void Object::add_position(float xdiff, float ydiff) {
 	// precision), do we move it to 105.1 or 105? e.g. should we lose the
 	// high-precision part of the current position? This is only relevant to Vehicles.
 
-	auto* main_part = get_renderable_for_part(0);
-	if (!main_part) {
-		throw_exception("Tried to move an object without any parts: {}", *this);
-	}
-	if (xdiff == 0 && ydiff == 0) {
-		return;
-	}
-	set_position(main_part->x() + xdiff, main_part->y() + ydiff);
+	// TODO: is using get_bbox() correct?
+	set_position(get_bbox().x + xdiff, get_bbox().y + ydiff);
 }
 
 int32_t Object::get_z_order() const {
@@ -420,7 +407,7 @@ const Renderable* Object::get_renderable_for_part(int32_t partnum) const {
 		if (idx >= as_compound_object()->parts.size()) {
 			return {};
 		}
-		return &as_compound_object()->parts[idx].renderable;
+		return &as_compound_object()->parts[idx];
 	}
 	return nullptr;
 }

@@ -5,21 +5,28 @@
 #include "common/NumericCast.h"
 #include "common/render/RenderSystem.h"
 
-void Renderable::Renderable::set_position(float x, float y) {
-	// TODO: better way of handling world wrap?
-	if (x >= CREATURES1_WORLD_WIDTH) {
-		x -= CREATURES1_WORLD_WIDTH;
-	} else if (x < 0) {
-		x += CREATURES1_WORLD_WIDTH;
-	}
+#include <fmt/format.h>
+#include <math.h>
 
+Renderable::Renderable() = default;
+
+Renderable::Renderable(const ImageGallery& gallery, int32_t sprite_base, float x, float y, int32_t z) {
+	gallery_ = gallery;
+	base_ = sprite_base;
 	x_ = x;
 	y_ = y;
+	z_ = z;
+
+	renderitem_ = get_rendersystem()->render_item_create(LAYER_OBJECTS);
 	update_renderitem();
 }
 
-void Renderable::set_z_order(int32_t z) {
-	z_ = z;
+void Renderable::set_position(float x, float y) {
+	// TODO: better way of handling world wrap?
+	x = remainderf(x, numeric_cast<float>(CREATURES1_WORLD_WIDTH));
+
+	x_ = x;
+	y_ = y;
 	update_renderitem();
 }
 
@@ -40,11 +47,6 @@ void Renderable::set_base(int part_sprite_base) {
 
 int32_t Renderable::base() const {
 	return base_;
-}
-
-void Renderable::set_gallery(const ImageGallery& gallery) {
-	gallery_ = gallery;
-	update_renderitem();
 }
 
 const ImageGallery& Renderable::gallery() const {
@@ -139,14 +141,6 @@ int32_t Renderable::pose() const {
 }
 
 void Renderable::update_renderitem() {
-	if (!gallery_) {
-		renderitem_ = {};
-		return;
-	}
-	if (!renderitem_) {
-		renderitem_ = get_rendersystem()->render_item_create(LAYER_OBJECTS);
-	}
-
 	get_rendersystem()->render_item_set_texture(renderitem_,
 		gallery_.texture,
 		gallery_.texture_locations[numeric_cast<size_t>(frame())]);

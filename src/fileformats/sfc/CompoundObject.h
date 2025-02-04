@@ -16,8 +16,8 @@ struct EntityV1;
 struct CompoundPartV1 {
 	// not CArchive serialized
 	std::shared_ptr<EntityV1> entity;
-	int32_t x;
-	int32_t y;
+	int32_t relx; // relative to the object
+	int32_t rely; // relative to the object
 };
 
 struct CompoundObjectV1 : ObjectV1 {
@@ -35,8 +35,8 @@ struct CompoundObjectV1 : ObjectV1 {
 			if (part.entity == nullptr) {
 				throw Exception("whoops, entity is null");
 			}
-			ar(part.x);
-			ar(part.y);
+			ar(part.relx);
+			ar(part.rely);
 		}
 		for (auto& h : hotspots) {
 			ar(h.left);

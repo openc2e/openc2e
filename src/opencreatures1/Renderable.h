@@ -10,20 +10,28 @@
 
 class Renderable {
   public:
-	void set_gallery(const ImageGallery& gallery);
+	Renderable(); // TODO: null part? shouldn't allow this
+
+	// the order of arguments here matches the CAOS command PAT: DULL, except that
+	// coordinates are expected as world-absolute instead of relative to the object.
+	Renderable(const ImageGallery& gallery, int32_t sprite_base, float x, float y, int32_t z);
+	// Renderable(Renderable&&) = default;
+
 	const ImageGallery& gallery() const;
 
-	void set_base(int base);
 	int32_t base() const;
+	void set_base(int32_t base);
 
-	void set_pose(int pose);
 	int32_t pose() const;
+	void set_pose(int32_t pose);
 
-	void set_position(float x, float y);
 	float x() const;
 	float y() const;
-	void set_z_order(int32_t z);
 	int32_t z_order() const;
+	void set_position(float x, float y);
+
+	int32_t width() const;
+	int32_t height() const;
 
 	bool has_animation() const;
 	void set_animation(uint8_t animation_frame_, std::string animation_string_);
@@ -31,9 +39,6 @@ class Renderable {
 	const std::string& animation_string() const;
 	void update_animation();
 	void clear_animation();
-
-	int32_t width() const;
-	int32_t height() const;
 
   private:
 	friend std::string format_as(const Renderable& r);
