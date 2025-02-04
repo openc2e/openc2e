@@ -252,10 +252,7 @@ ObjectHandle SFCLoader::load_object(sfc::ObjectV1* p) {
 	} else if (create_engine_object<sfc::VehicleV1, Vehicle>(this, p)) {
 	} else if (create_engine_object<sfc::LiftV1, Lift>(this, p)) {
 	} else if (create_engine_object<sfc::BlackboardV1, Blackboard>(this, p)) {
-		// } else if (create_engine_object<sfc::CreatureV1, Creature>(this, p)) {
-	} else if (typeid(*p) == typeid(sfc::CreatureV1)) {
-		fmt::print("WARN [SFCLoader] Unsupported type: Creature\n");
-		return {};
+	} else if (create_engine_object<sfc::CreatureV1, Creature>(this, p)) {
 	} else {
 		throw Exception("Unknown object type");
 	}
@@ -401,8 +398,9 @@ std::shared_ptr<sfc::ObjectV1> SFCSerializer::dump_object(Object* p) {
 	} else if (dump_engine_object<sfc::VehicleV1, Vehicle>(this, p)) {
 	} else if (dump_engine_object<sfc::LiftV1, Lift>(this, p)) {
 	} else if (dump_engine_object<sfc::BlackboardV1, Blackboard>(this, p)) {
-	} else if (typeid(*p) == typeid(Creature)) {
-		fmt::print("WARN [SFCWriter] Unsupported type: Creature\n");
+	} else if (dump_engine_object<sfc::CreatureV1, Creature>(this, p)) {
+	} else {
+		fmt::print("WARN [SFCWriter] Unsupported type: {}\n", typeid(*p).name());
 		return nullptr;
 	}
 
