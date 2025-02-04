@@ -8,6 +8,8 @@
 #include "common/backend/Keycodes.h"
 #include "common/render/RenderSystem.h"
 
+#include <math.h>
+
 constexpr float VIEWPORT_SCALE = 1.0f;
 
 void ViewportManager::handle_event(const BackendEvent& event) {
@@ -104,28 +106,24 @@ void ViewportManager::update() {
 	g_engine_context.sounds->set_listener_position(viewport);
 }
 
-int32_t ViewportManager::window_x_to_world_x(float winx) const {
+float ViewportManager::window_x_to_world_x(float winx) const {
 	// TODO: move this to RenderSystem?
 	Rect2i camera = get_rendersystem()->main_camera_get_src_rect();
 	Rect2f viewport = get_rendersystem()->main_viewport_get_dest_rect();
 	int32_t world_wrap = get_rendersystem()->world_get_wrap_width();
 
-	int32_t worldx = int32_t((winx - viewport.x) / viewport.width * camera.width + camera.x);
+	float worldx = (winx - viewport.x) / viewport.width * camera.width + camera.x;
 	if (world_wrap) {
-		if (worldx >= world_wrap) {
-			worldx -= world_wrap;
-		} else if (worldx < 0) {
-			worldx += world_wrap;
-		}
+		worldx = remainderf(worldx, numeric_cast<float>(world_wrap));
 	}
 	return worldx;
 }
 
-int32_t ViewportManager::window_y_to_world_y(float winy) const {
+float ViewportManager::window_y_to_world_y(float winy) const {
 	// TODO: move this to RenderSystem?
 	Rect2i camera = get_rendersystem()->main_camera_get_src_rect();
 	Rect2f viewport = get_rendersystem()->main_viewport_get_dest_rect();
-	return int32_t((winy - viewport.y) / viewport.height * camera.height + camera.y);
+	return (winy - viewport.y) / viewport.height * camera.height + camera.y;
 }
 
 void ViewportManager::set_scroll_position(int32_t scrollx_, int32_t scrolly_) {

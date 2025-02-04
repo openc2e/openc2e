@@ -109,7 +109,7 @@ const Creature* Object::as_creature() const {
 	return dynamic_cast<const Creature*>(this);
 }
 
-void Object::handle_left_click(int32_t relx, int32_t rely) {
+void Object::handle_left_click(float relx, float rely) {
 	// When an object is the subject of a left click event, we queue up a message
 	// to ACTIVATE1, ACTIVATE2, or DEACTIVATE. But how do we know which message
 	// to send?
@@ -391,13 +391,15 @@ int32_t Object::get_z_order() const {
 	return main_part->z_order();
 }
 
-Rect2i Object::get_bbox() const {
+Rect2f Object::get_bbox() const {
 	auto* main_part = get_renderable_for_part(0);
 	if (!main_part) {
 		throw_exception("Can't get main part of object without any parts: {}", *this);
 	}
 
-	return Rect2i{numeric_cast<int32_t>(main_part->x()), numeric_cast<int32_t>(main_part->y()), main_part->width(), main_part->height()};
+	// TODO: is this correct for CompoundObjects? should we find the max of widths and heights?
+	// and find any parts with negative relx/rely?
+	return Rect2f{main_part->x(), main_part->y(), numeric_cast<float>(main_part->width()), numeric_cast<float>(main_part->height())};
 }
 
 Renderable* Object::get_renderable_for_part(int32_t partnum) {

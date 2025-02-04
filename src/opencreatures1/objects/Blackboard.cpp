@@ -22,8 +22,8 @@ void Blackboard::blackboard_show_word(int32_t word_index) {
 	}
 	const auto& word = words[numeric_cast<size_t>(word_index)];
 
-	int32_t x = get_bbox().x + text_x_position;
-	const int32_t y = get_bbox().y + text_y_position;
+	float x = get_bbox().x + text_x_position;
+	const float y = get_bbox().y + text_y_position;
 	// TODO: What should the actual z-order be? Should this be in a SortingGroup with the
 	// main blackboard part?
 	const int32_t z = get_z_order() + 1;

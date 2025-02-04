@@ -34,6 +34,12 @@ struct Rect2i {
 		return pointx >= x && pointx < right() && pointy >= y && pointy < bottom();
 	}
 
+	bool has_point(float pointx, float pointy) const {
+		// TODO: there's probably a better way to do this. see e.g.
+		// https://stackoverflow.com/questions/58734034/how-to-properly-compare-an-integer-and-a-floating-point-values
+		return pointx >= numeric_cast<float>(x) && pointx < numeric_cast<float>(right()) && pointy >= numeric_cast<float>(y) && pointy < numeric_cast<float>(bottom());
+	}
+
 	bool operator==(const Rect2i& other) const {
 		return x == other.x && y == other.y && width == other.width && height == other.height;
 	}

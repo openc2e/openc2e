@@ -779,7 +779,7 @@ int32_t IntegerRV_ACTV(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_HGHT(MacroContext& ctx, Macro& m) {
-	return ctx.get_targ(m)->get_bbox().height;
+	return numeric_cast<int32_t>(ctx.get_targ(m)->get_bbox().height);
 }
 
 int32_t IntegerRV_LIMB(MacroContext& ctx, Macro& m) {
@@ -803,7 +803,7 @@ int32_t IntegerRV_LIMT(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_POSB(MacroContext& ctx, Macro& m) {
-	return ctx.get_targ(m)->get_bbox().bottom();
+	return numeric_cast<int32_t>(ctx.get_targ(m)->get_bbox().bottom());
 }
 
 int32_t IntegerRV_POSE(MacroContext& ctx, Macro& m) {
@@ -815,15 +815,15 @@ int32_t IntegerRV_POSE(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_POSL(MacroContext& ctx, Macro& m) {
-	return ctx.get_targ(m)->get_bbox().x;
+	return numeric_cast<int32_t>(ctx.get_targ(m)->get_bbox().x);
 }
 
 int32_t IntegerRV_POSR(MacroContext& ctx, Macro& m) {
-	return ctx.get_targ(m)->get_bbox().right();
+	return numeric_cast<int32_t>(ctx.get_targ(m)->get_bbox().right());
 }
 
 int32_t IntegerRV_POST(MacroContext& ctx, Macro& m) {
-	return ctx.get_targ(m)->get_bbox().y;
+	return numeric_cast<int32_t>(ctx.get_targ(m)->get_bbox().y);
 }
 
 int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
@@ -838,7 +838,7 @@ int32_t IntegerRV_TOTL(MacroContext& ctx, Macro& m) {
 }
 
 int32_t IntegerRV_WDTH(MacroContext& ctx, Macro& m) {
-	return ctx.get_targ(m)->get_bbox().width;
+	return numeric_cast<int32_t>(ctx.get_targ(m)->get_bbox().width);
 }
 
 int32_t IntegerRV_XVEC(MacroContext& ctx, Macro& m) {

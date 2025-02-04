@@ -13,8 +13,8 @@ class ViewportManager {
 	void handle_event(const BackendEvent& event);
 	void tick();
 
-	int32_t window_x_to_world_x(float) const;
-	int32_t window_y_to_world_y(float) const;
+	float window_x_to_world_x(float) const;
+	float window_y_to_world_y(float) const;
 
 	void set_scroll_position(int32_t scrollx, int32_t scrolly);
 

@@ -109,7 +109,7 @@ class Object {
 	const Blackboard* as_blackboard() const;
 	const Creature* as_creature() const;
 
-	void handle_left_click(int32_t relx, int32_t rely);
+	void handle_left_click(float relx, float rely);
 
 	void handle_mesg_activate1(Message);
 	void handle_mesg_activate2(Message);
@@ -123,7 +123,7 @@ class Object {
 	void add_position(float xdiff, float ydiff);
 
 	int32_t get_z_order() const;
-	Rect2i get_bbox() const;
+	Rect2f get_bbox() const;
 	Renderable* get_renderable_for_part(int32_t partnum);
 	const Renderable* get_renderable_for_part(int32_t partnum) const;
 

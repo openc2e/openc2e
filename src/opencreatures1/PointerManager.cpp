@@ -45,8 +45,8 @@ void PointerManager::handle_event(const BackendEvent& event) {
 		// must have all of their parts w/in the bounding box of the first/main part.
 		// We use the main part's z-order as the object overall z-order.
 
-		int worldx = g_engine_context.viewport->window_x_to_world_x(event.x);
-		int worldy = g_engine_context.viewport->window_y_to_world_y(event.y);
+		float worldx = g_engine_context.viewport->window_x_to_world_x(event.x);
+		float worldy = g_engine_context.viewport->window_y_to_world_y(event.y);
 
 		Object* pntr = g_engine_context.objects->try_get(m_pointer_tool);
 		if (pntr) {
@@ -85,12 +85,12 @@ void PointerManager::handle_event(const BackendEvent& event) {
 		if (best_object) {
 			auto bbox = best_object->get_bbox();
 			// TODO: better way to handle world wrap?
-			int32_t relx = worldx - bbox.x;
-			int32_t rely = worldy - bbox.y;
+			float relx = worldx - bbox.x;
+			float rely = worldy - bbox.y;
 			if (relx < 0) {
 				relx += CREATURES1_WORLD_WIDTH;
 			}
-			printf("clickrel %i %i\n", relx, rely);
+			fmt::print("clickrel {} {}\n", relx, rely);
 			best_object->handle_left_click(relx, rely);
 		}
 	}
