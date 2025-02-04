@@ -7,3 +7,4 @@ add_library(nativefiledialog
     $<$<NOT:$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:Darwin>>>:src/nfd_zenity.c>
 )
 target_include_directories(nativefiledialog PUBLIC src/include)
+target_link_libraries(nativefiledialog PUBLIC "$<$<PLATFORM_ID:Darwin>:-framework AppKit>")
