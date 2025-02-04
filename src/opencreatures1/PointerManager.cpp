@@ -5,16 +5,30 @@
 #include "objects/ObjectManager.h"
 #include "objects/PointerTool.h"
 
+#include <fmt/format.h>
 
 void PointerManager::update() {
 	Object* obj = g_engine_context.objects->try_get(m_pointer_tool);
 	if (!obj) {
 		return;
 	}
-	Renderable* r = obj->get_renderable_for_part(0);
-	r->set_position(
-		g_engine_context.viewport->window_x_to_world_x(m_screenx) - obj->as_pointer_tool()->relx,
-		g_engine_context.viewport->window_y_to_world_y(m_screeny) - obj->as_pointer_tool()->rely);
+
+	auto worldx = g_engine_context.viewport->window_x_to_world_x(m_screenx);
+	auto worldy = g_engine_context.viewport->window_y_to_world_y(m_screeny);
+
+	constexpr const int32_t too_big = (1 << 20);
+	if (worldx >= too_big || worldx <= -too_big || worldy >= too_big || worldy <= -too_big) {
+		// this can happen before the viewport manager is properly initialized. it causes
+		// issues later because we try to convert some floats back to int32_t but the floats
+		// are too big and would lose precision! these aren't real coordinates anyways so
+		// just skip and wait until the viewport manager is correctly returning information.
+		// TODO: properly make sure viewport manager is initialized instead of this hack
+		fmt::print("warning: pointermanager got nonsense world coordinates {} {} from viewportmanager, skipping update\n",
+			worldx, worldy);
+		return;
+	}
+
+	obj->set_position(worldx - obj->as_pointer_tool()->relx, worldy - obj->as_pointer_tool()->rely);
 }
 
 void PointerManager::handle_event(const BackendEvent& event) {
