@@ -1,5 +1,3 @@
-
-
 #include "common/wildcard_match.h"
 
 #include <gtest/gtest.h>

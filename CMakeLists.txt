@@ -152,12 +152,12 @@ add_executable(test_common
 	src/common/io/SpanReaderTest.cpp
 	src/common/io/StringWriterTest.cpp
 	src/common/io/VectorWriterTest.cpp
-	src/common/tests/DemangleTest.cpp
-	src/common/tests/EncodingTest.cpp
-	src/common/tests/EndsWithTest.cpp
-	src/common/tests/NumericCastTest.cpp
-	src/common/tests/SlotMapTest.cpp
-	src/common/tests/WildcardTest.cpp
+	src/common/DemangleTest.cpp
+	src/common/EncodingTest.cpp
+	src/common/EndsWithTest.cpp
+	src/common/NumericCastTest.cpp
+	src/common/SlotMapTest.cpp
+	src/common/WildcardMatchTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(test_common BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
