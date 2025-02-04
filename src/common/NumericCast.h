@@ -1,8 +1,11 @@
 #pragma once
 
 #include <limits>
-#include <stdexcept>
 #include <type_traits>
+#include <typeinfo>
+
+template <typename From>
+[[noreturn]] void throw_numeric_cast_error(const std::type_info&, From);
 
 template <typename To, typename From>
 constexpr inline auto numeric_cast(From value)
@@ -20,7 +23,7 @@ constexpr inline auto numeric_cast(From value)
 		// second check: if the value is signed, we can compare it against the
 		// new minimum. if the value is unsigned, it can't be under the new minimum.
 		|| (std::is_signed<From>::value && static_cast<std::make_signed_t<From>>(value) < low)) {
-		throw std::overflow_error{"bad numeric_cast"};
+		throw_numeric_cast_error(typeid(To), value);
 	}
 	return static_cast<To>(value);
 }
@@ -29,7 +32,7 @@ template <typename To>
 constexpr inline auto numeric_cast(float value)
 	-> std::enable_if_t<std::is_integral<To>::value, To> {
 	if ((value >= (std::numeric_limits<To>::max() / 2 + 1) * 2.0f) || (value - std::numeric_limits<To>::lowest() <= -1.0f)) {
-		throw std::overflow_error{"bad numeric_cast"};
+		throw_numeric_cast_error(typeid(To), value);
 	}
 	return static_cast<To>(value);
 }
@@ -52,7 +55,7 @@ constexpr inline auto numeric_cast(From value)
 	// would lose precision
 	if (value > (1 << std::numeric_limits<To>::digits) ||
 		(std::is_signed<From>::value && value < 0 && value < -(1 << std::numeric_limits<To>::digits))) {
-		throw std::overflow_error{"bad numeric_cast"};
+		throw_numeric_cast_error(typeid(To), value);
 	}
 	return static_cast<To>(value);
 }

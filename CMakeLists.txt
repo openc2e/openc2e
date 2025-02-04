@@ -131,6 +131,7 @@ add_library(openc2e-common OBJECT
 	src/common/creaturesImage.cpp
 	src/common/encoding.cpp
 	src/common/mappedfile.cpp
+	src/common/NumericCast.cpp
 	src/common/readfile.cpp
 	src/common/Random.cpp
 	src/common/userlocale.cpp
