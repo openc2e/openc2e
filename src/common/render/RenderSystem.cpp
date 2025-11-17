@@ -49,7 +49,7 @@ RenderItemHandle RenderSystem::render_item_create(int layer) {
 	item.layer = layer;
 
 	RenderItemHandle handle;
-	handle.key = m_render_items.add(item);
+	handle.key = m_render_items.insert(item);
 	handle.parent = this;
 
 	return handle;

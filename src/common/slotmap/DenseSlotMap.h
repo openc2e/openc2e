@@ -74,7 +74,7 @@ class DenseSlotMap {
 	};
 
   public:
-	Key add(T value) {
+	Key insert(T value) {
 		Key new_id;
 		if (m_deleted.size()) {
 			new_id = m_deleted.back();

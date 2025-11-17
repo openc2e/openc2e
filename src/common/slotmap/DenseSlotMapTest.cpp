@@ -31,9 +31,9 @@ TEST(DenseSlotMap, DenseSlotMap) {
 	EXPECT_EQ(count(pool), 0);
 
 	// add some values
-	auto first = pool.add(5);
-	auto second = pool.add(47);
-	auto third = pool.add(132);
+	auto first = pool.insert(5);
+	auto second = pool.insert(47);
+	auto third = pool.insert(132);
 	EXPECT_EQ(pool.size(), 3);
 	EXPECT_EQ(pool.extent(), 3);
 	EXPECT_EQ(count(pool), 3);
@@ -63,7 +63,7 @@ TEST(DenseSlotMap, DenseSlotMap) {
 	EXPECT_EQ(pool.try_get(third)->value, 132);
 
 	// add a value after erasing a value
-	auto fourth = pool.add(23);
+	auto fourth = pool.insert(23);
 	EXPECT_EQ(pool.size(), 3);
 	EXPECT_NE(fourth, second); // don't recycle ids
 	EXPECT_EQ(pool.extent(), 3); // but do recycle sparse slots
@@ -98,7 +98,7 @@ TEST(DenseSlotMap, erase_at_back_of_dense_array) {
 	// this used to segfault because there was a bug when erasing items at the back
 	// of the dense array
 	DenseSlotMap<MyTestItem> pool;
-	auto first = pool.add(5);
+	auto first = pool.insert(5);
 	pool.erase(first);
 	EXPECT_FALSE(pool.contains(first));
 	EXPECT_EQ(pool.try_get(first), nullptr);
@@ -107,9 +107,9 @@ TEST(DenseSlotMap, erase_at_back_of_dense_array) {
 TEST(DenseSlotMap, erase_during_iteration) {
 	// this used to segfault
 	DenseSlotMap<MyTestItem> pool;
-	pool.add(0);
-	pool.add(1);
-	pool.add(2);
+	pool.insert(0);
+	pool.insert(1);
+	pool.insert(2);
 
 	std::vector<MyTestItem> seen_values;
 

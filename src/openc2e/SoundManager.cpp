@@ -68,7 +68,7 @@ Sound SoundManager::getNewSound(AudioChannel handle, bool is_creature_voice) {
 	data.is_creature_voice = is_creature_voice;
 	updateVolume(data);
 
-	SoundId id = sources.add(std::move(data));
+	SoundId id = sources.insert(std::move(data));
 	static_assert(sizeof(Sound) == sizeof(SoundManager::SoundId), "");
 	return *reinterpret_cast<Sound*>(&id); // TODO
 }

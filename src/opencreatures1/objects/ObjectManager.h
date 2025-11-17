@@ -22,7 +22,7 @@ class ObjectManager {
 	template <typename T>
 	auto add() -> std::enable_if_t<std::is_base_of<Object, T>::value, ObjectHandle> {
 		auto t = new T();
-		ObjectHandle handle = m_pool.add(std::unique_ptr<Object>(t));
+		ObjectHandle handle = m_pool.insert(std::unique_ptr<Object>(t));
 		t->uid = handle;
 		return handle;
 	}
