@@ -1,10 +1,10 @@
 #pragma once
 
-#include "common/SlotMap.h"
+#include "common/slotmap/SlotMapKey.h"
 
 #include <memory>
 #include <stdint.h>
 
 class Object;
 
-using ObjectHandle = DenseSlotMap<std::unique_ptr<Object>>::Key;
+using ObjectHandle = SlotMapKey;

@@ -1,4 +1,4 @@
-#include "common/SlotMap.h"
+#include "DenseSlotMap.h"
 
 #include <fmt/core.h>
 #include <gtest/gtest.h>
@@ -16,7 +16,7 @@ struct MyTestItem {
 	int value = -1;
 };
 
-TEST(SlotMap, DenseSlotMap) {
+TEST(DenseSlotMap, DenseSlotMap) {
 	DenseSlotMap<MyTestItem> pool;
 
 	// starts empty
@@ -107,7 +107,7 @@ TEST(SlotMap, DenseSlotMap) {
 	}
 }
 
-TEST(SlotMap, erase_at_back_of_dense_array) {
+TEST(DenseSlotMap, erase_at_back_of_dense_array) {
 	// this used to segfault because there was a bug when erasing items at the back
 	// of the dense array
 	DenseSlotMap<MyTestItem> pool;
@@ -117,7 +117,7 @@ TEST(SlotMap, erase_at_back_of_dense_array) {
 	EXPECT_EQ(pool.try_get(first), nullptr);
 }
 
-TEST(SlotMap, erase_during_enumeration) {
+TEST(DenseSlotMap, erase_during_enumeration) {
 	// this used to segfault
 	DenseSlotMap<MyTestItem> pool;
 	auto zero = pool.add(0);
@@ -139,14 +139,14 @@ TEST(SlotMap, erase_during_enumeration) {
 	}
 }
 
-TEST(SlotMap, get_null_id) {
+TEST(DenseSlotMap, get_null_id) {
 	// this used to segfault
 	DenseSlotMap<MyTestItem> pool;
 	DenseSlotMap<MyTestItem>::Key id;
 	EXPECT_EQ(pool.contains(id), false);
 }
 
-TEST(SlotMap, sort) {
+TEST(DenseSlotMap, sort) {
 	DenseSlotMap<MyTestItem> pool;
 	auto zero = pool.add(3);
 	auto one = pool.add(2);
@@ -169,7 +169,7 @@ TEST(SlotMap, sort) {
 	EXPECT_EQ(pool.try_get(three)->value, 0);
 }
 
-TEST(SlotMap, sort_scenario1) {
+TEST(DenseSlotMap, sort_scenario1) {
 	// this used to segfault
 	DenseSlotMap<MyTestItem> pool;
 	auto zero = pool.add(1);

@@ -43,9 +43,9 @@ Future improvements:
 
 #include "RenderItemHandle.h"
 #include "common/Color.h"
-#include "common/SlotMap.h"
 #include "common/backend/BackendTexture.h"
 #include "common/math/Rect.h"
+#include "common/slotmap/DenseSlotMap.h"
 
 #include <stdint.h>
 

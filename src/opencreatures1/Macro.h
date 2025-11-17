@@ -6,6 +6,7 @@
 #include <array>
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 struct Macro {
 	Macro() = default;

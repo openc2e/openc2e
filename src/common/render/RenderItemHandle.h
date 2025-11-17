@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common/SlotMap.h"
+#include "common/slotmap/SlotMapKey.h"
 
 class RenderSystem;
 

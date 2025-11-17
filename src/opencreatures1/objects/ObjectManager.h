@@ -4,7 +4,7 @@
 #include "Object.h"
 #include "ObjectHandle.h"
 #include "common/Ranges.h"
-#include "common/SlotMap.h"
+#include "common/slotmap/DenseSlotMap.h"
 
 #include <memory>
 

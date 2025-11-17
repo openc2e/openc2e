@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Sound.h"
-#include "common/SlotMap.h"
 #include "common/audio/AudioBackend.h"
+#include "common/slotmap/DenseSlotMap.h"
 
 #include <chrono>
 #include <memory>

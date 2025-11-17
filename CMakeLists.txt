@@ -148,11 +148,11 @@ add_executable(test_common
 	src/common/io/VectorWriterTest.cpp
 	src/common/ioutil/GetlineTest.cpp
 	src/common/ioutil/ScanfTest.cpp
+	src/common/slotmap/DenseSlotMapTest.cpp
 	src/common/DemangleTest.cpp
 	src/common/EncodingTest.cpp
 	src/common/EndsWithTest.cpp
 	src/common/NumericCastTest.cpp
-	src/common/SlotMapTest.cpp
 	src/common/WildcardMatchTest.cpp
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
