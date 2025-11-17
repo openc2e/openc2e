@@ -1,6 +1,5 @@
 #include "DenseSlotMap.h"
 
-#include <fmt/core.h>
 #include <gtest/gtest.h>
 #include <iterator>
 
@@ -13,6 +12,13 @@ struct MyTestItem {
 	MyTestItem() {}
 	MyTestItem(int value_)
 		: value(value_) {}
+	bool operator==(const MyTestItem& other) const {
+		return value == other.value;
+	}
+	bool operator<(const MyTestItem& other) const {
+		return value < other.value;
+	}
+
 	int value = -1;
 };
 
@@ -78,33 +84,14 @@ TEST(DenseSlotMap, DenseSlotMap) {
 
 	// iterate values
 	EXPECT_EQ(count(pool), 3);
-	size_t i = 0;
+	std::vector<MyTestItem> seen_values;
 	for (const auto& item : pool) {
-		int expected = -1;
-		if (i == 0) {
-			expected = 5;
-		} else if (i == 1) {
-			expected = 132;
-		} else if (i == 2) {
-			expected = 81;
-		}
-		EXPECT_EQ(item.value, expected);
-		i++;
+		seen_values.push_back(item);
 	}
 
-	// iterate ids
-	for (auto i : pool.enumerate()) {
-		if (i.id == first) {
-			EXPECT_EQ(i.value->value, 5);
-		} else if (i.id == third) {
-			EXPECT_EQ(i.value->value, 132);
-		} else if (i.id == fourth) {
-			EXPECT_EQ(i.value->value, 81);
-		} else {
-			fmt::print("unknown id {}\n", i.id);
-			EXPECT_TRUE(false);
-		}
-	}
+	const std::vector<MyTestItem> expected{5, 81, 132};
+	std::sort(seen_values.begin(), seen_values.end());
+	EXPECT_EQ(seen_values, expected);
 }
 
 TEST(DenseSlotMap, erase_at_back_of_dense_array) {
@@ -117,26 +104,28 @@ TEST(DenseSlotMap, erase_at_back_of_dense_array) {
 	EXPECT_EQ(pool.try_get(first), nullptr);
 }
 
-TEST(DenseSlotMap, erase_during_enumeration) {
+TEST(DenseSlotMap, erase_during_iteration) {
 	// this used to segfault
 	DenseSlotMap<MyTestItem> pool;
-	auto zero = pool.add(0);
-	auto one = pool.add(1);
-	auto two = pool.add(2);
+	pool.add(0);
+	pool.add(1);
+	pool.add(2);
 
-	for (auto i : pool.enumerate()) {
-		if (i.id == zero) {
-			pool.erase(i.id);
+	std::vector<MyTestItem> seen_values;
+
+	for (auto it = pool.begin(); it != pool.end();) {
+		seen_values.push_back(*it);
+		if (it->value == 0) {
+			it = pool.erase(it);
 			continue;
-		}
-		if (i.id == one) {
-			EXPECT_EQ(i.value->value, 1);
-		} else if (i.id == two) {
-			EXPECT_EQ(i.value->value, 2);
 		} else {
-			EXPECT_TRUE(false);
+			it++;
 		}
 	}
+
+	const std::vector<MyTestItem> expected{0, 1, 2};
+	std::sort(seen_values.begin(), seen_values.end());
+	EXPECT_EQ(seen_values, expected);
 }
 
 TEST(DenseSlotMap, get_null_id) {

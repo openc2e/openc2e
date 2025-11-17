@@ -27,6 +27,52 @@ class DenseSlotMap {
 
 	static constexpr IndexType NULL_INDEX = Key().index;
 
+	struct Iterator {
+		using difference_type = ptrdiff_t;
+		using value_type = T;
+		using pointer = T*;
+		using reference = T&;
+		using iterator_category = std::random_access_iterator_tag;
+
+		reference operator*() const {
+			return parent->m_values[dense_index];
+		}
+
+		pointer operator->() const {
+			return &(**this);
+		}
+
+		bool operator==(const Iterator& other) const {
+			return parent == other.parent && dense_index == other.dense_index;
+		}
+
+		bool operator!=(const Iterator& other) const {
+			return !(*this == other);
+		}
+
+		Iterator& operator++() {
+			dense_index++;
+			return *this;
+		}
+
+		Iterator operator++(int) {
+			Iterator old = *this;
+			++(*this);
+			return old;
+		}
+
+		difference_type operator-(const Iterator& other) const {
+			return static_cast<difference_type>(dense_index - other.dense_index);
+		}
+
+	  private:
+		friend class DenseSlotMap;
+		Iterator(DenseSlotMap* parent_, size_t dense_index_)
+			: parent(parent_), dense_index(dense_index_) {}
+		DenseSlotMap* parent;
+		size_t dense_index;
+	};
+
   public:
 	Key add(T value) {
 		Key new_id;
@@ -83,6 +129,13 @@ class DenseSlotMap {
 		m_deleted.push_back(id);
 	}
 
+	Iterator erase(const Iterator& it) {
+		// invalidates end() iterator, like std::vector but unlike std::map
+		Key key = m_dense[it.dense_index];
+		erase(key);
+		return it;
+	}
+
 	bool contains(Key id) const {
 		if (id.index == NULL_INDEX) {
 			return false;
@@ -105,50 +158,11 @@ class DenseSlotMap {
 	}
 
 	auto begin() {
-		return m_values.begin();
+		return Iterator{this, 0};
 	}
 
 	auto end() {
-		return m_values.end();
-	}
-
-	auto enumerate() {
-		// TODO: make a const version
-		// TODO: make an actual iterator
-		// we do this backwards so that erasing during enumeration is okay
-
-		struct ValueWrapper {
-			T& operator*() {
-				return (*values_p)[index];
-			}
-			T* operator->() {
-				return &**this;
-			}
-
-		  private:
-			friend DenseSlotMap;
-			ValueWrapper(std::vector<T>* values_p_, size_t index_)
-				: values_p(values_p_), index(index_) {}
-			std::vector<T>* values_p = nullptr;
-			size_t index = NULL_INDEX;
-		};
-		struct Pair {
-			Key id;
-			// a wrapper that ensures that if you erase an id while enumerating
-			// and the values vector gets reallocated, the remaining enumerated
-			// values will still be accessible
-			ValueWrapper value;
-
-		  private:
-			friend DenseSlotMap;
-			Pair(Key id_, std::vector<T>* values_p, size_t index)
-				: id(id_), value(values_p, index) {}
-		};
-		std::vector<Pair> ret;
-		for (size_t i = m_dense.size(); i > 0; --i) {
-			ret.emplace_back(Pair(m_dense[i - 1], &m_values, i - 1));
-		}
-		return ret;
+		return Iterator{this, m_values.size()};
 	}
 
   private:

@@ -152,13 +152,15 @@ void SoundManager::updateVolume(SoundData& s) {
 }
 
 void SoundManager::updateVolumes() {
-	for (auto i : sources.enumerate()) {
-		if (!i.value->isAlive()) {
-			// Make sure erasing during enumeration is okay!!!
-			sources.erase(i.id);
-			continue;
+	for (auto it = sources.begin(); it != sources.end();) {
+		if (it->isAlive()) {
+			updateVolume(*it);
+			it++;
+		} else {
+			// safe because erasure invalidates the end() iterator,
+			// but we're calculating it again at the start of each loop.
+			it = sources.erase(it);
 		}
-		updateVolume(*i.value);
 	}
 }
 
