@@ -116,11 +116,11 @@ add_library(openc2e-common OBJECT
 	src/common/backend/NullBackend.cpp
 	src/common/io/FileReader.cpp
 	src/common/io/FileWriter.cpp
-	src/common/io/Getline.cpp
-	src/common/io/Scanf.cpp
 	src/common/io/SpanReader.cpp
 	src/common/io/StringWriter.cpp
 	src/common/io/VectorWriter.cpp
+	src/common/ioutil/Getline.cpp
+	src/common/ioutil/Scanf.cpp
 	src/common/render/RenderItemHandle.cpp
 	src/common/render/RenderSystem.cpp
 	src/common/case_insensitive_filesystem.cpp
@@ -143,11 +143,11 @@ target_link_libraries(openc2e-common
 
 add_executable(test_common
 	src/common/io/FileIOTest.cpp
-	src/common/io/GetlineTest.cpp
-	src/common/io/ScanfTest.cpp
 	src/common/io/SpanReaderTest.cpp
 	src/common/io/StringWriterTest.cpp
 	src/common/io/VectorWriterTest.cpp
+	src/common/ioutil/GetlineTest.cpp
+	src/common/ioutil/ScanfTest.cpp
 	src/common/DemangleTest.cpp
 	src/common/EncodingTest.cpp
 	src/common/EndsWithTest.cpp

@@ -23,12 +23,12 @@
 #include "caosVM.h"
 #include "common/io/FileReader.h"
 #include "common/io/FileWriter.h"
-#include "common/io/Getline.h"
 #include "common/io/IOException.h"
 #include "common/io/Reader.h"
-#include "common/io/Scanf.h"
 #include "common/io/SpanReader.h"
 #include "common/io/WriterFmt.h"
+#include "common/ioutil/Getline.h"
+#include "common/ioutil/Scanf.h"
 #include "common/throw_ifnot.h"
 
 #include <fmt/core.h>

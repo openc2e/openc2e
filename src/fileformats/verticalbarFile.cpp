@@ -1,7 +1,7 @@
 #include "verticalbarFile.h"
 
 #include "common/io/FileReader.h"
-#include "common/io/Getline.h"
+#include "common/ioutil/Getline.h"
 
 std::vector<std::vector<std::string>> ReadVerticalBarSeparatedValuesFile(const std::string& path) {
 	FileReader in(path);
