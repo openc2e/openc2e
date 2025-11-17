@@ -7,7 +7,7 @@ import subprocess
 import sys
 import re
 
-REQUIRED_CLANG_FORMAT_MAJOR = 10
+REQUIRED_CLANG_FORMAT_MAJOR = 11
 COLOR_BOLD = "\033[1m" if sys.stdout.isatty() else ""
 COLOR_GREEN = "\033[92m" if sys.stdout.isatty() else ""
 COLOR_RED = "\033[91m" if sys.stdout.isatty() else ""

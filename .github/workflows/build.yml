@@ -23,9 +23,9 @@ jobs:
       uses: actions/checkout@v3
     - name: "Install clang-format"
       run: |
-        wget https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-10_linux-amd64
-        chmod +x clang-format-10_linux-amd64
-        mv clang-format-10_linux-amd64 /usr/local/bin/clang-format
+        wget https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-2da3e7b/clang-format-11_linux-amd64
+        chmod +x clang-format-11_linux-amd64
+        mv clang-format-11_linux-amd64 /usr/local/bin/clang-format
     - name: "clang-format"
       run: ./scripts/lint.py -v 0000000 # diff from null sha is every file
       

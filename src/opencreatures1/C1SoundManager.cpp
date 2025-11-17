@@ -48,7 +48,8 @@ C1SoundManager::SoundData* C1SoundManager::get_sound_data(AudioChannel channel) 
 template <typename T, typename U, typename V>
 auto clamp(T value, U low, V high) {
 	assert(!(high < low));
-	return (value < low) ? low : (high < value) ? high : value;
+	return (value < low) ? low : (high < value) ? high
+												: value;
 }
 
 struct DistanceInfo {
