@@ -151,35 +151,6 @@ class DenseSlotMap {
 		return ret;
 	}
 
-	template <typename Compare>
-	void stable_sort(Compare&& compare) {
-		// Create a vector of indices into m_values, then std::stable_sort it.
-		// It's then a list of permuted indices that tell us where to move values
-		// so that they are sorted.
-		// This could be more optimized, see https://skypjack.github.io/2019-09-25-ecs-baf-part-5/
-		std::vector<IndexType> permutation(m_values.size());
-		for (IndexType i = 0; i < permutation.size(); ++i) {
-			permutation[i] = i;
-		}
-		std::stable_sort(permutation.begin(), permutation.end(), [&](auto a, auto b) {
-			return compare(const_cast<const T&>(m_values[a]), const_cast<const T&>(m_values[b]));
-		});
-
-		for (IndexType pos = 0; pos < permutation.size(); ++pos) {
-			auto curr = pos;
-			auto next = permutation[curr];
-			while (curr != next) {
-				auto a = permutation[curr], b = permutation[next];
-				std::swap(m_sparse[m_dense[a].index], m_sparse[m_dense[b].index]);
-				std::swap(m_dense[a], m_dense[b]);
-				std::swap(m_values[a], m_values[b]);
-				permutation[curr] = curr;
-				curr = next;
-				next = permutation[curr];
-			}
-		}
-	}
-
   private:
 	std::vector<IndexType> m_sparse;
 	std::vector<Key> m_dense;
