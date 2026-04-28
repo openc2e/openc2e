@@ -136,6 +136,10 @@ void C1SoundManager::update_volumes() {
 	}
 }
 
+void C1SoundManager::update() {
+	update_volumes();
+}
+
 AudioChannel C1SoundManager::play_sound_helper(std::string name, Rect2f initial_position, bool loop) {
 	if (name.size() == 0) {
 		return {};

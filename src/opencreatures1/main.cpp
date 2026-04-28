@@ -78,6 +78,7 @@ void load_everything() {
 void update_everything() {
 	// these should update as often as possible, regardless of ticks
 	g_engine_context.music->update();
+	g_engine_context.sounds->update();
 
 	// some things can update only every "tick" - usually described as
 	// 1/10sec but actually every 90 milliseconds, or 1/11.1̅ sec

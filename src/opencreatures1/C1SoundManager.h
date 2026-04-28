@@ -30,6 +30,7 @@ class C1SoundManager {
 
 	bool is_muted();
 	void set_muted(bool);
+	void update();
 
   private:
 	struct SoundData {
