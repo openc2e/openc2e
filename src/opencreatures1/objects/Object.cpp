@@ -18,6 +18,7 @@
 #include "common/Ascii.h"
 #include "common/NumericCast.h"
 #include "common/Ranges.h"
+#include "common/render/RenderSystem.h"
 #include "fileformats/sfc/Object.h"
 
 #include <cmath>
@@ -484,6 +485,18 @@ void Object::creature_stim_disappoint() {
 void Object::creature_stim_writ() {
 	if (as_creature()) {
 		printf("WARNING: creature_stim_writ not implemented\n");
+	}
+}
+
+void Object::render(RenderSystem& rendersystem) const {
+	int32_t partnum = 0;
+	while (const auto* part = this->get_part(partnum++)) {
+		rendersystem.add(create_render_item_texture(
+			part->gallery().texture,
+			part->gallery().texture_locations[numeric_cast<size_t>(part->frame())],
+			part->x(),
+			part->y(),
+			part->z_order()));
 	}
 }
 

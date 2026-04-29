@@ -2,7 +2,6 @@
 
 #include "CompoundObject.h"
 #include "ImageGallery.h"
-#include "common/render/RenderItemHandle.h"
 
 #include <array>
 #include <stdint.h>
@@ -28,7 +27,7 @@ struct Blackboard : CompoundObject {
 
 	// engine data
 	ImageGallery charset_sprite;
-	std::array<RenderItemHandle, 11> text_render_items;
+	int32_t current_word_index = -1;
 
 	void blackboard_show_word(int32_t word_index);
 	void blackboard_hide_word();
@@ -37,5 +36,6 @@ struct Blackboard : CompoundObject {
 	void blackboard_emit_eyesight(int32_t word_index);
 	void blackboard_emit_earshot(int32_t word_index);
 
+	void render(class RenderSystem&) const override;
 	void serialize(SFCContext&, sfc::BlackboardV1*);
 };

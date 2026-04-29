@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common/math/Rect.h"
+
 #include <stdint.h>
 
 struct BackendEvent;
@@ -15,6 +17,9 @@ class ViewportManager {
 
 	float window_x_to_world_x(float) const;
 	float window_y_to_world_y(float) const;
+
+	const Rect2i& get_main_camera_rect() const;
+	const Rect2f& get_screen_dest_rect() const;
 
 	void set_scroll_position(int32_t scrollx, int32_t scrolly);
 
@@ -44,4 +49,7 @@ class ViewportManager {
 
 	float margin_top = 0;
 	float margin_bottom = 0;
+
+	Rect2i main_camera;
+	Rect2f screen_dest;
 };

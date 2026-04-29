@@ -3,7 +3,6 @@
 #include "EngineContext.h"
 #include "ViewportManager.h"
 #include "common/NumericCast.h"
-#include "common/render/RenderSystem.h"
 
 #include <fmt/format.h>
 #include <math.h>
@@ -16,9 +15,6 @@ DullPart::DullPart(const ImageGallery& gallery, int32_t sprite_base, float x, fl
 	x_ = x;
 	y_ = y;
 	z_ = z;
-
-	renderitem_ = get_rendersystem()->render_item_create(LAYER_OBJECTS);
-	update_renderitem();
 }
 
 void DullPart::set_position(float x, float y) {
@@ -27,7 +23,6 @@ void DullPart::set_position(float x, float y) {
 
 	x_ = x;
 	y_ = y;
-	update_renderitem();
 }
 
 float DullPart::x() const {
@@ -133,18 +128,10 @@ void DullPart::update_animation() {
 
 void DullPart::set_pose(int sprite_index) {
 	pose_ = sprite_index;
-	update_renderitem();
 }
 
 int32_t DullPart::pose() const {
 	return pose_;
-}
-
-void DullPart::update_renderitem() {
-	get_rendersystem()->render_item_set_texture(renderitem_,
-		gallery_.texture,
-		gallery_.texture_locations[numeric_cast<size_t>(frame())]);
-	get_rendersystem()->render_item_set_position(renderitem_, x_, y_, z_);
 }
 
 std::string format_as(const DullPart& r) {

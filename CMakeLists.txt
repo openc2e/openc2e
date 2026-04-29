@@ -121,7 +121,7 @@ add_library(openc2e-common OBJECT
 	src/common/io/VectorWriter.cpp
 	src/common/ioutil/Getline.cpp
 	src/common/ioutil/Scanf.cpp
-	src/common/render/RenderItemHandle.cpp
+	src/common/render/RenderItem.cpp
 	src/common/render/RenderSystem.cpp
 	src/common/case_insensitive_filesystem.cpp
 	src/common/creaturesImage.cpp

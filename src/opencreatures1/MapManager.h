@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/render/RenderItemHandle.h"
 #include "opencreatures1/ImageGallery.h"
 
 #include <array>
@@ -13,8 +12,6 @@ class Room {
 	int32_t right;
 	int32_t bottom;
 	int32_t type;
-
-	RenderItemHandle renderitem;
 
 	int32_t width() const {
 		return right - left;
@@ -35,10 +32,12 @@ class MapManager {
 	void set_groundlevel(const std::array<uint32_t, 261>&);
 	const auto& get_groundlevel() const { return groundlevel; }
 
+	int32_t get_world_wrap_width() const;
+
+	void render(class RenderSystem&) const;
+
   private:
 	std::vector<Room> rooms;
 	ImageGallery background;
-	RenderItemHandle background_renderitem;
 	std::array<uint32_t, 261> groundlevel;
-	std::array<RenderItemHandle, 261> groundlevel_renderitems;
 };

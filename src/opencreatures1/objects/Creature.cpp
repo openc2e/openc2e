@@ -2,7 +2,6 @@
 
 #include "SFCSerialization.h"
 #include "common/Color.h"
-#include "common/render/RenderSystem.h"
 #include "fileformats/sfc/CBiochemistry.h"
 
 #include <fmt/core.h>
@@ -47,9 +46,6 @@ class PoseStringView {
   private:
 	const std::string& p;
 };
-
-
-static std::vector<RenderItemHandle> g_points;
 
 
 static void set_creature_pose(Creature* creature, const std::string& p) {
@@ -133,7 +129,7 @@ static void set_creature_pose(Creature* creature, const std::string& p) {
 			creature->footy - offsety);
 
 
-		g_points.clear();
+		// g_points.clear();
 
 		auto position_limb = [creature](auto* limb, int32_t trunk_part) {
 			float offsetx = attachment_for_pose_and_part(creature->body->body_data, creature->body->pose(), trunk_part).x;

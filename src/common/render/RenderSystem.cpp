@@ -3,102 +3,13 @@
 #include "common/NumericCast.h"
 #include "common/backend/Backend.h"
 
-struct RenderSystemConstructTag {};
-
-RenderSystem* get_rendersystem() {
-	static RenderSystem s_render_system{RenderSystemConstructTag{}};
-	return &s_render_system;
+RenderSystem::RenderSystem() {
 }
 
-RenderSystem::RenderSystem(const RenderSystemConstructTag&) {
-}
-
-void RenderSystem::main_camera_set_src_rect(Rect2i src) {
-	if (m_world_wrap_width) {
-		if (src.x < 0) {
-			src.x += m_world_wrap_width;
-		} else if (src.x >= m_world_wrap_width) {
-			src.x -= m_world_wrap_width;
-		}
-	}
-	m_main_camera_src_rect = src;
-}
-
-const Rect2i& RenderSystem::main_camera_get_src_rect() const {
-	return m_main_camera_src_rect;
-}
-
-void RenderSystem::main_viewport_set_dest_rect(Rect2f src) {
-	m_main_viewport_dest_rect = src;
-}
-
-const Rect2f& RenderSystem::main_viewport_get_dest_rect() const {
-	return m_main_viewport_dest_rect;
-}
-
-void RenderSystem::world_set_wrap_width(int32_t wrap_width) {
-	m_world_wrap_width = wrap_width;
-}
-
-int32_t RenderSystem::world_get_wrap_width() const {
-	return m_world_wrap_width;
-}
-
-RenderItemHandle RenderSystem::render_item_create(int layer) {
-	RenderItem item;
-	item.layer = layer;
-
-	RenderItemHandle handle;
-	handle.key = m_render_items.insert(item);
-	handle.parent = this;
-
-	return handle;
-}
-
-void RenderSystem::render_item_set_position(const RenderItemHandle& handle, float x, float y, int32_t z) {
-	if (RenderItem* item = m_render_items.try_get(handle.key)) {
-		item->dest.x = x;
-		item->dest.y = y;
-		item->z = z;
-	}
-}
-
-void RenderSystem::render_item_set_texture(const RenderItemHandle& handle, const Texture& tex, Rect2i location) {
-	if (RenderItem* item = m_render_items.try_get(handle.key)) {
-		item->type = RENDER_TEXTURE;
-		item->tex = tex;
-		item->src = location;
-		item->dest.width = location.width;
-		item->dest.height = location.height;
-	}
-}
-
-void RenderSystem::render_item_set_unfilled_rect(const RenderItemHandle& handle, float x, float y, float w, float h, Color color) {
-	if (RenderItem* item = m_render_items.try_get(handle.key)) {
-		item->type = RENDER_RECT;
-		item->dest.x = x;
-		item->dest.y = y;
-		item->dest.width = w;
-		item->dest.height = h;
-		item->color = color;
-	}
-}
-
-void RenderSystem::render_item_set_line(const RenderItemHandle& handle, float xstart, float ystart, float xend, float yend, Color color) {
-	if (RenderItem* item = m_render_items.try_get(handle.key)) {
-		item->type = RENDER_LINE;
-		item->dest.x = xstart;
-		item->dest.y = ystart;
-		item->dest.width = xend - xstart;
-		item->dest.height = yend - ystart;
-		item->color = color;
-	}
-}
-
-void RenderSystem::draw() {
+void RenderSystem::draw(const DrawConfig& config) {
 	auto renderer = get_backend()->getMainRenderTarget();
 	renderer->renderClear();
-	renderer->setClip(m_main_viewport_dest_rect);
+	renderer->setClip(config.screen_dest);
 
 	std::vector<RenderItem*> render_list;
 	render_list.reserve(m_render_items.size());
@@ -128,25 +39,29 @@ void RenderSystem::draw() {
 
 	// What's the transformation for this camera? First, let's transform source space to dest space
 
-	// destx = srcx * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_viewport_dest_rect.x
-	// desty = srcy * (m_main_viewport_dest_rect.height / m_main_camera_src_rect.height) + m_main_viewport_dest_rect.y
+	// destx = srcx * (config.screen_dest.width / config.world_src.width) + config.screen_dest.x
+	// desty = srcy * (config.screen_dest.height / config.world_src.height) + config.screen_dest.y
 
 	// Now, let's transfom world space to source space
-	// srcx = worldx + m_main_camera_src_rect.x
-	// srcy = worldy + m_main_camera_src_rect.y
+	// srcx = worldx + config.world_src.x
+	// srcy = worldy + config.world_src.y
 
 	// Putting it together, we have
-	// destx = (worldx + m_main_camera_src_rect.x) * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_viewport_dest_rect.x
-	//       = worldx * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_camera_src_rect.x * (m_main_viewport_dest_rect.width / m_main_camera_src_rect.width) + m_main_viewport_dest_rect.x
+	// destx = (worldx + config.world_src.x) * (config.screen_dest.width / config.world_src.width) + config.screen_dest.x
+	//       = worldx * (config.screen_dest.width / config.world_src.width) + config.world_src.x * (config.screen_dest.width / config.world_src.width) + config.screen_dest.x
 	//       = worldx * xscale + xadjust
 
+	int32_t world_x = config.world_src.x;
+	if (config.world_wrap_width) {
+		world_x = world_x % config.world_wrap_width;
+	}
 
-	const float xscale = 1.f * m_main_viewport_dest_rect.width / m_main_camera_src_rect.width;
-	const float xadjust = m_main_camera_src_rect.x * xscale - m_main_viewport_dest_rect.x;
-	const float yscale = 1.f * m_main_viewport_dest_rect.height / m_main_camera_src_rect.height;
-	const float yadjust = m_main_camera_src_rect.y * yscale - m_main_viewport_dest_rect.y;
+	const float xscale = config.screen_dest.width / numeric_cast<float>(config.world_src.width);
+	const float xadjust = numeric_cast<float>(world_x) * xscale - config.screen_dest.x;
+	const float yscale = config.screen_dest.height / numeric_cast<float>(config.world_src.height);
+	const float yadjust = numeric_cast<float>(config.world_src.y) * yscale - config.screen_dest.y;
 
-	const float worldadjust = m_world_wrap_width * xscale;
+	const float worldadjust = numeric_cast<float>(config.world_wrap_width) * xscale;
 
 	for (auto* r : render_list) {
 		float x = r->dest.x * xscale - xadjust;
@@ -154,7 +69,7 @@ void RenderSystem::draw() {
 		float w = r->dest.width * xscale;
 		float h = r->dest.height * yscale;
 
-		if (r->type == RENDER_TEXTURE) {
+		if (r->type == RenderItem::RENDER_TEXTURE) {
 			Rect2f dest;
 			dest.x = x;
 			dest.y = y;
@@ -162,7 +77,7 @@ void RenderSystem::draw() {
 			dest.height = h;
 
 			renderer->renderTexture(r->tex, r->src, dest);
-			if (m_world_wrap_width) {
+			if (config.world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
 				dest.x += worldadjust;
 				renderer->renderTexture(r->tex, r->src, dest);
@@ -170,7 +85,7 @@ void RenderSystem::draw() {
 				renderer->renderTexture(r->tex, r->src, dest);
 			}
 
-		} else if (r->type == RENDER_RECT) {
+		} else if (r->type == RenderItem::RENDER_RECT) {
 			const auto renderRect = [&](auto a) {
 				const float x1 = x + a;
 				const float x2 = x + w + a;
@@ -185,19 +100,33 @@ void RenderSystem::draw() {
 				// left
 				renderer->renderLine(x1, y1, x1, y2, r->color);
 			};
-			renderRect(0);
-			if (m_world_wrap_width) {
+			renderRect(0.f);
+			if (config.world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
 				renderRect(worldadjust);
 				renderRect(-worldadjust);
 			}
-		} else if (r->type == RENDER_LINE) {
+		} else if (r->type == RenderItem::RENDER_LINE) {
 			renderer->renderLine(x, y, x + w, y + h, r->color);
-			if (m_world_wrap_width) {
+			if (config.world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
 				renderer->renderLine(x + worldadjust, y, x + worldadjust + w, y + h, r->color);
 				renderer->renderLine(x - worldadjust, y, x - worldadjust + w, y + h, r->color);
 			}
 		}
 	}
+}
+
+void RenderSystem::add(const RenderItem& item) {
+	m_render_items.push_back(item);
+}
+
+void RenderSystem::add(const RenderItem& item_, LayerIndex layer) {
+	RenderItem item{item_};
+	item.layer = layer;
+	m_render_items.push_back(item);
+}
+
+void RenderSystem::clear() {
+	m_render_items.clear();
 }

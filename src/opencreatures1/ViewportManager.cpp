@@ -75,8 +75,8 @@ void ViewportManager::tick() {
 }
 
 void ViewportManager::update() {
-	const float width = get_backend()->getMainRenderTarget()->getWidth();
-	const float height = get_backend()->getMainRenderTarget()->getHeight();
+	const float width = numeric_cast<float>(get_backend()->getMainRenderTarget()->getWidth());
+	const float height = numeric_cast<float>(get_backend()->getMainRenderTarget()->getHeight());
 	const int32_t viewport_height = numeric_cast<int32_t>((height - margin_top - margin_bottom) / VIEWPORT_SCALE);
 
 	// clamp scroll
@@ -89,41 +89,37 @@ void ViewportManager::update() {
 		scroll_vely = 0;
 	}
 	// wraparound left and right
-	if (scrollx < 0 || scrollx >= CREATURES1_WORLD_WIDTH) {
-		scrollx = scrollx % CREATURES1_WORLD_WIDTH;
-	}
+	scrollx = scrollx % CREATURES1_WORLD_WIDTH;
 
-	// update rendersystem and soundmanager
+	// update rects and soundmanager
 	// TODO: this doesn't feel like the best place for this
-	Rect2i viewport{
+	main_camera = Rect2i{
 		scrollx,
 		scrolly,
 		numeric_cast<int32_t>(width / VIEWPORT_SCALE),
 		viewport_height};
+	screen_dest = Rect2f{0, margin_top, width, height - margin_top - margin_bottom};
+	g_engine_context.sounds->set_listener_position(main_camera);
+}
 
-	get_rendersystem()->main_camera_set_src_rect(viewport);
-	get_rendersystem()->main_viewport_set_dest_rect({0, margin_top, width, height - margin_top - margin_bottom});
-	g_engine_context.sounds->set_listener_position(viewport);
+const Rect2i& ViewportManager::get_main_camera_rect() const {
+	return main_camera;
+}
+
+const Rect2f& ViewportManager::get_screen_dest_rect() const {
+	return screen_dest;
 }
 
 float ViewportManager::window_x_to_world_x(float winx) const {
 	// TODO: move this to RenderSystem?
-	Rect2i camera = get_rendersystem()->main_camera_get_src_rect();
-	Rect2f viewport = get_rendersystem()->main_viewport_get_dest_rect();
-	int32_t world_wrap = get_rendersystem()->world_get_wrap_width();
-
-	float worldx = (winx - viewport.x) / viewport.width * camera.width + camera.x;
-	if (world_wrap) {
-		worldx = remainderf(worldx, numeric_cast<float>(world_wrap));
-	}
+	float worldx = (winx - screen_dest.x) / screen_dest.width * numeric_cast<float>(main_camera.width) + numeric_cast<float>(main_camera.x);
+	worldx = remainderf(worldx, numeric_cast<float>(CREATURES1_WORLD_WIDTH));
 	return worldx;
 }
 
 float ViewportManager::window_y_to_world_y(float winy) const {
 	// TODO: move this to RenderSystem?
-	Rect2i camera = get_rendersystem()->main_camera_get_src_rect();
-	Rect2f viewport = get_rendersystem()->main_viewport_get_dest_rect();
-	return (winy - viewport.y) / viewport.height * camera.height + camera.y;
+	return (winy - screen_dest.y) / screen_dest.height * numeric_cast<float>(main_camera.height) + numeric_cast<float>(main_camera.y);
 }
 
 void ViewportManager::set_scroll_position(int32_t scrollx_, int32_t scrolly_) {

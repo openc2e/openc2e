@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common/math/Rect.h"
-#include "common/render/RenderItemHandle.h"
 #include "opencreatures1/ImageGallery.h"
 
 #include <fmt/format.h>
@@ -38,12 +37,10 @@ class DullPart {
 	const std::string& animation_string() const;
 	void update_animation();
 	void clear_animation();
+	int32_t frame() const;
 
   private:
 	friend std::string format_as(const DullPart& r);
-
-	int32_t frame() const;
-	void update_renderitem();
 
 	ImageGallery gallery_;
 	int32_t base_ = 0;
@@ -54,6 +51,4 @@ class DullPart {
 	bool has_animation_ = false;
 	uint8_t animation_frame_ = 0; // only if has_animation is true
 	std::string animation_string_; // only if has_animation is true
-
-	RenderItemHandle renderitem_;
 };

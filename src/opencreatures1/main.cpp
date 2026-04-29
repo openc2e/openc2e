@@ -3,6 +3,7 @@
 #include "EngineContext.h"
 #include "ImageManager.h"
 #include "MacroManager.h"
+#include "MapManager.h"
 #include "MessageManager.h"
 #include "PathManager.h"
 #include "PointerManager.h"
@@ -14,6 +15,7 @@
 #include "common/io/FileWriter.h"
 #include "common/render/RenderSystem.h"
 #include "fileformats/sfc/SFCFile.h"
+#include "objects/Blackboard.h"
 #include "objects/ObjectManager.h"
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
@@ -35,6 +37,8 @@ namespace fs = ghc::filesystem;
 // SDL tries stealing main on some platforms, which we don't want.
 #undef main
 
+static RenderSystem s_rendersystem;
+
 void load_everything() {
 	// set up global objects
 	set_backend(SDLBackend::get_instance());
@@ -43,7 +47,6 @@ void load_everything() {
 	set_audio_backend(SDLMixerBackend::get_instance());
 	get_audio_backend()->init(); // TODO: initialized early so SFC sounds can start.. is this right?
 
-	get_rendersystem()->world_set_wrap_width(CREATURES1_WORLD_WIDTH);
 	g_engine_context.sounds->set_listener_world_wrap_width(CREATURES1_WORLD_WIDTH);
 
 	// load palette
@@ -115,6 +118,20 @@ void update_everything() {
 	// these should update as often as possible, regardless of ticks
 	// update pointer after viewport
 	g_engine_context.pointer->update();
+}
+
+void draw_everything() {
+	s_rendersystem.clear();
+	g_engine_context.map->render(s_rendersystem);
+	for (const auto* object : *g_engine_context.objects) {
+		object->render(s_rendersystem);
+	}
+
+	RenderSystem::DrawConfig drawconfig;
+	drawconfig.world_src = g_engine_context.viewport->get_main_camera_rect();
+	drawconfig.world_wrap_width = g_engine_context.map->get_world_wrap_width();
+	drawconfig.screen_dest = g_engine_context.viewport->get_screen_dest_rect();
+	s_rendersystem.draw(drawconfig);
 }
 
 int32_t get_fps() {
@@ -222,7 +239,7 @@ extern "C" int main(int argc, char** argv) {
 		update_everything();
 
 		// draw
-		get_rendersystem()->draw();
+		draw_everything();
 		return true;
 	});
 

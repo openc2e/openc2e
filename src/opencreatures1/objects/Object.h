@@ -138,6 +138,7 @@ class Object {
 
 	void tick();
 
+	virtual void render(class RenderSystem&) const;
 	void serialize(SFCContext&, sfc::ObjectV1*);
 };
 
