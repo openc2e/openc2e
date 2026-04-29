@@ -192,7 +192,7 @@ void draw_imgui_rightclick_menu() {
 	}
 }
 
-extern "C" int main(int argc, char** argv) {
+int main(int argc, char** argv) {
 	install_backtrace_printer();
 
 	bool no_save = false;

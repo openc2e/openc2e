@@ -34,7 +34,7 @@
 // SDL tries stealing main on some platforms, which we don't want.
 #undef main
 
-extern "C" int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	install_backtrace_printer();
 
 	std::string version;
