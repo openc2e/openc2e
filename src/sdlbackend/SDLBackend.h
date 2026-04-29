@@ -86,7 +86,7 @@ class SDLBackend : public Backend {
 	Texture createTexture(int32_t width, int32_t height) override;
 	void updateTexture(Texture& tex, Rect2i location, const Image& image) override;
 
-	std::shared_ptr<RenderTarget> getMainRenderTarget() override;
+	RenderTarget* getMainRenderTarget() override;
 	std::shared_ptr<RenderTarget> newRenderTarget(int32_t width, int32_t height) override;
 
 	bool keyDown(Openc2eKeycode key) override;

@@ -477,8 +477,8 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget* s, Rect2f dest) {
 	SDL_RenderCopyF(parent->renderer, src->texture, nullptr, &r);
 }
 
-std::shared_ptr<RenderTarget> SDLBackend::getMainRenderTarget() {
-	return mainrendertarget;
+RenderTarget* SDLBackend::getMainRenderTarget() {
+	return mainrendertarget.get();
 }
 
 std::shared_ptr<RenderTarget> SDLBackend::newRenderTarget(int32_t w, int32_t h) {

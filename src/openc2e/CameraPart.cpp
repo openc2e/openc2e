@@ -18,7 +18,7 @@ CameraPart::CameraPart(Agent* p, unsigned int _id, std::string spritefile, unsig
 
 void CameraPart::partRender(RenderTarget* renderer, int xoffset, int yoffset) {
 	// TODO: hack to stop us rendering cameras inside cameras. but cameras are marked as camera-shy anyways...
-	if (renderer == get_backend()->getMainRenderTarget().get()) {
+	if (renderer == get_backend()->getMainRenderTarget()) {
 		// make sure we're onscreen before bothering to do any work..
 		if (xoffset + x + (int)camerawidth >= 0 && yoffset + y + (int)cameraheight >= 0 &&
 			xoffset + x < (int)renderer->getWidth() && yoffset + y < (int)renderer->getHeight()) {

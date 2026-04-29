@@ -72,7 +72,7 @@ class Backend {
 	virtual bool pollEvent(BackendEvent& e) = 0;
 	virtual bool keyDown(Openc2eKeycode key) = 0;
 
-	virtual std::shared_ptr<RenderTarget> getMainRenderTarget() = 0;
+	virtual RenderTarget* getMainRenderTarget() = 0;
 	virtual std::shared_ptr<RenderTarget> newRenderTarget(int32_t width, int32_t height) = 0;
 
 	virtual Texture createTexture(int32_t width, int32_t height) = 0;

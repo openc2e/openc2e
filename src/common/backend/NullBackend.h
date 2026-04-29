@@ -55,8 +55,8 @@ class NullBackend : public Backend {
 	bool pollEvent(BackendEvent&) override { return false; }
 	bool keyDown(Openc2eKeycode) override { return false; }
 
-	std::shared_ptr<RenderTarget> getMainRenderTarget() override {
-		return std::dynamic_pointer_cast<RenderTarget>(mainrendertarget);
+	RenderTarget* getMainRenderTarget() override {
+		return static_cast<RenderTarget*>(mainrendertarget.get());
 	}
 	std::shared_ptr<RenderTarget> newRenderTarget(int32_t, int32_t) override { return {}; }
 
