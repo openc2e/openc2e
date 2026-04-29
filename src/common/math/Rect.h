@@ -92,6 +92,13 @@ struct Rect2f {
 	bool operator!=(const Rect2f& other) const {
 		return !(*this == other);
 	}
+
+	Rect2f move(float x, float y) const {
+		Rect2f result = *this;
+		result.x += x;
+		result.y += y;
+		return result;
+	}
 };
 
 inline auto format_as(Rect2f val) {

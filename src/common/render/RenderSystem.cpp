@@ -6,7 +6,12 @@
 RenderSystem::RenderSystem() {
 }
 
-void RenderSystem::draw(const DrawConfig& config) {
+void RenderSystem::draw(const DrawConfig& config_) {
+	DrawConfig config = config_;
+	if (config.world_wrap_width) {
+		config.world_src.x %= config.world_wrap_width;
+	}
+
 	auto renderer = get_backend()->getMainRenderTarget();
 	renderer->renderClear();
 	renderer->setClip(config.screen_dest);
@@ -17,7 +22,13 @@ void RenderSystem::draw(const DrawConfig& config) {
 		// TODO: speed up by culling non-visible items, so we don't need to
 		// sort them and we get a higher likelihood of batching textures. remember
 		// to cull taking world wrap into account
-		render_list.push_back(&r);
+
+		if (
+			r.dest.intersects(config.world_src) ||
+			r.dest.move(numeric_cast<float>(config.world_wrap_width), 0).intersects(config.world_src) ||
+			r.dest.move(numeric_cast<float>(-config.world_wrap_width), 0).intersects(config.world_src)) {
+			render_list.push_back(&r);
+		}
 	}
 	std::sort(render_list.begin(), render_list.end(), [](auto* left, auto* right) {
 		// TODO: speed up by caching composite sort key on renderitem, secondly
@@ -51,13 +62,8 @@ void RenderSystem::draw(const DrawConfig& config) {
 	//       = worldx * (config.screen_dest.width / config.world_src.width) + config.world_src.x * (config.screen_dest.width / config.world_src.width) + config.screen_dest.x
 	//       = worldx * xscale + xadjust
 
-	int32_t world_x = config.world_src.x;
-	if (config.world_wrap_width) {
-		world_x = world_x % config.world_wrap_width;
-	}
-
 	const float xscale = config.screen_dest.width / numeric_cast<float>(config.world_src.width);
-	const float xadjust = numeric_cast<float>(world_x) * xscale - config.screen_dest.x;
+	const float xadjust = numeric_cast<float>(config.world_src.x) * xscale - config.screen_dest.x;
 	const float yscale = config.screen_dest.height / numeric_cast<float>(config.world_src.height);
 	const float yadjust = numeric_cast<float>(config.world_src.y) * yscale - config.screen_dest.y;
 
