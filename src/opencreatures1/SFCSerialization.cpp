@@ -176,9 +176,10 @@ DullPart sfc_load_entity(const sfc::EntityV1* part) {
 	if (part->x >= CREATURES1_WORLD_WIDTH) {
 		throw Exception(fmt::format("Expected x to be between [0, {}), but got {}", CREATURES1_WORLD_WIDTH, part->x));
 	}
-	if (part->y >= CREATURES1_WORLD_HEIGHT) {
-		throw Exception(fmt::format("Expected y to be between [0, {}), but got {}", CREATURES1_WORLD_HEIGHT, part->y));
-	}
+	// if (part->y >= CREATURES1_WORLD_HEIGHT) {
+	// 	// unless this is the pointer then we're fine
+	// 	throw Exception(fmt::format("Expected y to be between [0, {}), but got {}", CREATURES1_WORLD_HEIGHT, part->y));
+	// }
 
 	auto gallery = g_engine_context.images->get_image(
 		part->gallery->filename,
