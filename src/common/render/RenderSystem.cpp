@@ -12,9 +12,8 @@ void RenderSystem::draw(const DrawConfig& config_) {
 		config.world_src.x %= config.world_wrap_width;
 	}
 
-	auto renderer = get_backend()->getMainRenderTarget();
-	renderer->renderClear();
-	renderer->setClip(config.screen_dest);
+	config.renderer->renderClear();
+	config.renderer->setClip(config.screen_dest);
 
 	std::vector<RenderItem*> render_list;
 	render_list.reserve(m_render_items.size());
@@ -82,13 +81,13 @@ void RenderSystem::draw(const DrawConfig& config_) {
 			dest.width = w;
 			dest.height = h;
 
-			renderer->renderTexture(r->tex, r->src, dest);
+			config.renderer->renderTexture(r->tex, r->src, dest);
 			if (config.world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
 				dest.x += worldadjust;
-				renderer->renderTexture(r->tex, r->src, dest);
+				config.renderer->renderTexture(r->tex, r->src, dest);
 				dest.x -= worldadjust * 2;
-				renderer->renderTexture(r->tex, r->src, dest);
+				config.renderer->renderTexture(r->tex, r->src, dest);
 			}
 
 		} else if (r->type == RenderItem::RENDER_RECT) {
@@ -98,13 +97,13 @@ void RenderSystem::draw(const DrawConfig& config_) {
 				const float y1 = y;
 				const float y2 = y + h;
 				// top
-				renderer->renderLine(x1, y1, x2, y1, r->color);
+				config.renderer->renderLine(x1, y1, x2, y1, r->color);
 				// right
-				renderer->renderLine(x2, y1, x2, y2, r->color);
+				config.renderer->renderLine(x2, y1, x2, y2, r->color);
 				// bottom
-				renderer->renderLine(x1, y2, x2, y2, r->color);
+				config.renderer->renderLine(x1, y2, x2, y2, r->color);
 				// left
-				renderer->renderLine(x1, y1, x1, y2, r->color);
+				config.renderer->renderLine(x1, y1, x1, y2, r->color);
 			};
 			renderRect(0.f);
 			if (config.world_wrap_width) {
@@ -113,11 +112,11 @@ void RenderSystem::draw(const DrawConfig& config_) {
 				renderRect(-worldadjust);
 			}
 		} else if (r->type == RenderItem::RENDER_LINE) {
-			renderer->renderLine(x, y, x + w, y + h, r->color);
+			config.renderer->renderLine(x, y, x + w, y + h, r->color);
 			if (config.world_wrap_width) {
 				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				renderer->renderLine(x + worldadjust, y, x + worldadjust + w, y + h, r->color);
-				renderer->renderLine(x - worldadjust, y, x - worldadjust + w, y + h, r->color);
+				config.renderer->renderLine(x + worldadjust, y, x + worldadjust + w, y + h, r->color);
+				config.renderer->renderLine(x - worldadjust, y, x - worldadjust + w, y + h, r->color);
 			}
 		}
 	}

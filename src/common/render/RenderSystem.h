@@ -31,6 +31,8 @@ class RenderSystem {
 		int32_t world_wrap_width = 0;
 		// Where the MainCamera is drawn onto the actual screen (screen coordinates).
 		Rect2f screen_dest;
+		// Renderer to use to actually draw.
+		class RenderTarget* renderer;
 	};
 
   private:

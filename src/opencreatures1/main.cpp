@@ -131,6 +131,7 @@ void draw_everything() {
 	drawconfig.world_src = g_engine_context.viewport->get_main_camera_rect();
 	drawconfig.world_wrap_width = g_engine_context.map->get_world_wrap_width();
 	drawconfig.screen_dest = g_engine_context.viewport->get_screen_dest_rect();
+	drawconfig.renderer = get_backend()->getMainRenderTarget().get();
 	s_rendersystem.draw(drawconfig);
 }
 
