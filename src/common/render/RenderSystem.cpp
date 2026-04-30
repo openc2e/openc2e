@@ -2,30 +2,19 @@
 
 #include "common/NumericCast.h"
 #include "common/backend/Backend.h"
+#include "common/math/ModularArithmetic.h"
 
 RenderSystem::RenderSystem() {
 }
 
-void RenderSystem::draw(const DrawConfig& config_) {
-	DrawConfig config = config_;
-	if (config.world_wrap_width) {
-		config.world_src.x %= config.world_wrap_width;
-	}
-
+void RenderSystem::draw(const DrawConfig& config) {
 	config.renderer->renderClear();
 	config.renderer->setClip(config.screen_dest);
 
 	std::vector<RenderItem*> render_list;
-	render_list.reserve(m_render_items.size());
 	for (auto& r : m_render_items) {
-		// TODO: speed up by culling non-visible items, so we don't need to
-		// sort them and we get a higher likelihood of batching textures. remember
-		// to cull taking world wrap into account
-
-		if (
-			r.dest.intersects(config.world_src) ||
-			r.dest.move(numeric_cast<float>(config.world_wrap_width), 0).intersects(config.world_src) ||
-			r.dest.move(numeric_cast<float>(-config.world_wrap_width), 0).intersects(config.world_src)) {
+		// TODO: optimize with separate path for non-modular arithmetic?
+		if (r.dest.intersects_modx(config.world_src, numeric_cast<float>(config.world_wrap_width))) {
 			render_list.push_back(&r);
 		}
 	}
@@ -62,14 +51,14 @@ void RenderSystem::draw(const DrawConfig& config_) {
 	//       = worldx * xscale + xadjust
 
 	const float xscale = config.screen_dest.width / numeric_cast<float>(config.world_src.width);
-	const float xadjust = numeric_cast<float>(config.world_src.x) * xscale - config.screen_dest.x;
+	const float xadjust = numeric_cast<float>(mod_remainder(config.world_src.x, config.world_wrap_width)) * xscale - config.screen_dest.x;
 	const float yscale = config.screen_dest.height / numeric_cast<float>(config.world_src.height);
 	const float yadjust = numeric_cast<float>(config.world_src.y) * yscale - config.screen_dest.y;
 
 	const float worldadjust = numeric_cast<float>(config.world_wrap_width) * xscale;
 
 	for (auto* r : render_list) {
-		float x = r->dest.x * xscale - xadjust;
+		float x = mod_remainder(r->dest.x, numeric_cast<float>(config.world_wrap_width)) * xscale - xadjust;
 		float y = r->dest.y * yscale - yadjust;
 		float w = r->dest.width * xscale;
 		float h = r->dest.height * yscale;
@@ -81,15 +70,10 @@ void RenderSystem::draw(const DrawConfig& config_) {
 			dest.width = w;
 			dest.height = h;
 
+			// handle wraparound by just drawing multiple times, SDLBackend will cull from here
 			config.renderer->renderTexture(r->tex, r->src, dest);
-			if (config.world_wrap_width) {
-				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				dest.x += worldadjust;
-				config.renderer->renderTexture(r->tex, r->src, dest);
-				dest.x -= worldadjust * 2;
-				config.renderer->renderTexture(r->tex, r->src, dest);
-			}
-
+			config.renderer->renderTexture(r->tex, r->src, dest.move(-worldadjust, 0));
+			config.renderer->renderTexture(r->tex, r->src, dest.move(worldadjust, 0));
 		} else if (r->type == RenderItem::RENDER_RECT) {
 			const auto renderRect = [&](auto a) {
 				const float x1 = x + a;
@@ -105,19 +89,18 @@ void RenderSystem::draw(const DrawConfig& config_) {
 				// left
 				config.renderer->renderLine(x1, y1, x1, y2, r->color);
 			};
+			// handle wraparound by just drawing multiple times, SDLBackend will cull from here
 			renderRect(0.f);
-			if (config.world_wrap_width) {
-				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				renderRect(worldadjust);
-				renderRect(-worldadjust);
-			}
+			renderRect(worldadjust);
+			renderRect(-worldadjust);
 		} else if (r->type == RenderItem::RENDER_LINE) {
-			config.renderer->renderLine(x, y, x + w, y + h, r->color);
-			if (config.world_wrap_width) {
-				// eh, handle wraparound by just drawing multiple times, SDLBackend will cull from here
-				config.renderer->renderLine(x + worldadjust, y, x + worldadjust + w, y + h, r->color);
-				config.renderer->renderLine(x - worldadjust, y, x - worldadjust + w, y + h, r->color);
-			}
+			const auto renderLine = [&](auto a) {
+				config.renderer->renderLine(x + a, y, x + a + w, y + h, r->color);
+			};
+			// handle wraparound by just drawing multiple times, SDLBackend will cull from here
+			renderLine(0.f);
+			renderLine(worldadjust);
+			renderLine(-worldadjust);
 		}
 	}
 }

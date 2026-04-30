@@ -72,9 +72,8 @@ void PointerManager::handle_event(const BackendEvent& event) {
 				continue;
 			}
 
-			// TODO: better way to handle world wrap?
 			auto bbox = obj->get_bbox();
-			bool contains_click = (bbox.has_point(worldx, worldy) || bbox.has_point(worldx + CREATURES1_WORLD_WIDTH, worldy) || bbox.has_point(worldx - CREATURES1_WORLD_WIDTH, worldy));
+			bool contains_click = bbox.has_point_modx(worldx, worldy, CREATURES1_WORLD_WIDTH);
 			bool topmost = (best_object == nullptr || obj->get_z_order() > best_object->get_z_order());
 			if (contains_click && topmost) {
 				fmt::print("found {}\n", format_as(obj));

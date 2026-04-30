@@ -5,6 +5,7 @@
 #include "PathResolver.h"
 #include "World.h"
 #include "caosValue.h"
+#include "common/math/ModularArithmetic.h"
 
 #include <fmt/core.h>
 
@@ -104,9 +105,12 @@ void SoundManager::updateVolume(SoundData& s) {
 	if (s.positioned) {
 		MetaRoom* room = world.map->metaRoomAt(s.x, s.y);
 		if (room && engine.camera->getMetaRoom() == room) {
-			// std::remainder gives the distance between x and camerax, taking
+			// mod_distance gives the distance between x and camerax, taking
 			// into account metaroom wraparound ("modular distance")
-			const float distx = std::remainder(s.x + s.width / 2 - engine.camera->getXCentre(), room->width());
+			const float distx = mod_distance(
+				s.x + s.width / 2,
+				static_cast<float>(engine.camera->getXCentre()),
+				room->wraparound() ? static_cast<float>(room->width()) : INFINITY);
 			const float disty = s.y + s.height / 2 - engine.camera->getYCentre();
 
 			const float screen_width = engine.camera->getWidth();

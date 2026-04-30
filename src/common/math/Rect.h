@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/NumericCast.h"
+#include "common/math/ModularArithmetic.h"
 
 #include <fmt/core.h>
 #include <stdint.h>
@@ -70,20 +71,17 @@ struct Rect2f {
 		return pointx >= x && pointx < right() && pointy >= y && pointy < bottom();
 	}
 
+	bool has_point_modx(float pointx, float pointy, float modulus) const {
+		return (
+			mod_point_in_right_open_interval(pointx, x, width, modulus) && pointy >= y && pointy < bottom());
+	}
+
 	bool intersects(Rect2f other) const {
-		if (x > other.x + other.width) {
-			return false;
-		}
-		if (x + width < other.x) {
-			return false;
-		}
-		if (y > other.y + other.height) {
-			return false;
-		}
-		if (y + height < other.y) {
-			return false;
-		}
-		return true;
+		return other.x < (x + width) && x < (other.x + other.width) && other.y < (y + height) && y < (other.y + other.height);
+	}
+
+	bool intersects_modx(Rect2f other, float modulus) {
+		return mod_intervals_overlap(x, width, other.x, other.width, modulus) && other.y < (y + height) && y < (other.y + other.height);
 	}
 
 	bool operator==(const Rect2f& other) const {

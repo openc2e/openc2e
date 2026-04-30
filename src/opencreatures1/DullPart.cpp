@@ -3,6 +3,7 @@
 #include "EngineContext.h"
 #include "ViewportManager.h"
 #include "common/NumericCast.h"
+#include "common/math/ModularArithmetic.h"
 
 #include <fmt/format.h>
 #include <math.h>
@@ -19,7 +20,7 @@ DullPart::DullPart(const ImageGallery& gallery, int32_t sprite_base, float x, fl
 
 void DullPart::set_position(float x, float y) {
 	// TODO: better way of handling world wrap?
-	x = remainderf(x, numeric_cast<float>(CREATURES1_WORLD_WIDTH));
+	x = mod_remainder(x, numeric_cast<float>(CREATURES1_WORLD_WIDTH));
 
 	x_ = x;
 	y_ = y;

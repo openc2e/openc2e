@@ -148,6 +148,7 @@ add_executable(test_common
 	src/common/io/VectorWriterTest.cpp
 	src/common/ioutil/GetlineTest.cpp
 	src/common/ioutil/ScanfTest.cpp
+	src/common/math/ModularArithmeticTest.cpp
 	src/common/slotmap/DenseSlotMapTest.cpp
 	src/common/DemangleTest.cpp
 	src/common/EncodingTest.cpp

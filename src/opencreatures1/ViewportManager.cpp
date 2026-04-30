@@ -6,6 +6,7 @@
 #include "common/backend/Backend.h"
 #include "common/backend/BackendEvent.h"
 #include "common/backend/Keycodes.h"
+#include "common/math/ModularArithmetic.h"
 #include "common/render/RenderSystem.h"
 
 #include <math.h>
@@ -89,7 +90,7 @@ void ViewportManager::update() {
 		scroll_vely = 0;
 	}
 	// wraparound left and right
-	scrollx = scrollx % CREATURES1_WORLD_WIDTH;
+	scrollx = mod_remainder(scrollx, CREATURES1_WORLD_WIDTH);
 
 	// update rects and soundmanager
 	// TODO: this doesn't feel like the best place for this
@@ -113,7 +114,7 @@ const Rect2f& ViewportManager::get_screen_dest_rect() const {
 float ViewportManager::window_x_to_world_x(float winx) const {
 	// TODO: move this to RenderSystem?
 	float worldx = (winx - screen_dest.x) / screen_dest.width * numeric_cast<float>(main_camera.width) + numeric_cast<float>(main_camera.x);
-	worldx = remainderf(worldx, numeric_cast<float>(CREATURES1_WORLD_WIDTH));
+	worldx = mod_remainder(worldx, numeric_cast<float>(CREATURES1_WORLD_WIDTH));
 	return worldx;
 }
 

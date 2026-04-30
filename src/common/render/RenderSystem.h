@@ -28,7 +28,7 @@ class RenderSystem {
 		// The position of the camera looking at the world (world coordinates).
 		Rect2i world_src;
 		// The width of the world, after which RenderItems start wrapping back around (Creatures 1 and 2).
-		int32_t world_wrap_width = 0;
+		int32_t world_wrap_width = INT32_MAX;
 		// Where the MainCamera is drawn onto the actual screen (screen coordinates).
 		Rect2f screen_dest;
 		// Renderer to use to actually draw.

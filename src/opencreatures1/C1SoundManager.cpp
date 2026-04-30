@@ -5,6 +5,7 @@
 #include "PathManager.h"
 #include "common/Exception.h"
 #include "common/audio/AudioBackend.h"
+#include "common/math/ModularArithmetic.h"
 
 #include <assert.h>
 #include <fmt/core.h>
@@ -77,15 +78,14 @@ static float logarithmic_attenuation(float x, float x_near, float x_far) {
 	return clamp(-log2f((x - x_near) / (x_far - x_near) / 2 + 0.5f), 0, 1);
 }
 
-static DistanceInfo calculate_distance(Rect2f listener, int32_t world_wrap_width, Rect2f sound) {
+static DistanceInfo calculate_distance(Rect2f listener, float world_wrap_width, Rect2f sound) {
 	const auto centerx = listener.x + listener.width / 2;
 	const auto centery = listener.y + listener.height / 2;
 
-	// std::remainder gives the distance between x and centerx, taking
-	// into account world wraparound ("modular distance")
-	const float distx = remainderf(
-		sound.x + sound.width / 2.0f - centerx,
-		(world_wrap_width ? world_wrap_width : 1) * 1.0f);
+	const float distx = mod_distance(
+		sound.x + sound.width / 2.0f,
+		centerx,
+		world_wrap_width);
 	const float disty = sound.y + sound.height / 2.0f - centery;
 
 	const float screen_width = listener.width;
@@ -122,7 +122,7 @@ void C1SoundManager::update_volume(SoundData& s) {
 	float volume = muted ? 0 : s.volume;
 
 	if (s.position != Rect2f{}) {
-		auto distance = calculate_distance(listener, world_wrap_width, s.position);
+		auto distance = calculate_distance(listener, numeric_cast<float>(world_wrap_width), s.position);
 		volume *= distance.volume;
 		get_audio_backend()->audio_channel_set_pan(s.channel, distance.pan);
 	}
@@ -146,7 +146,7 @@ AudioChannel C1SoundManager::play_sound_helper(std::string name, Rect2f initial_
 	}
 
 	if (initial_position != Rect2f{}) {
-		auto distance = calculate_distance(listener, world_wrap_width, initial_position);
+		auto distance = calculate_distance(listener, numeric_cast<float>(world_wrap_width), initial_position);
 		if (distance.volume <= 0) {
 			if (loop) {
 				// TODO: probably worth not loading looping sounds, or at least
