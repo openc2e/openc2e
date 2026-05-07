@@ -46,8 +46,8 @@ C1SoundManager::SoundData* C1SoundManager::get_sound_data(AudioChannel channel) 
 	return sounddata;
 }
 
-template <typename T, typename U, typename V>
-auto clamp(T value, U low, V high) {
+template <typename T>
+T clamp(T value, T low, T high) {
 	assert(!(high < low));
 	return (value < low) ? low : (high < value) ? high
 												: value;
@@ -75,7 +75,7 @@ static float logarithmic_attenuation(float x, float x_near, float x_far) {
 	if (x >= x_far) {
 		return 0;
 	}
-	return clamp(-log2f((x - x_near) / (x_far - x_near) / 2 + 0.5f), 0, 1);
+	return clamp(-log2f((x - x_near) / (x_far - x_near) / 2 + 0.5f), 0.f, 1.f);
 }
 
 static DistanceInfo calculate_distance(Rect2f listener, float world_wrap_width, Rect2f sound) {
@@ -103,7 +103,7 @@ static DistanceInfo calculate_distance(Rect2f listener, float world_wrap_width, 
 
 	// Pan sound as we get closer to screen edge
 	// TODO: Does this sound right?
-	float pan = clamp(distx / screen_width, -1, 1);
+	float pan = clamp(distx / screen_width, -1.f, 1.f);
 
 	DistanceInfo d;
 	d.distx = distx;
