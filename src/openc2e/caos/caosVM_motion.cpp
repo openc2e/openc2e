@@ -798,7 +798,7 @@ void c_SPIN(caosVM* vm) {
 	valid_agent(vm->targ);
 	angle = fmodf(angle, 1.0f);
 	if (angle < 0.0f)
-		angle += 0.0f;
+		angle += 1.0f;
 	vm->targ->spin = angle;
 }
 
