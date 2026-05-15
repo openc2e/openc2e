@@ -1,90 +1,73 @@
-/*
- *  SDLMixerBackend.cpp
- *  openc2e
- *
- *  Created by Alyssa Milburn on Thu Oct 09 2008.
- *  Copyright (c) 2008 Alyssa Milburn. All rights reserved.
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2 of the License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- */
-
 #include "SDLMixerBackend.h"
 
+#include "common/Ascii.h"
 #include "common/Exception.h"
-#include "common/scope_guard.h"
+#include "common/OutPtr.h"
+#include "common/slotmap/DenseSlotMap.h"
 
-#include <SDL.h>
-#include <SDL_mixer.h>
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <climits>
-#include <memory>
-#include <string.h>
+#include <SDL3/SDL.h>
+#include <SDL3_mixer/SDL_mixer.h>
+#include <SDL3_native_midi/SDL_native_midi.h>
+#include <ghc/filesystem.hpp>
+#include <mutex>
 
-// Try to run at 44,100 Hz. Across supported games, the most common sound
-// file sampling rates are 11,025 Hz, 22,050 Hz, 32,075 Hz and 44,100 Hz.
-// There are only three sounds above 44,100 (all in Creatures Village, at
-// 48,000 Hz).
-constexpr int SDLMIXERBACKEND_FREQUENCY = 44100;
-constexpr int SDLMIXERBACKEND_CHUNK_SIZE = 1024;
+namespace fs = ghc::filesystem;
 
-#if SDL_MIXER_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 2)
-enum {
-	MIX_INIT_MID = MIX_INIT_FLUIDSYNTH
-};
-#endif
-
-struct MixChunkDeleter {
-	void operator()(Mix_Chunk* chunk) {
-		if (chunk) {
-			Mix_FreeChunk(chunk);
-		}
+template <typename T, void (*F)(T*)>
+struct deleter {
+	void operator()(T* ptr) {
+		F(ptr);
 	}
 };
 
-struct ChunkRef {
-	std::string name;
-	std::unique_ptr<Mix_Chunk, MixChunkDeleter> ptr;
-	int ref = 0;
-	void add_ref() {
-		ref++;
-	}
-	void release() {
-		ref--;
-	}
+using MIXAudioDeleter = deleter<MIX_Audio, MIX_DestroyAudio>;
+using MIXMixerDeleter = deleter<MIX_Mixer, MIX_DestroyMixer>;
+using MIXTrackDeleter = deleter<MIX_Track, MIX_DestroyTrack>;
+using NativeMidiSongDeleter = deleter<NativeMidi_Song, NativeMidi_DestroySong>;
+using SDLFreeDeleter = deleter<void, SDL_free>;
+
+struct ChannelInfo {
+	std::unique_ptr<MIX_Track, MIXTrackDeleter> track;
 };
 
-static std::vector<uint16_t> s_channel_to_generation;
-static std::vector<size_t> s_channel_to_chunk;
-static std::vector<ChunkRef> s_chunks;
+static std::mutex s_channels_mutex;
+static DenseSlotMap<ChannelInfo> s_channels;
+static std::unique_ptr<NativeMidi_Song, NativeMidiSongDeleter> s_midi;
+static std::unique_ptr<MIX_Mixer, MIXMixerDeleter> s_mixer;
 
-static int audiochannel_to_int(AudioChannel source) {
-	uint16_t channel = source.handle & 0xffff;
-	uint16_t generation = (source.handle >> 16) & 0xffff;
-	if (channel >= s_channel_to_generation.size()) {
-		return -1;
+template <typename F>
+static void audio_channel_to_track(AudioChannel source, F&& f) {
+	std::lock_guard<std::mutex> lock(s_channels_mutex);
+	ChannelInfo* channel_p = s_channels.try_get(SlotMapKey::from_integral(source.handle));
+	if (!channel_p) {
+		return;
 	}
-	if (s_channel_to_generation[channel] != generation) {
-		return -1;
-	}
-	return channel;
+	// Hold lock while callback is using MIX_Track pointer, so it doesn't get destroyed
+	// out from under us.
+	f(channel_p->track.get());
 }
 
-static AudioChannel int_to_audio_channel(int channel) {
-	if (channel < 0)
-		return {};
-	return {
-		(uint32_t)channel | ((uint32_t)s_channel_to_generation[channel]) << 16};
+static AudioChannel track_to_audio_channel(std::unique_ptr<MIX_Track, MIXTrackDeleter>&& track) {
+	using KeyIntegerType = decltype(SlotMapKey().to_integral());
+	using UserDataType = void*;
+	static_assert(sizeof(UserDataType) >= sizeof(KeyIntegerType), "");
+
+	MIX_Track* trackp = track.get();
+	SlotMapKey key;
+	{
+		std::lock_guard<std::mutex> lock(s_channels_mutex);
+		key = s_channels.insert(ChannelInfo{std::move(track)});
+	}
+
+	MIX_SetTrackStoppedCallback(
+		trackp, [](UserDataType key_, MIX_Track*) {
+			auto key = SlotMapKey::from_integral((KeyIntegerType)(uintptr_t)key_);
+			std::lock_guard<std::mutex> lock(s_channels_mutex);
+			s_channels.erase(key);
+		},
+		reinterpret_cast<UserDataType>(key.to_integral()));
+
+	return AudioChannel{key.to_integral()};
 }
 
 AudioBackend* SDLMixerBackend::get_instance() {
@@ -93,225 +76,184 @@ AudioBackend* SDLMixerBackend::get_instance() {
 }
 
 void SDLMixerBackend::play_midi_file(const std::string& filename) {
-	Mix_Music* music = Mix_LoadMUS(filename.c_str());
-	if (!music) {
-		fmt::print("* SDLMixer: Couldn't load {}: {}\n", filename, Mix_GetError());
+	// TODO: also support SDL_mixer's Timidity/FluidSynth support
+	s_midi.reset(NativeMidi_LoadSong(filename.c_str()));
+	if (!s_midi) {
+		fmt::print("* SDLMixer: Couldn't load {}: {}\n", filename, SDL_GetError());
 		return;
 	}
-	midi_stop();
-	Mix_PlayMusic(music, -1); // TODO: is looping forever correct?
-	midi = music;
+	NativeMidi_Start(s_midi.get(), -1); // TODO: is looping forever correct?
+	const auto shortname = to_ascii_lowercase(fs::path(filename).filename().string());
+	fmt::print("INFO [SDLMixer] Playing {} looping=true\n", shortname);
 }
 
 void SDLMixerBackend::midi_set_volume(float volume) {
-	Mix_VolumeMusic(volume * MIX_MAX_VOLUME);
+	NativeMidi_SetVolume(volume);
 }
 
 void SDLMixerBackend::midi_stop() {
-	if (midi) {
-		Mix_HaltMusic();
-		Mix_FreeMusic(midi);
-		midi = nullptr;
-	}
+	s_midi.reset();
 }
 
-static std::string sdl_audioformat_to_string(SDL_AudioFormat fmt) {
-	switch (fmt) {
-		case AUDIO_U8: return "AUDIO_U8";
-		case AUDIO_S8: return "AUDIO_S8";
-		case AUDIO_U16LSB: return "AUDIO_U16LSB";
-		case AUDIO_U16MSB: return "AUDIO_U16MSB";
-		case AUDIO_S16LSB: return "AUDIO_S16LSB";
-		case AUDIO_S16MSB: return "AUDIO_S16MSB";
-		case AUDIO_S32LSB: return "AUDIO_S32LSB";
-		case AUDIO_S32MSB: return "AUDIO_S32MSB";
-		case AUDIO_F32LSB: return "AUDIO_F32LSB";
-		case AUDIO_F32MSB: return "AUDIO_F32MSB";
-		default: return fmt::format("{}", fmt);
+static std::string sdl_audioformat_to_string(SDL_AudioFormat audioformat) {
+	switch (audioformat) {
+		case SDL_AUDIO_U8: return "u8";
+		case SDL_AUDIO_S8: return "s8";
+		case SDL_AUDIO_S16LE: return "s16le";
+		case SDL_AUDIO_S16BE: return "s16be";
+		case SDL_AUDIO_S32LE: return "s32le";
+		case SDL_AUDIO_S32BE: return "s32be";
+		case SDL_AUDIO_F32LE: return "f32le";
+		case SDL_AUDIO_F32BE: return "f32be";
+		default: return fmt::format("{}", fmt::underlying(audioformat));
 	}
 }
 
 void SDLMixerBackend::init() {
 	// TODO: ensure SDLBackend is in use?
 
-	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
+	if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
 		throw Exception(std::string("SDL error during sound initialization: ") + SDL_GetError());
-
-	if (Mix_OpenAudioDevice(SDLMIXERBACKEND_FREQUENCY, AUDIO_F32SYS, 2,
-			SDLMIXERBACKEND_CHUNK_SIZE, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE) < 0) {
-		throw Exception(std::string("SDL_mixer error during sound initialization: ") + Mix_GetError());
 	}
 
-	int actual_frequency;
-	SDL_AudioFormat actual_format;
-	int actual_channels;
-	if (Mix_QuerySpec(&actual_frequency, &actual_format, &actual_channels) == 1) {
-		fmt::print("* SDL Mixer: format={} channels={} freq={}Hz\n",
-			sdl_audioformat_to_string(actual_format), actual_channels, actual_frequency);
+	if (!MIX_Init()) {
+		printf("* SDLMixer: Mix_Init failed: %s\n", SDL_GetError());
 	}
 
-	if (!(Mix_Init(MIX_INIT_MID) & MIX_INIT_MID)) {
-		printf("* SDLMixer: failed to load MIDI support: %s\n", Mix_GetError());
+	if (!NativeMidi_Init()) {
+		printf("* SDLMixer: NativeMidi_Init failed: %s\n", SDL_GetError());
 	}
 
-	Mix_ChannelFinished([](int i) {
-		// release reference to the chunk we just played
-		if ((unsigned int)i >= s_channel_to_generation.size() || (unsigned int)i >= s_channel_to_chunk.size()) {
-			printf("* SDLMixer: channel %i finished that we weren't tracking, this shouldn't happen\n", i);
-		} else {
-			s_channel_to_generation[i]++;
-			s_chunks[s_channel_to_chunk[i]].release();
-		}
-	});
+	s_mixer.reset(MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr));
+	if (!s_mixer) {
+		printf("* SDLMixer: Couldn't create mixer on default device: %s\n", SDL_GetError());
+	}
+
+	SDL_AudioSpec actual;
+	if (MIX_GetMixerFormat(s_mixer.get(), &actual)) {
+		fmt::print("* SDL Mixer: name={} channels={} freq={}Hz format={}\n",
+			SDL_GetCurrentAudioDriver(),
+			actual.channels,
+			actual.freq,
+			sdl_audioformat_to_string(actual.format));
+	} else {
+		fmt::print("* SDL Mixer: error getting format: {}\n", SDL_GetError());
+	}
 }
 
 void SDLMixerBackend::shutdown() {
-	Mix_CloseAudio();
+	{
+		std::lock_guard<std::mutex> lock(s_channels_mutex);
+		s_channels = {};
+	}
+	s_mixer.reset();
+	MIX_Quit();
+
+	s_midi.reset();
+	NativeMidi_Quit();
+
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 }
 
-static int playChannel(size_t chunk_idx, bool looping) {
-	int channel = Mix_PlayChannel(-1, s_chunks[chunk_idx].ptr.get(), (looping ? -1 : 0));
-	if (channel == -1) {
-		Mix_AllocateChannels(Mix_AllocateChannels(-1) + 1);
-		channel = Mix_PlayChannel(-1, s_chunks[chunk_idx].ptr.get(), (looping ? -1 : 0));
-	}
-	if (channel == -1) {
-		printf("Couldn't play source: %s\n", Mix_GetError());
-		return -1;
-	}
-	SDL_LockAudio();
-	if ((unsigned int)channel >= s_channel_to_generation.size()) {
-		s_channel_to_generation.resize(channel + 1, 0);
-		s_channel_to_chunk.resize(channel + 1);
-	}
-	s_channel_to_chunk[channel] = chunk_idx;
-	SDL_UnlockAudio();
-	return channel;
-}
-
-static size_t add_chunk(std::string name, std::unique_ptr<Mix_Chunk, MixChunkDeleter>&& ptr) {
-	for (size_t i = 0; i < s_chunks.size(); ++i) {
-		if (s_chunks[i].ref == 0) {
-			s_chunks[i].name = name;
-			s_chunks[i].ptr = std::move(ptr);
-			s_chunks[i].ref = 1;
-			return i;
-		}
-		if (s_chunks[i].ref < 0) {
-			throw Exception("ChunkRef was less than zero!");
-		}
-	}
-	SDL_LockAudio();
-	// Lock because we might reallocate s_chunks
-	s_chunks.emplace_back(ChunkRef{name, std::move(ptr), 1});
-	SDL_UnlockAudio();
-	return s_chunks.size() - 1;
-}
-
-AudioChannel SDLMixerBackend::play_clip(const std::string& filename, bool looping) {
-	// do we have this file already loaded?
-	size_t chunk_idx = (size_t)-1;
-	for (size_t i = 0; i < s_chunks.size(); ++i) {
-		if (s_chunks[i].name == filename && s_chunks[i].ptr) {
-			SDL_LockAudio();
-			s_chunks[i].add_ref();
-			SDL_UnlockAudio();
-			chunk_idx = i;
-			break;
-		}
-	}
-
-	// nope, have to load it from scratch
-	if (chunk_idx == (size_t)-1) {
-		std::unique_ptr<Mix_Chunk, MixChunkDeleter> chunk{Mix_LoadWAV(filename.c_str())};
-		if (!chunk) {
-			return {};
-		}
-		chunk_idx = add_chunk(filename, std::move(chunk));
-	}
-
-	// new channel to play this chunk
-	int channel = playChannel(chunk_idx, looping);
-	if (channel == -1) {
-		SDL_LockAudio();
-		s_chunks[chunk_idx].release();
-		SDL_UnlockAudio();
-		return {};
-	}
-
-	// set panning, which will reduce volume by ~3db
-	// (assumes mono audio, which isn't always true, there are a few true
-	// stereo WAV files)
-	audio_channel_set_pan(int_to_audio_channel(channel), 0.0);
-	return int_to_audio_channel(channel);
-}
-
-AudioChannel SDLMixerBackend::play_wav_data(const uint8_t* data, size_t size, bool looping) {
-	std::unique_ptr<Mix_Chunk, MixChunkDeleter> chunk{Mix_LoadWAV_RW(SDL_RWFromConstMem(data, size), SDL_TRUE)};
-	if (!chunk) {
-		return {};
-	}
-
-	size_t chunk_idx = add_chunk("", std::move(chunk));
-	int channel = playChannel(chunk_idx, looping);
-	if (channel == -1) {
-		SDL_LockAudio();
-		s_chunks[chunk_idx].release();
-		SDL_UnlockAudio();
-		return {};
-	}
-
-	// set panning, which will reduce volume by ~3db
-	// (assumes mono audio, which is always true for MNG data)
-	audio_channel_set_pan(int_to_audio_channel(channel), 0.0);
-	return int_to_audio_channel(channel);
-}
-
 void SDLMixerBackend::audio_channel_set_volume(AudioChannel source, float v) {
-	int channel = audiochannel_to_int(source);
-	if (channel == -1)
-		return;
-	Mix_Volume(channel, v * MIX_MAX_VOLUME);
+	audio_channel_to_track(source, [&](auto* track) {
+		MIX_SetTrackGain(track, v);
+	});
+}
+
+static void audio_channel_set_pan(AudioChannel source, float pan) {
+	audio_channel_to_track(source, [&](auto* track) {
+		// assumes mono audio that has been duplicated to two channels
+		// (not always true, there are a few game WAV files that are stereo. but
+		// we can't handle panning true stereo without writing our own logic.)
+		MIX_Point3D position;
+		position.x = SDL_clamp(pan, -1, 1);
+		position.y = 0;
+		position.z = 0;
+		MIX_SetTrack3DPosition(track, &position);
+	});
 }
 
 void SDLMixerBackend::audio_channel_set_pan(AudioChannel source, float pan) {
-	int channel = audiochannel_to_int(source);
-	if (channel == -1)
-		return;
-
-	pan = SDL_clamp(pan, -1, 1);
-
-	// sin/cos panning algorithm
-	// assumes mono audio that has been duplicated to two channels
-	// (not always true, there are a few game WAV files that are stereo. but
-	// we can't handle panning true stereo without writing our own Mixer Effect.)
-	float x = (pan + 1) / 2;
-	float left = cos(x * M_PI / 2);
-	float right = sin(x * M_PI / 2);
-	Mix_SetPanning(channel, 255 * left, 255 * right);
+	return ::audio_channel_set_pan(source, pan);
 }
 
 void SDLMixerBackend::audio_channel_fade_out(AudioChannel source, int32_t milliseconds) {
-	int channel = audiochannel_to_int(source);
-	if (channel == -1)
-		return;
-	Mix_FadeOutChannel(channel, milliseconds);
+	audio_channel_to_track(source, [&](auto* track) {
+		MIX_StopTrack(track, MIX_TrackMSToFrames(track, milliseconds));
+	});
 }
 
 AudioState SDLMixerBackend::audio_channel_get_state(AudioChannel source) {
-	int channel = audiochannel_to_int(source);
-	if (channel != -1 && Mix_Playing(channel)) {
-		return AUDIO_PLAYING;
-	}
-	return AUDIO_STOPPED;
+	AudioState result = AUDIO_STOPPED;
+	audio_channel_to_track(source, [&](auto* track) {
+		if (MIX_TrackPlaying(track)) {
+			result = AUDIO_PLAYING;
+		}
+	});
+	return result;
 }
 
 void SDLMixerBackend::audio_channel_stop(AudioChannel source) {
-	int channel = audiochannel_to_int(source);
-	if (channel == -1)
-		return;
-	Mix_HaltChannel(channel);
+	audio_channel_to_track(source, [&](auto* track) {
+		// Call MIX_StopTrack fading out over one frame to avoid segfaults:
+		// https://github.com/libsdl-org/SDL_mixer/issues/852
+		MIX_StopTrack(track, 1);
+	});
 }
 
-/* vim: set noet: */
+static AudioChannel play_sdl_io(const std::string& name, SDL_IOStream* io, bool looping) {
+	// Use SDL_LoadWAV because MIX_LoadAudio will read loop points from WAV files
+	// and then loop the sound forever, which we don't want. See https://github.com/libsdl-org/SDL_mixer/issues/847
+	// These Creatures 1 files have loop points: fall, kito, kitp, tele, pian, show, hmle, hdsk, hfml, sqek
+	SDL_AudioSpec spec;
+	std::unique_ptr<uint8_t, SDLFreeDeleter> data;
+	uint32_t datalen = 0;
+	if (!SDL_LoadWAV_IO(io, true, &spec, out_ptr(data), &datalen)) {
+		printf("* SDLMixer: error loading %s: %s\n", name.c_str(), SDL_GetError());
+		return {};
+	}
+
+	// TODO: expose concept of a loaded piece of audio (e.g., a MIX_Audio*) and let the
+	// engine load and manage audio lifetimes, so we don't reload the same data over
+	// and over.
+	std::unique_ptr<MIX_Audio, MIXAudioDeleter> audio(MIX_LoadRawAudio(s_mixer.get(), data.get(), datalen, &spec));
+	if (!audio) {
+		printf("* SDLMixer: error loading %s: %s\n", name.c_str(), SDL_GetError());
+		return {};
+	}
+
+	std::unique_ptr<MIX_Track, MIXTrackDeleter> track(MIX_CreateTrack(s_mixer.get()));
+	if (!track) {
+		printf("* SDLMixer: error creating track for %s: %s\n", name.c_str(), SDL_GetError());
+		return {};
+	}
+	MIX_SetTrackAudio(track.get(), audio.get());
+
+	if (looping) {
+		MIX_SetTrackLoops(track.get(), -1);
+	}
+
+	MIX_Track* trackp = track.get();
+	auto channel = track_to_audio_channel(std::move(track));
+
+	// set initial panning, which will reduce volume a bit
+	// (assumes mono audio, which isn't always true, there are a few true stereo WAV files)
+	audio_channel_set_pan(channel, 0.0f);
+
+	// now start the track
+	MIX_PlayTrack(trackp, 0);
+
+	const auto shortname = to_ascii_lowercase(fs::path(name).filename().string());
+	fmt::print("INFO [SDLMixer] Playing {} format={}/{}Hz/{}{}\n", shortname, spec.channels, spec.freq, sdl_audioformat_to_string(spec.format), looping ? " looping=true" : "");
+
+	return channel;
+}
+
+AudioChannel SDLMixerBackend::play_clip(const std::string& filename, bool looping) {
+	return play_sdl_io(filename, SDL_IOFromFile(filename.c_str(), "rb"), looping);
+}
+
+AudioChannel SDLMixerBackend::play_wav_data(const std::string& name, const uint8_t* buf, size_t size, bool looping) {
+	return play_sdl_io(name, SDL_IOFromMem((void*)buf, size), looping);
+}

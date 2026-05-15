@@ -14,7 +14,7 @@
 #include "sdlbackend/SDLBackend.h"
 #include "sdlbackend/SDLMixerBackend.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <chrono>
 #include <cstring>
 #include <fmt/core.h>
@@ -123,7 +123,7 @@ static bool ShowConfirmBox(const std::string& title, const std::string& message)
 		buttons,
 		nullptr};
 	int buttonid;
-	if (SDL_ShowMessageBox(&messageboxdata, &buttonid) < 0) {
+	if (!SDL_ShowMessageBox(&messageboxdata, &buttonid)) {
 		SDL_Log("error displaying message box");
 		return false;
 	}

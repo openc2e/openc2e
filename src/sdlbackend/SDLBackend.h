@@ -17,12 +17,11 @@
  *
  */
 
-#ifndef _SDLBACKEND_H
-#define _SDLBACKEND_H
+#pragma once
 
 #include "common/backend/Backend.h"
 
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <array>
 #include <memory>
 #include <string>
@@ -91,5 +90,3 @@ class SDLBackend : public Backend {
 
 	bool keyDown(Openc2eKeycode key) override;
 };
-
-#endif

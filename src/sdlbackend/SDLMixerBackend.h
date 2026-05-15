@@ -24,8 +24,6 @@
 #include <memory>
 #include <vector>
 
-typedef struct _Mix_Music Mix_Music;
-
 class SDLMixerBackend : public AudioBackend {
   private:
 	SDLMixerBackend() {}
@@ -34,9 +32,6 @@ class SDLMixerBackend : public AudioBackend {
 	SDLMixerBackend& operator=(const SDLMixerBackend&) = delete;
 	SDLMixerBackend& operator=(SDLMixerBackend&&) = delete;
 
-
-	Mix_Music* midi = nullptr;
-
   public:
 	static AudioBackend* get_instance();
 
@@ -44,7 +39,7 @@ class SDLMixerBackend : public AudioBackend {
 	void shutdown();
 
 	AudioChannel play_clip(const std::string& filename, bool looping = false);
-	AudioChannel play_wav_data(const uint8_t* data, size_t size, bool looping = false);
+	AudioChannel play_wav_data(const std::string& name, const uint8_t* data, size_t size, bool looping = false);
 
 	void audio_channel_set_volume(AudioChannel, float);
 	void audio_channel_set_pan(AudioChannel, float pan);

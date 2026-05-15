@@ -157,7 +157,7 @@ static float evaluateExpression(const MNGExpression& e, MusicLayer* layer = null
 
 static AudioChannel playSample(const std::string& name, MNGFile* file, bool looping = false) {
 	const auto& sample = file->samples[file->getSampleForName(name)];
-	return get_audio_backend()->play_wav_data(sample.data(), sample.size(), looping);
+	return get_audio_backend()->play_wav_data(file->name + "\\\\" + name, sample.data(), sample.size(), looping);
 }
 
 MusicStage::MusicStage(MNGStage node) {

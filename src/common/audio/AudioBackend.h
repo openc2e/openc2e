@@ -32,7 +32,7 @@ class AudioBackend {
 	virtual void shutdown() = 0;
 
 	virtual AudioChannel play_clip(const std::string& filename, bool looping = false) = 0;
-	virtual AudioChannel play_wav_data(const uint8_t* data, size_t size, bool looping = false) = 0;
+	virtual AudioChannel play_wav_data(const std::string& name, const uint8_t* data, size_t size, bool looping = false) = 0;
 
 	virtual void audio_channel_set_volume(AudioChannel, float) = 0;
 	virtual void audio_channel_set_pan(AudioChannel, float pan) = 0;

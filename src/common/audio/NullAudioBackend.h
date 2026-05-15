@@ -40,7 +40,7 @@ class NullAudioBackend : public AudioBackend {
 			return {};
 		return {1};
 	}
-	virtual AudioChannel play_wav_data(const uint8_t*, size_t, bool) {
+	virtual AudioChannel play_wav_data(const std::string&, const uint8_t*, size_t, bool) {
 		return {1};
 	}
 

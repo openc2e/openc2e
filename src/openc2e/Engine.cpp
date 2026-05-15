@@ -118,7 +118,6 @@ void Engine::addPossibleBackend(std::string s, Backend* b) {
 }
 
 void Engine::addPossibleAudioBackend(std::string s, AudioBackend* b) {
-	assert(!get_audio_backend());
 	assert(b);
 	preferred_audiobackend = s;
 	possible_audiobackends[s] = b;

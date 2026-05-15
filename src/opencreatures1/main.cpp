@@ -258,6 +258,7 @@ int main(int argc, char** argv) {
 	// C1ControlledSounds need to be destroyed before the AudioBackend is destroyed,
 	// because they'll try to stop their AudioChannel.
 	g_engine_context.reset();
+	get_audio_backend()->shutdown();
 
 	return 0;
 }

@@ -33,6 +33,12 @@ struct SlotMapKey {
 		return !(*this == other);
 	}
 
+	static SlotMapKey from_integral(uint32_t value) {
+		return SlotMapKey{
+			static_cast<uint16_t>(value),
+			static_cast<uint16_t>(value >> 16)};
+	}
+
 	uint32_t to_integral() const {
 		return (static_cast<uint32_t>(counter) << 16) | static_cast<uint32_t>(index);
 	}

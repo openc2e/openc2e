@@ -23,8 +23,8 @@
 #include "common/NumericCast.h"
 #include "common/backend/Keycodes.h"
 #include "common/creaturesImage.h"
-#include "imgui_impl_sdl2.h"
-#include "imgui_impl_sdlrenderer2.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
 
 #include <array>
 #include <cassert>
@@ -47,17 +47,19 @@ static void ImGuiInit(SDL_Window* window, SDL_Renderer* renderer) {
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 	io.IniFilename = nullptr; // don't save settings
 
-	if (!ImGui_ImplSDL2_InitForSDLRenderer(window, renderer)) {
-		throw Exception("Couldn't initialize ImGui SDL2");
+	if (!ImGui_ImplSDL3_InitForSDLRenderer(window, renderer)) {
+		throw Exception("Couldn't initialize ImGui SDL3");
 	}
-	if (!ImGui_ImplSDLRenderer2_Init(renderer)) {
+	if (!ImGui_ImplSDLRenderer3_Init(renderer)) {
 		throw Exception("Couldn't initialize ImGui SDLRenderer");
 	}
 
+	io.Fonts->Flags |= ImFontAtlasFlags_NoBakedLines;
+
 	// fix for imgui#4768
 	{
-		ImGui_ImplSDLRenderer2_DestroyFontsTexture();
-		ImGui_ImplSDLRenderer2_Data* bd = ImGui_ImplSDLRenderer2_GetBackendData();
+		ImGui_ImplSDLRenderer3_DestroyFontsTexture();
+		auto* bd = ImGui_ImplSDLRenderer3_GetBackendData();
 		unsigned char* pixels;
 		int width, height;
 		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
@@ -67,39 +69,37 @@ static void ImGuiInit(SDL_Window* window, SDL_Renderer* renderer) {
 		}
 		SDL_UpdateTexture(bd->FontTexture, nullptr, pixels, 4 * width);
 		SDL_SetTextureBlendMode(bd->FontTexture, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureScaleMode(bd->FontTexture, SDL_ScaleModeNearest);
+		SDL_SetTextureScaleMode(bd->FontTexture, SDL_SCALEMODE_NEAREST);
 		io.Fonts->SetTexID((ImTextureID)(intptr_t)bd->FontTexture);
 	}
 }
 
 void SDLBackend::init(const std::string& name, int32_t width, int32_t height) {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
 		throw Exception(std::string("SDL error during initialization: ") + SDL_GetError());
+	}
 
 	window = SDL_CreateWindow(name.c_str(),
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
 		width, height,
-		SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+		SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY);
 	if (!window) {
 		throw Exception(std::string("SDL error creating window: ") + SDL_GetError());
 	}
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE);
+	renderer = SDL_CreateRenderer(window, nullptr);
 	if (!renderer) {
 		throw Exception(std::string("SDL error creating renderer: ") + SDL_GetError());
 	}
 
-	{
-		SDL_RendererInfo info;
-		SDL_GetRendererInfo(renderer, &info);
-		fmt::print("* SDL Renderer: {} max_texture_size={}x{} preferred_format={}\n",
-			info.name, info.max_texture_width, info.max_texture_height,
-			info.num_texture_formats > 0 ? SDL_GetPixelFormatName(info.texture_formats[0]) : "unknown");
-	}
+	SDL_PropertiesID props = SDL_GetRendererProperties(renderer);
+	fmt::print("* SDL Renderer: name={} max_texture_size={}x{} preferred_format={}\n",
+		SDL_GetStringProperty(props, SDL_PROP_RENDERER_NAME_STRING, "unknown"),
+		SDL_GetNumberProperty(props, SDL_PROP_RENDERER_MAX_TEXTURE_SIZE_NUMBER, -1),
+		SDL_GetNumberProperty(props, SDL_PROP_RENDERER_MAX_TEXTURE_SIZE_NUMBER, -1),
+		SDL_GetPixelFormatName(((const SDL_PixelFormat*)SDL_GetPointerProperty(props, SDL_PROP_RENDERER_TEXTURE_FORMATS_POINTER, nullptr))[0]));
 
-	SDL_ShowCursor(false);
-	SDL_StartTextInput();
+	SDL_HideCursor();
+	SDL_StartTextInput(window);
 
 	ImGuiInit(window, renderer);
 }
@@ -109,7 +109,7 @@ void SDLBackend::shutdown() {
 }
 
 static bool ImGuiConsumeEvent(const SDL_Event& event) {
-	ImGui_ImplSDL2_ProcessEvent(&event);
+	ImGui_ImplSDL3_ProcessEvent(&event);
 
 	auto& io = ImGui::GetIO();
 
@@ -120,15 +120,15 @@ static bool ImGuiConsumeEvent(const SDL_Event& event) {
 			io.ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
 		} else {
 			io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-			SDL_ShowCursor(false);
+			SDL_HideCursor();
 		}
 		imguiHasCursorPrev = imguiHasCursor;
 	}
 
-	if (io.WantCaptureMouse && (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL)) {
+	if (io.WantCaptureMouse && (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN || event.type == SDL_EVENT_MOUSE_BUTTON_UP || event.type == SDL_EVENT_MOUSE_WHEEL)) {
 		return true;
 	}
-	if (io.WantCaptureKeyboard && (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP || event.type == SDL_TEXTINPUT)) {
+	if (io.WantCaptureKeyboard && (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP || event.type == SDL_EVENT_TEXT_INPUT)) {
 		return true;
 	}
 
@@ -141,24 +141,23 @@ retry:
 	if (!SDL_PollEvent(&event))
 		return false;
 
+	if (!SDL_ConvertEventToRenderCoordinates(renderer, &event)) {
+		throw Exception(fmt::format("error converting event to render coordinates: {}", SDL_GetError()));
+	}
+
 	if (ImGuiConsumeEvent(event)) {
 		goto retry;
 	}
 
 	switch (event.type) {
-		case SDL_WINDOWEVENT:
-			switch (event.window.event) {
-				case SDL_WINDOWEVENT_RESIZED:
-					e.window_id = event.window.windowID;
-					e.type = eventresizewindow;
-					e.x = event.window.data1;
-					e.y = event.window.data2;
-					return true;
-				default:
-					goto retry;
-			}
+		case SDL_EVENT_WINDOW_RESIZED:
+			e.window_id = event.window.windowID;
+			e.type = eventresizewindow;
+			e.x = event.window.data1;
+			e.y = event.window.data2;
+			return true;
 
-		case SDL_MOUSEMOTION:
+		case SDL_EVENT_MOUSE_MOTION:
 			e.window_id = event.motion.windowID;
 			e.type = eventmousemove;
 			e.x = event.motion.x;
@@ -166,18 +165,18 @@ retry:
 			e.xrel = event.motion.xrel;
 			e.yrel = event.motion.yrel;
 			e.button = 0;
-			if (event.motion.state & SDL_BUTTON(1))
+			if (event.motion.state & SDL_BUTTON_MASK(1))
 				e.button |= buttonleft;
-			if (event.motion.state & SDL_BUTTON(2))
+			if (event.motion.state & SDL_BUTTON_MASK(2))
 				e.button |= buttonmiddle;
-			if (event.motion.state & SDL_BUTTON(3))
+			if (event.motion.state & SDL_BUTTON_MASK(3))
 				e.button |= buttonright;
 			break;
 
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
 			e.window_id = event.button.windowID;
-			if (event.type == SDL_MOUSEBUTTONDOWN)
+			if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
 				e.type = eventmousebuttondown;
 			else
 				e.type = eventmousebuttonup;
@@ -191,7 +190,7 @@ retry:
 			e.y = event.button.y - mainrendertarget->viewport_offset_top;
 			break;
 
-		case SDL_MOUSEWHEEL:
+		case SDL_EVENT_MOUSE_WHEEL:
 			e.window_id = event.wheel.windowID;
 			e.type = eventmousebuttondown;
 			if (event.wheel.y > 0) {
@@ -205,15 +204,15 @@ retry:
 			}
 			break;
 
-		case SDL_TEXTINPUT:
+		case SDL_EVENT_TEXT_INPUT:
 			e.window_id = event.text.windowID;
 			e.type = eventtextinput;
 			e.text = event.text.text;
 			break;
 
-		case SDL_KEYUP: {
+		case SDL_EVENT_KEY_UP: {
 			e.window_id = event.key.windowID;
-			int key = translateScancode(event.key.keysym.scancode);
+			int key = translateScancode(event.key.scancode);
 			if (key != -1) {
 				e.type = eventrawkeyup;
 				e.key = key;
@@ -222,9 +221,9 @@ retry:
 			goto retry;
 		}
 
-		case SDL_KEYDOWN: {
+		case SDL_EVENT_KEY_DOWN: {
 			e.window_id = event.key.windowID;
-			int key = translateScancode(event.key.keysym.scancode);
+			int key = translateScancode(event.key.scancode);
 			if (key != -1) {
 				e.type = eventrawkeydown;
 				e.key = key;
@@ -233,7 +232,7 @@ retry:
 			goto retry;
 		}
 
-		case SDL_QUIT:
+		case SDL_EVENT_QUIT:
 			e.type = eventquit;
 			break;
 
@@ -258,7 +257,7 @@ SDLRenderTarget::~SDLRenderTarget() {
 void SDLRenderTarget::renderLine(float x1, float y1, float x2, float y2, Color color) {
 	SDL_SetRenderTarget(parent->renderer, texture);
 	SDL_SetRenderDrawColor(parent->renderer, color.r, color.g, color.b, color.a);
-	SDL_RenderDrawLineF(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
+	SDL_RenderLine(parent->renderer, x1, y1 + viewport_offset_top, x2, y2 + viewport_offset_top);
 }
 
 Texture SDLBackend::createTexture(int32_t width, int32_t height) {
@@ -272,12 +271,14 @@ Texture SDLBackend::createTexture(int32_t width, int32_t height) {
 	}
 	// enable alpha blending
 	SDL_SetTextureBlendMode(tex.as<SDL_Texture*>(), SDL_BLENDMODE_BLEND);
+	// nearest pixel sampling for source textures
+	SDL_SetTextureScaleMode(tex.as<SDL_Texture*>(), SDL_SCALEMODE_NEAREST);
 	return tex;
 }
 
 struct SDLSurfaceDeleter {
 	void operator()(SDL_Surface* ptr) {
-		SDL_FreeSurface(ptr);
+		SDL_DestroySurface(ptr);
 	}
 };
 
@@ -291,13 +292,13 @@ void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image
 	}
 
 	// map our format enum to SDL's format enum
-	Uint32 sdlformat = SDL_PIXELFORMAT_UNKNOWN;
+	SDL_PixelFormat sdlformat = SDL_PIXELFORMAT_UNKNOWN;
 	switch (image.format) {
 		case if_index8:
 			sdlformat = SDL_PIXELFORMAT_INDEX8;
 			break;
 		case if_rgb555:
-			sdlformat = SDL_PIXELFORMAT_RGB555;
+			sdlformat = SDL_PIXELFORMAT_XRGB1555;
 			break;
 		case if_rgb565:
 			sdlformat = SDL_PIXELFORMAT_RGB565;
@@ -311,13 +312,13 @@ void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image
 	}
 
 	// create initial surface
-	std::unique_ptr<SDL_Surface, SDLSurfaceDeleter> surf{SDL_CreateRGBSurfaceWithFormatFrom(
-		const_cast<uint8_t*>(image.data.data()),
+	std::unique_ptr<SDL_Surface, SDLSurfaceDeleter> surf{SDL_CreateSurfaceFrom(
 		image.width,
 		image.height,
-		SDL_BITSPERPIXEL(sdlformat), // depth
-		image.width * SDL_BYTESPERPIXEL(sdlformat), // pitch
-		sdlformat)};
+		sdlformat,
+		const_cast<uint8_t*>(image.data.data()),
+		image.width * SDL_BYTESPERPIXEL(sdlformat) // pitch
+		)};
 	assert(surf);
 
 	// set palette
@@ -332,7 +333,7 @@ void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image
 			palette[i].b = image.palette[i].b;
 			palette[i].a = image.palette[i].a;
 		}
-		SDL_SetPaletteColors(surf->format->palette, palette.data(), 0, palette.size());
+		SDL_SetPaletteColors(SDL_CreateSurfacePalette(surf.get()), palette.data(), 0, palette.size());
 	}
 
 	// set colour-keying
@@ -340,19 +341,18 @@ void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image
 		if (image.colorkey.a != 255) {
 			throw Exception("Expected alpha value of transparent color to be 255");
 		}
-		Uint32 sdlcolorkey = SDL_MapRGB(
-			surf->format,
+		const Uint32 sdlcolorkey = SDL_MapRGB(
+			SDL_GetPixelFormatDetails(surf->format),
+			SDL_GetSurfacePalette(surf.get()),
 			image.colorkey.r,
 			image.colorkey.g,
 			image.colorkey.b);
-		SDL_SetColorKey(surf.get(), SDL_TRUE, sdlcolorkey);
+		SDL_SetSurfaceColorKey(surf.get(), true, sdlcolorkey);
 	}
 
 	// convert surface to texture format
-	uint32_t tex_format;
-	SDL_QueryTexture(tex.as<SDL_Texture*>(), &tex_format, nullptr, nullptr, nullptr);
 	std::unique_ptr<SDL_Surface, SDLSurfaceDeleter> converted{
-		SDL_ConvertSurfaceFormat(surf.get(), tex_format, 0)};
+		SDL_ConvertSurface(surf.get(), tex.as<SDL_Texture*>()->format)};
 	assert(converted);
 
 	// update texture
@@ -361,29 +361,38 @@ void SDLBackend::updateTexture(Texture& tex, Rect2i location, const Image& image
 	rect.y = location.y;
 	rect.w = location.width;
 	rect.h = location.height;
-	if (SDL_UpdateTexture(tex.as<SDL_Texture*>(), location == Rect2i{} ? nullptr : &rect,
-			converted->pixels, converted->pitch) != 0) {
+	if (!SDL_UpdateTexture(tex.as<SDL_Texture*>(), location == Rect2i{} ? nullptr : &rect,
+			converted->pixels, converted->pitch)) {
 		throw Exception(fmt::format("error updating texture: {}", SDL_GetError()));
 	};
 }
 
 int32_t SDLRenderTarget::getWidth() const {
-	int width;
 	if (texture) {
-		SDL_QueryTexture(texture, nullptr, nullptr, &width, nullptr);
+		float width;
+		SDL_GetTextureSize(texture, &width, nullptr);
+		return numeric_cast<int32_t>(width);
 	} else {
-		SDL_GetWindowSize(parent->window, &width, nullptr);
+		int width;
+		SDL_GetWindowSizeInPixels(parent->window, &width, nullptr);
+		width = width / SDL_GetWindowDisplayScale(parent->window);
+		return numeric_cast<int32_t>(width);
 	}
-	return numeric_cast<int32_t>(width);
 }
+
 int32_t SDLRenderTarget::getHeight() const {
-	int height;
 	if (texture) {
-		SDL_QueryTexture(texture, nullptr, nullptr, nullptr, &height);
+		float height;
+		SDL_GetTextureSize(texture, nullptr, &height);
+		assert(viewport_offset_top == 0);
+		assert(viewport_offset_bottom == 0);
+		return numeric_cast<int32_t>(height);
 	} else {
-		SDL_GetWindowSize(parent->window, nullptr, &height);
+		int height;
+		SDL_GetWindowSizeInPixels(parent->window, nullptr, &height);
+		height = height / SDL_GetWindowDisplayScale(parent->window);
+		return numeric_cast<int32_t>(height - viewport_offset_top - viewport_offset_bottom);
 	}
-	return numeric_cast<int32_t>(height - viewport_offset_top - viewport_offset_bottom);
 }
 
 void SDLRenderTarget::setClip(Rect2f dest) {
@@ -393,7 +402,7 @@ void SDLRenderTarget::setClip(Rect2f dest) {
 	clip.y = dest.y;
 	clip.w = dest.width;
 	clip.h = dest.height;
-	if (SDL_RenderSetClipRect(parent->renderer, dest == Rect2f{} ? nullptr : &clip) != 0) {
+	if (!SDL_SetRenderClipRect(parent->renderer, dest == Rect2f{} ? nullptr : &clip)) {
 		throw Exception(fmt::format("error in SDL_RenderSetClipRect(): {}", SDL_GetError()));
 	}
 }
@@ -416,9 +425,9 @@ void SDLRenderTarget::renderTexture(const Texture& tex_, Rect2i src, Rect2f dest
 	assert(tex);
 
 	SDL_SetTextureAlphaMod(tex, options.alpha);
-	SDL_RendererFlip flip = options.mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+	SDL_FlipMode flip = options.mirror ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
-	SDL_Rect srcrect;
+	SDL_FRect srcrect;
 	srcrect.x = src.x;
 	srcrect.y = src.y;
 	srcrect.w = src.width;
@@ -431,7 +440,7 @@ void SDLRenderTarget::renderTexture(const Texture& tex_, Rect2i src, Rect2f dest
 	destrect.h = (options.override_drawsize ? options.overridden_drawheight : dest.height) * options.scale;
 
 	SDL_SetRenderTarget(parent->renderer, texture);
-	SDL_RenderCopyExF(parent->renderer, tex, &srcrect, &destrect, 0, nullptr, flip);
+	SDL_RenderTextureRotated(parent->renderer, tex, &srcrect, &destrect, 0, nullptr, flip);
 }
 
 void SDLRenderTarget::renderCreaturesImage(creaturesImage& img, unsigned int frame, int x, int y, RenderOptions options) {
@@ -474,7 +483,7 @@ void SDLRenderTarget::blitRenderTarget(RenderTarget* s, Rect2f dest) {
 	r.w = dest.width;
 	r.h = dest.height;
 	SDL_SetRenderTarget(parent->renderer, texture);
-	SDL_RenderCopyF(parent->renderer, src->texture, nullptr, &r);
+	SDL_RenderTexture(parent->renderer, src->texture, nullptr, &r);
 }
 
 RenderTarget* SDLBackend::getMainRenderTarget() {
@@ -482,7 +491,7 @@ RenderTarget* SDLBackend::getMainRenderTarget() {
 }
 
 std::shared_ptr<RenderTarget> SDLBackend::newRenderTarget(int32_t w, int32_t h) {
-	SDL_Texture* texture = SDL_CreateTexture(renderer, 0, SDL_TEXTUREACCESS_TARGET, w, h);
+	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_UNKNOWN, SDL_TEXTUREACCESS_TARGET, w, h);
 	assert(texture);
 	printf("* SDL created rendertarget texture %p\n", texture);
 
@@ -582,7 +591,7 @@ int SDLBackend::translateScancode(int key) {
 
 // TODO: this is possibly not a great idea, we should maybe maintain our own state table
 bool SDLBackend::keyDown(Openc2eKeycode key) {
-	const Uint8* keystate = SDL_GetKeyboardState(nullptr);
+	const bool* keystate = SDL_GetKeyboardState(nullptr);
 
 	for (auto keytran : keytrans) {
 		if (keytran.openc2e == key)
@@ -598,12 +607,12 @@ static constexpr int OPENC2E_MIN_FPS = 20;
 
 static bool should_quit = false;
 
-int sdl_event_watcher(void* userdata, SDL_Event* event) {
+bool sdl_event_watcher(void* userdata, SDL_Event* event) {
 	(void)userdata;
-	if (event->type == SDL_QUIT) {
+	if (event->type == SDL_EVENT_QUIT) {
 		should_quit = true;
 	}
-	return 1;
+	return true;
 }
 
 void SDLBackend::run(std::function<bool()> update_callback) {
@@ -616,11 +625,8 @@ void SDLBackend::run(std::function<bool()> update_callback) {
 		// otherwise side panels get in weird locations. related to issue with panels
 		// when resizing in general?
 
-		int windowwidth, windowheight;
-		int drawablewidth, drawableheight;
-		SDL_GetWindowSize(window, &windowwidth, &windowheight);
-		SDL_GetRendererOutputSize(renderer, &drawablewidth, &drawableheight);
-		SDL_RenderSetScale(renderer, drawablewidth * 1.f / windowwidth, drawableheight * 1.f / windowheight);
+		// TODO: does this work on Windows?
+		SDL_SetRenderScale(renderer, SDL_GetWindowDisplayScale(window), SDL_GetWindowDisplayScale(window));
 
 		bool focused = SDL_GetWindowFlags(window) & (SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS);
 		Uint32 desired_ticks_per_frame = 1000 / (focused ? OPENC2E_MAX_FPS : OPENC2E_MIN_FPS);
@@ -630,8 +636,8 @@ void SDLBackend::run(std::function<bool()> update_callback) {
 		}
 		last_frame_end = SDL_GetTicks();
 
-		ImGui_ImplSDLRenderer2_NewFrame();
-		ImGui_ImplSDL2_NewFrame();
+		ImGui_ImplSDLRenderer3_NewFrame();
+		ImGui_ImplSDL3_NewFrame();
 		ImGui::NewFrame();
 
 		bool result = update_callback();
@@ -640,7 +646,7 @@ void SDLBackend::run(std::function<bool()> update_callback) {
 		}
 
 		ImGui::Render();
-		ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+		ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
 
 		SDL_RenderPresent(renderer);
 	}

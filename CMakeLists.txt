@@ -34,6 +34,10 @@ if(NOT (WIN32 OR EMSCRIPTEN))
 	endif()
 endif()
 
+if(APPLE)
+	enable_language(OBJC)
+endif()
+
 option(OPENC2E_USE_SERIALIZATION "Build the experimental serialization code" OFF)
 option(OPENC2E_PROFILE_ALLOCATION "Collect allocation profile stats for DBG: SIZO" OFF)
 if (OPENC2E_PROFILE_ALLOCATION)
@@ -64,13 +68,25 @@ else()
 endif()
 
 if(WIN32 OR APPLE)
-	add_subdirectory(externals/SDL2 EXCLUDE_FROM_ALL)
-	add_subdirectory(externals/SDL2_mixer EXCLUDE_FROM_ALL)
-	add_library(SDL2::Mixer ALIAS SDL2_mixer)
+	add_subdirectory(externals/SDL3 EXCLUDE_FROM_ALL)
+	set(SDLMIXER_AIFF OFF)
+	set(SDLMIXER_AU OFF)
+	set(SDLMIXER_FLAC OFF)
+	set(SDLMIXER_GME OFF)
+	set(SDLMIXER_MIDI OFF) # TODO
+	set(SDLMIXER_MOD OFF)
+	set(SDLMIXER_MP3 OFF)
+	set(SDLMIXER_OPUS OFF)
+	set(SDLMIXER_VOC OFF)
+	set(SDLMIXER_VORBIS_STB OFF)
+	set(SDLMIXER_VORBIS_VORBISFILE OFF)
+	set(SDLMIXER_WAVPACK OFF)
+	add_subdirectory(externals/SDL3_mixer EXCLUDE_FROM_ALL)
 else()
-	find_package(SDL2 2.0.18 REQUIRED)
-	find_package(SDL2_mixer REQUIRED)
+	find_package(SDL3 REQUIRED)
+	find_package(SDL3_mixer REQUIRED)
 endif()
+add_subdirectory(externals/SDL3_native_midi EXCLUDE_FROM_ALL)
 
 if (OPENC2E_USE_SERIALIZATION)
 	find_package(Boost 1.34.0 COMPONENTS serialization REQUIRED)
@@ -137,8 +153,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(openc2e-common BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_link_libraries(openc2e-common
-	PUBLIC fmt
-	PRIVATE ghc_filesystem "$<$<PLATFORM_ID:Darwin>:-framework Foundation>"
+	PUBLIC fmt ghc_filesystem
+	PRIVATE "$<$<PLATFORM_ID:Darwin>:-framework Foundation>"
 )
 
 add_executable(test_common
@@ -221,7 +237,16 @@ add_library(openc2e_sdlbackend OBJECT
 	src/sdlbackend/SDLBackend.cpp
 	src/sdlbackend/SDLMixerBackend.cpp
 )
-target_link_libraries(openc2e_sdlbackend PUBLIC openc2e-common imgui SDL2::SDL2 SDL2::Mixer ${CMAKE_DL_LIBS})
+target_link_libraries(openc2e_sdlbackend
+	PUBLIC
+		openc2e-common
+		imgui
+		SDL3::SDL3
+	PRIVATE
+		SDL3_mixer::SDL3_mixer
+		SDL_native_midi
+		${CMAKE_DL_LIBS}
+)
 
 add_library(openc2e_core OBJECT
 	src/openc2e/Agent.cpp
@@ -386,7 +411,6 @@ target_include_directories(opencreatures1_core PUBLIC src/opencreatures1)
 target_link_libraries(opencreatures1_core PUBLIC
 	openc2e-common
 	openc2e-fileformats
-	SDL2::SDL2
 	ghc_filesystem
 )
 
@@ -448,7 +472,6 @@ target_link_libraries(mngplayer2
 	openc2e_sdlbackend
 )
 if(WIN32)
-	target_link_libraries(mngplayer2 SDL2main)
 	set_target_properties(mngplayer2 PROPERTIES WIN32_EXECUTABLE TRUE OUTPUT_NAME MNGPlayer2)
 endif()
 
