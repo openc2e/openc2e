@@ -2,6 +2,7 @@
 
 #include "common/Ascii.h"
 #include "common/Exception.h"
+#include "common/NumericCast.h"
 #include "common/OutPtr.h"
 #include "common/slotmap/DenseSlotMap.h"
 
@@ -49,8 +50,7 @@ static void audio_channel_to_track(AudioChannel source, F&& f) {
 
 static AudioChannel track_to_audio_channel(std::unique_ptr<MIX_Track, MIXTrackDeleter>&& track) {
 	using KeyIntegerType = decltype(SlotMapKey().to_integral());
-	using UserDataType = void*;
-	static_assert(sizeof(UserDataType) >= sizeof(KeyIntegerType), "");
+	static_assert(sizeof(void*) >= sizeof(KeyIntegerType), "");
 
 	MIX_Track* trackp = track.get();
 	SlotMapKey key;
@@ -60,12 +60,12 @@ static AudioChannel track_to_audio_channel(std::unique_ptr<MIX_Track, MIXTrackDe
 	}
 
 	MIX_SetTrackStoppedCallback(
-		trackp, [](UserDataType key_, MIX_Track*) {
-			auto key = SlotMapKey::from_integral((KeyIntegerType)(uintptr_t)key_);
+		trackp, [](void* key_, MIX_Track*) {
+			auto key = SlotMapKey::from_integral(numeric_cast<KeyIntegerType>(reinterpret_cast<uintptr_t>(key_)));
 			std::lock_guard<std::mutex> lock(s_channels_mutex);
 			s_channels.erase(key);
 		},
-		reinterpret_cast<UserDataType>(key.to_integral()));
+		reinterpret_cast<void*>(numeric_cast<uintptr_t>(key.to_integral())));
 
 	return AudioChannel{key.to_integral()};
 }
