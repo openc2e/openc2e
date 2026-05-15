@@ -24,7 +24,7 @@ inline float truncating_remainder(float value, float modulus) {
 template <typename T>
 T euclidean_remainder(T value, T modulus) {
 	// Centered remainder could also be used here with no change to the math.
-	T result = detail::truncating_remainder(value, modulus);
+	T result = truncating_remainder(value, modulus);
 	return result + (result < 0 ? modulus : 0);
 }
 
@@ -38,7 +38,7 @@ T euclidean_remainder(T value, T modulus) {
 template <typename T>
 T mod_remainder(T value, T modulus) {
 	assert(modulus > 0);
-	return detail::euclidean_remainder(value, modulus);
+	return ::detail::euclidean_remainder(value, modulus);
 }
 
 
