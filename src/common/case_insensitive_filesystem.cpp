@@ -14,13 +14,7 @@ namespace case_insensitive_filesystem {
 
 namespace fs = ghc::filesystem;
 
-struct path_hash {
-	std::size_t operator()(const fs::path& path) const {
-		return hash_value(path);
-	}
-};
-
-static std::unordered_map<fs::path, cacheinfo, path_hash> s_cache;
+static std::unordered_map<fs::path, detail::cacheinfo, detail::path_hash> s_cache;
 
 static bool path_startswith(const fs::path& path, fs::path prefix) {
 	auto end = prefix.end();

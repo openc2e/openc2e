@@ -10,10 +10,19 @@ namespace case_insensitive_filesystem {
 
 namespace fs = ghc::filesystem;
 
+namespace detail {
 struct cacheinfo {
 	fs::path realfilename;
 	fs::file_time_type mtime = fs::file_time_type::min();
 };
+
+struct path_hash {
+	std::size_t operator()(const fs::path& path) const {
+		return hash_value(path);
+	}
+};
+
+} // namespace detail
 
 fs::path canonical(const fs::path&, std::error_code&);
 bool exists(const fs::path&);
@@ -32,7 +41,7 @@ class directory_iterator {
   private:
 	directory_iterator();
 	fs::path lcdirname;
-	std::unordered_map<fs::path, cacheinfo>::iterator it;
+	std::unordered_map<fs::path, detail::cacheinfo, detail::path_hash>::iterator it;
 };
 
 } // namespace case_insensitive_filesystem
