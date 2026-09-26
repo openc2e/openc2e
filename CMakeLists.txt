@@ -95,6 +95,7 @@ add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
 add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
 add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
+set(INSTALL_GTEST OFF)
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
 add_subdirectory(externals/imgui EXCLUDE_FROM_ALL)
 add_subdirectory(externals/nativefiledialog EXCLUDE_FROM_ALL)
