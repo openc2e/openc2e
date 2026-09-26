@@ -35,17 +35,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest,ubuntu-latest,macos-latest]
+        os: [windows-latest,ubuntu-26.04,macos-latest]
     steps:
     - name: "Check out source"
       uses: actions/checkout@v3
     - name: "Install dependencies (Ubuntu)"
       if: "startsWith(matrix.os, 'ubuntu-')"
-      run: sudo apt-get update && sudo apt-get install libpng-dev zlib1g-dev
+      run: sudo apt-get update && sudo apt-get install libpng-dev zlib1g-dev libsdl3-dev
     - name: "Configure"
-      # TODO: remove OPENC2E_SDL_VENDORED=true when libsdl3-dev and libsdl3-mixer-dev are available
-      # on ubuntu-latest GitHub Actions image.
-      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOPENC2E_SDL_VENDORED=true
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
     - name: "Build"
       run: cmake --build build --config RelWithDebInfo
     - name: "Test"
