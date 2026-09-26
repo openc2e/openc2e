@@ -3,6 +3,7 @@
 #include "common/NumericCast.h"
 
 #include <stdexcept>
+#include <stdint.h>
 #include <utility>
 
 template <typename T, size_t N>

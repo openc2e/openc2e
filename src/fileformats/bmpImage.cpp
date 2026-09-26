@@ -26,6 +26,7 @@
 #include "common/throw_ifnot.h"
 
 #include <memory>
+#include <stdint.h>
 #include <string.h>
 
 #define BI_RGB 0

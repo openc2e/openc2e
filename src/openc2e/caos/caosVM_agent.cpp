@@ -34,6 +34,7 @@
 #include "creatures/SkeletalCreature.h"
 
 #include <cassert>
+#include <stdint.h>
 #include <climits>
 #include <fmt/core.h>
 #include <memory>

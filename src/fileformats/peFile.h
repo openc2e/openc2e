@@ -24,6 +24,7 @@
 #include "common/optional.h"
 
 #include <ghc/filesystem.hpp>
+#include <stdint.h>
 #include <string>
 #include <vector>
 

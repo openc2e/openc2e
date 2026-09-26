@@ -4,6 +4,7 @@
 #include "common/io/Reader.h"
 
 #include <array>
+#include <stdint.h>
 
 shared_array<Color> ReadPaletteFile(const std::string& path) {
 	FileReader in(path);

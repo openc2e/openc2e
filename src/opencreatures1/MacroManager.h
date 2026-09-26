@@ -6,6 +6,7 @@
 #include "objects/ObjectHandle.h"
 
 #include <array>
+#include <stdint.h>
 #include <fmt/core.h>
 #include <map>
 #include <memory>

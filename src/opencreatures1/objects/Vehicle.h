@@ -2,6 +2,7 @@
 
 #include "CompoundObject.h"
 #include "common/math/Rect.h"
+#include <stdint.h>
 
 namespace sfc {
 struct VehicleV1;

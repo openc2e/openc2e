@@ -23,6 +23,7 @@
 #include "fileformats/PrayFileReader.h"
 
 #include <cassert>
+#include <stdint.h>
 #include <ghc/filesystem.hpp>
 #include <map>
 #include <string>

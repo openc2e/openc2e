@@ -1,6 +1,7 @@
 #include "Getline.h"
 
 #include "common/io/Reader.h"
+#include <stdint.h>
 
 std::string getline(Reader& r) {
 	std::string s;

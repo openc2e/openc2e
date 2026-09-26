@@ -4,6 +4,7 @@
 #include "common/NumericCast.h"
 
 #include <map>
+#include <stdint.h>
 #include <string>
 #include <utility>
 

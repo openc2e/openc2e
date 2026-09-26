@@ -21,6 +21,7 @@
 #include "sdlbackend/SDLMixerBackend.h"
 
 #include <imgui.h>
+#include <stdint.h>
 
 #ifdef _WIN32
 #include "common/WindowsRegistry.h"

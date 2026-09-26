@@ -4,6 +4,7 @@
 #include "opencreatures1/ImageGallery.h"
 
 #include <fmt/format.h>
+#include <stdint.h>
 #include <string>
 
 class DullPart {

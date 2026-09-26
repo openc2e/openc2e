@@ -26,6 +26,7 @@
 #include "oldCreature.h"
 
 #include <memory>
+#include <stdint.h>
 
 void oldCreature::tickBrain() {
 	if (asleep) {

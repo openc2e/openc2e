@@ -3,6 +3,7 @@
 #include "common/io/Reader.h"
 
 #include <istream>
+#include <stdint.h>
 #include <sstream>
 #include <string>
 

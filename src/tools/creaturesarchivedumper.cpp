@@ -4,6 +4,7 @@
 #include "common/io/SpanReader.h"
 
 #include <fmt/format.h>
+#include <stdint.h>
 #include <ghc/filesystem.hpp>
 #include <zlib.h>
 

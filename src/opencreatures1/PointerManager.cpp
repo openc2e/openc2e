@@ -6,6 +6,7 @@
 #include "objects/PointerTool.h"
 
 #include <fmt/format.h>
+#include <stdint.h>
 
 void PointerManager::update() {
 	Object* obj = g_engine_context.objects->try_get(m_pointer_tool);

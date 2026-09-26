@@ -10,6 +10,7 @@
 #include "objects/Object.h"
 #include "objects/ObjectManager.h"
 #include "objects/Vehicle.h"
+#include <stdint.h>
 
 void Command_ADDV(MacroContext& ctx, Macro& m) {
 	ctx.instructions_left_this_tick++;

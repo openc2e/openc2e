@@ -23,6 +23,7 @@
 #include "common/NumericCast.h"
 
 #include <fmt/core.h>
+#include <stdint.h>
 #include <memory>
 #include <stdio.h>
 

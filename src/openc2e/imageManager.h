@@ -23,6 +23,7 @@
 #include "common/creaturesImage.h"
 
 #include <map>
+#include <stdint.h>
 #include <memory>
 #include <string>
 

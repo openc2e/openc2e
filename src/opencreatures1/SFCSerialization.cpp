@@ -34,6 +34,7 @@
 #include "objects/Vehicle.h"
 
 #include <fmt/ranges.h>
+#include <stdint.h>
 
 struct SFCLoader : SFCContext {
 	SFCLoader(sfc::SFCFile& sfc_)

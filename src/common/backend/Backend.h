@@ -27,6 +27,7 @@
 #include "common/span.h"
 
 #include <functional>
+#include <stdint.h>
 #include <memory>
 #include <string>
 

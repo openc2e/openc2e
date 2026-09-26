@@ -29,6 +29,7 @@
 #include "prayManager.h"
 
 #include <fmt/core.h>
+#include <stdint.h>
 #include <ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 

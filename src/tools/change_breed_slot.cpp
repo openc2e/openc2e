@@ -8,6 +8,7 @@
 #include "openc2e/creatures/lifestage.h"
 
 #include <algorithm>
+#include <stdint.h>
 #include <ctype.h>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>

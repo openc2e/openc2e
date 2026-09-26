@@ -20,6 +20,7 @@
 #pragma once
 
 #include "common/audio/AudioBackend.h"
+#include <stdint.h>
 
 class NullAudioBackend : public AudioBackend {
   protected:

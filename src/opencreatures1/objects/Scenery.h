@@ -2,6 +2,7 @@
 
 #include "DullPart.h"
 #include "Object.h"
+#include <stdint.h>
 
 namespace sfc {
 struct SceneryV1;

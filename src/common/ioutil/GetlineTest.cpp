@@ -3,6 +3,7 @@
 #include "common/io/SpanReader.h"
 
 #include <gtest/gtest.h>
+#include <stdint.h>
 
 
 TEST(Getline, getline) {

@@ -24,6 +24,7 @@
 #include "common/throw_ifnot.h"
 
 #include <memory>
+#include <stdint.h>
 #include <string.h>
 
 MultiImage ReadC16File(Reader& in) {

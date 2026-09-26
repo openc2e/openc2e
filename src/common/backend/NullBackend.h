@@ -22,6 +22,7 @@
 #include "Backend.h"
 
 #include <memory>
+#include <stdint.h>
 
 class NullRenderTarget : public RenderTarget {
   public:

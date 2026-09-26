@@ -18,6 +18,7 @@
  */
 
 #include "CompoundAgent.h"
+#include <stdint.h>
 
 #ifndef _C2E_BLACKBOARD_H
 #define _C2E_BLACKBOARD_H

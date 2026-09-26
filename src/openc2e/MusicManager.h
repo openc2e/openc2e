@@ -23,6 +23,7 @@
 #include "common/audio/AudioChannel.h"
 
 #include <map>
+#include <stdint.h>
 #include <memory>
 #include <string>
 

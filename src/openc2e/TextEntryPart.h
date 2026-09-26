@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TextPart.h"
+#include <stdint.h>
 
 class TextEntryPart : public TextPart {
   private:

@@ -23,6 +23,7 @@
 #include "AudioState.h"
 
 #include <memory>
+#include <stdint.h>
 #include <string>
 
 class AudioBackend {

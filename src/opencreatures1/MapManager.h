@@ -3,6 +3,7 @@
 #include "opencreatures1/ImageGallery.h"
 
 #include <array>
+#include <stdint.h>
 #include <vector>
 
 class Room {

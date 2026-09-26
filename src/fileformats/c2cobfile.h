@@ -23,6 +23,7 @@
 #include "common/io/FileReader.h"
 
 #include <cassert>
+#include <stdint.h>
 #include <string>
 #include <vector>
 

@@ -5,6 +5,7 @@
 #include "common/math/Rect.h"
 
 #include <chrono>
+#include <stdint.h>
 #include <string>
 #include <vector>
 

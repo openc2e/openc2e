@@ -23,6 +23,7 @@
 #include "fileformats/genomeFile.h"
 
 #include <map>
+#include <stdint.h>
 #include <set>
 
 struct oldSVRule {

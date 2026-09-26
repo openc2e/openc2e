@@ -13,6 +13,7 @@
 #include "common/math/Rect.h"
 
 #include <array>
+#include <stdint.h>
 
 class SFCContext;
 namespace sfc {

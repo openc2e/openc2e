@@ -20,6 +20,7 @@
 #pragma once
 
 #include <ghc/filesystem.hpp>
+#include <stdint.h>
 #include <stdexcept>
 #include <string>
 

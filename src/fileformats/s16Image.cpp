@@ -4,6 +4,7 @@
 #include "common/shared_array.h"
 
 #include <vector>
+#include <stdint.h>
 
 MultiImage ReadS16File(Reader& in) {
 	uint32_t flags = read32le(in);

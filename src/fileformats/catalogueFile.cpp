@@ -5,6 +5,7 @@
 #include "common/readfile.h"
 
 #include <assert.h>
+#include <stdint.h>
 #include <fmt/core.h>
 
 enum cataloguetokentype {

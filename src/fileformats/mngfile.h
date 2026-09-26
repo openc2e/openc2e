@@ -23,6 +23,7 @@
 #include "common/shared_array.h"
 
 #include <map>
+#include <stdint.h>
 #include <string>
 #include <vector>
 

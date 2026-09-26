@@ -3,6 +3,7 @@
 #include "common/backend/BackendTexture.h"
 
 #include <imgui.h>
+#include <stdint.h>
 #include <string>
 #include <vector>
 

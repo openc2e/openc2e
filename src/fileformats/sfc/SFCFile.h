@@ -4,6 +4,7 @@
 #include "fileformats/sfc/Script.h"
 
 #include <array>
+#include <stdint.h>
 #include <memory>
 #include <string>
 #include <vector>

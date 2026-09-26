@@ -22,6 +22,7 @@
 #include "common/backend/Backend.h"
 
 #include <SDL3/SDL.h>
+#include <stdint.h>
 #include <array>
 #include <memory>
 #include <string>

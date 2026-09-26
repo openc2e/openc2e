@@ -45,6 +45,7 @@
 #include "imageManager.h"
 
 #include <cassert>
+#include <stdint.h>
 #include <fmt/core.h>
 #include <memory>
 #include <typeinfo> // TODO: remove when genome system is fixed

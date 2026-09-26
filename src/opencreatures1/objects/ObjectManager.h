@@ -7,6 +7,7 @@
 #include "common/slotmap/DenseSlotMap.h"
 
 #include <memory>
+#include <stdint.h>
 
 class ObjectManager {
   private:

@@ -21,6 +21,7 @@
 #define _ENGINE_H
 
 #include <ghc/filesystem.hpp>
+#include <stdint.h>
 #include <map>
 #include <memory>
 #include <string>

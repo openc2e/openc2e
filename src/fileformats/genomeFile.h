@@ -23,6 +23,7 @@
 #include "openc2e/creatures/lifestage.h"
 
 #include <memory>
+#include <stdint.h>
 #include <string>
 #include <vector>
 

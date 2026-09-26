@@ -24,6 +24,7 @@
 #include "CompoundPart.h"
 
 #include <map>
+#include <stdint.h>
 #include <string>
 
 struct Hotspot {

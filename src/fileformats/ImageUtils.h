@@ -3,6 +3,7 @@
 #include "common/Image.h"
 
 #include <string>
+#include <stdint.h>
 
 namespace ImageUtils {
 

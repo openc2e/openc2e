@@ -6,6 +6,7 @@
 #include "openc2e/imageManager.h"
 
 #include <gtest/gtest-spi.h>
+#include <stdint.h>
 #include <gtest/gtest.h>
 
 class Openc2eTestHelper {

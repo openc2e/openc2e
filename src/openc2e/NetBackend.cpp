@@ -4,6 +4,7 @@
 #include "common/Exception.h"
 
 #include <fmt/core.h>
+#include <stdint.h>
 
 NetBackend::NetBackend() = default;
 

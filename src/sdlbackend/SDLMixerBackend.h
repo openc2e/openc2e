@@ -22,6 +22,7 @@
 #include "common/audio/AudioBackend.h"
 
 #include <memory>
+#include <stdint.h>
 #include <vector>
 
 class SDLMixerBackend : public AudioBackend {

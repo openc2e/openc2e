@@ -5,6 +5,7 @@
 #include "common/io/FileWriter.h"
 
 #include <zlib.h>
+#include <stdint.h>
 
 void WritePngFile(const Image& image, const std::string& filename) {
 	FileWriter out(filename);

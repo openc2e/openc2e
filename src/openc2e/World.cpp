@@ -45,6 +45,7 @@
 #include "prayManager.h"
 
 #include <cassert>
+#include <stdint.h>
 #include <fmt/core.h>
 #include <ghc/filesystem.hpp>
 #include <limits.h> // for MAXINT

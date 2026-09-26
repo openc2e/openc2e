@@ -18,6 +18,7 @@
  */
 
 #include "CompoundAgent.h"
+#include <stdint.h>
 
 #ifndef _C2E_BUBBLE_H
 #define _C2E_BUBBLE_H

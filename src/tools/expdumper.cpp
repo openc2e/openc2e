@@ -12,6 +12,7 @@
 #include "fileformats/sfc/SimpleObject.h"
 
 #include <fmt/core.h>
+#include <stdint.h>
 
 
 static void

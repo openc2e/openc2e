@@ -22,6 +22,7 @@
 #include "common/endianlove.h"
 #include "common/io/Reader.h"
 #include "common/throw_ifnot.h"
+#include <stdint.h>
 
 Image ReadBlkFile(Reader& in) {
 	uint32_t flags = read32le(in);

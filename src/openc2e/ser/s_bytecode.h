@@ -5,6 +5,7 @@
 #include "dialect.h"
 #include "ser/s_caosValue.h"
 #include "serialization.h"
+#include <stdint.h>
 
 BOOST_CLASS_IMPLEMENTATION(caosOp, boost::serialization::object_serializable);
 BOOST_CLASS_TRACKING(caosOp, boost::serialization::track_never);

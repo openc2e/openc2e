@@ -23,6 +23,7 @@
 #include "fileformats/genomeFile.h"
 
 #include <cassert>
+#include <stdint.h>
 #include <map>
 #include <set>
 

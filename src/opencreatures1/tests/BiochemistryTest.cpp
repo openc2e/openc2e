@@ -1,6 +1,7 @@
 #include "opencreatures1/Biochemistry.h"
 
 #include <gtest/gtest.h>
+#include <stdint.h>
 
 constexpr struct DecayTest {
 	uint8_t rate;
