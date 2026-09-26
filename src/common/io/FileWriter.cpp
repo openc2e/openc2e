@@ -3,6 +3,7 @@
 #include "common/io/IOException.h"
 
 #include <string.h>
+#include <system_error>
 
 #ifdef _WIN32
 #include <io.h>
@@ -13,13 +14,7 @@
 namespace fs = ghc::filesystem;
 
 static inline std::string errno_message() {
-	char buf[128];
-#ifdef _WIN32
-	strerror_s(buf, 128, errno);
-#else
-	strerror_r(errno, buf, 128);
-#endif
-	return buf;
+	return std::error_code(errno, std::generic_category()).message();
 }
 
 FileWriter::FileWriter(const fs::path& name) {

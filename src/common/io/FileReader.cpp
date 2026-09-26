@@ -7,6 +7,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <system_error>
 
 #if !defined(_WIN32)
 static_assert(sizeof(off_t) == sizeof(int64_t), "off_t == int64_t");
@@ -15,13 +16,7 @@ static_assert(sizeof(off_t) == sizeof(int64_t), "off_t == int64_t");
 namespace fs = ghc::filesystem;
 
 static inline std::string errno_message() {
-	char buf[128];
-#ifdef _WIN32
-	strerror_s(buf, 128, errno);
-#else
-	strerror_r(errno, buf, 128);
-#endif
-	return buf;
+	return std::error_code(errno, std::generic_category()).message();
 }
 
 FileReader::FileReader(const fs::path& name) {
