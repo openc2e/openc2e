@@ -25,10 +25,10 @@
 #include "common/io/WriterFmt.h"
 #include "common/throw_ifnot.h"
 
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 /**
  OUTX (command) val (string)

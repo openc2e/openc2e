@@ -18,7 +18,7 @@
 mappedfile::mappedfile() {
 }
 
-mappedfile::mappedfile(const ghc::filesystem::path& filename) {
+mappedfile::mappedfile(const std::filesystem::path& filename) {
 #ifdef _WIN32
 	// todo: store the handle somewhere?
 	m_file = CreateFileW(filename.wstring().c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);

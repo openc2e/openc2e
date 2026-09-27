@@ -23,7 +23,7 @@ Couple things to note:
 
 #include "common/io/Writer.h"
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -37,8 +37,8 @@ class FileWriter final : public Writer {
 
 	// to open a file and truncate: FileWriter(path)
 	// to open a file and append: FileWriter(path, FileWriter::option_append)
-	FileWriter(const ghc::filesystem::path&);
-	FileWriter(const ghc::filesystem::path&, option_append_t);
+	FileWriter(const std::filesystem::path&);
+	FileWriter(const std::filesystem::path&, option_append_t);
 	FileWriter(const FileWriter&) = delete;
 	FileWriter(FileWriter&&);
 	~FileWriter();
@@ -46,12 +46,12 @@ class FileWriter final : public Writer {
 	FileWriter& operator=(const FileWriter&) = delete;
 	FileWriter& operator=(FileWriter&&) = delete;
 
-	const ghc::filesystem::path& path() const;
+	const std::filesystem::path& path() const;
 	void flush() override;
 
   private:
 	void do_write(const uint8_t*, size_t) override;
 
 	FILE* ptr_ = nullptr;
-	ghc::filesystem::path path_;
+	std::filesystem::path path_;
 };

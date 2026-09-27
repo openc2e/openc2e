@@ -13,7 +13,7 @@
 static_assert(sizeof(off_t) == sizeof(int64_t), "off_t == int64_t");
 #endif
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 static inline std::string errno_message() {
 	return std::error_code(errno, std::generic_category()).message();

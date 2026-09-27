@@ -2,7 +2,7 @@
 
 #include "common/Exception.h"
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -32,5 +32,5 @@ struct CatalogueFile {
 };
 
 
-CatalogueFile readCatalogueFile(ghc::filesystem::path);
+CatalogueFile readCatalogueFile(std::filesystem::path);
 CatalogueFile readCatalogueFile(Reader& in);

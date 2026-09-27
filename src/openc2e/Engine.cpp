@@ -56,7 +56,7 @@
 #endif
 
 #include <cassert>
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #define CXXOPTS_VECTOR_DELIMITER '\0'
 #include <cxxopts.hpp>
 #include <fmt/core.h>
@@ -71,7 +71,7 @@
 #include <sys/types.h> // passwd*
 #endif
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 Engine engine;
 

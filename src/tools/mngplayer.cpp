@@ -6,12 +6,12 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <filesystem>
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 #include <mutex>
 #include <thread>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 class Event {
   public:

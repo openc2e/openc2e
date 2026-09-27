@@ -9,10 +9,10 @@
 #include "openc2e/caosparser.h"
 #include "openc2e/dialect.h"
 
+#include <filesystem>
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 void caos1_format_visitor(CAOSNodePtr node, std::string& out) {
 	if (CAOSCommandNode* ccn = dynamic_cast<CAOSCommandNode*>(node.get())) {

@@ -5,11 +5,11 @@
 #include "sdlbackend/SDLMixerBackend.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 #include <thread>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv) {
 	if (argc != 4) {

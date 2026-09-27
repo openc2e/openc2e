@@ -12,10 +12,10 @@
 #include "fileformats/c2cobfile.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 void CobManager::update() {
 	objects.clear();

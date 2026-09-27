@@ -3,12 +3,12 @@
 #include "common/io/FileWriter.h"
 #include "common/io/SpanReader.h"
 
+#include <filesystem>
 #include <fmt/format.h>
 #include <stdint.h>
-#include <ghc/filesystem.hpp>
 #include <zlib.h>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 static const std::string CREATURES_ARCHIVE_MAGIC = "Creatures Evolution Engine - Archived information file. zLib 1.13 compressed.";
 

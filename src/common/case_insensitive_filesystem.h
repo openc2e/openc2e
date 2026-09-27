@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <system_error>
 #include <unordered_map>
 
@@ -8,7 +8,7 @@ class FileWriter;
 
 namespace case_insensitive_filesystem {
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 namespace detail {
 struct cacheinfo {

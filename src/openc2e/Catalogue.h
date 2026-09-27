@@ -19,7 +19,7 @@
  */
 #pragma once
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <map>
 #include <string>
 #include <vector>
@@ -34,8 +34,8 @@ class Catalogue {
 	std::string calculateWildcardTag(std::string tag, unsigned char family, unsigned char genus, unsigned short species) const;
 
 	void reset();
-	void addFile(ghc::filesystem::path path);
-	void initFrom(ghc::filesystem::path path, std::string language);
+	void addFile(std::filesystem::path path);
+	void initFrom(std::filesystem::path path, std::string language);
 
   private:
 	void addVals(const std::string& title, bool override, const std::vector<std::string>& vals);

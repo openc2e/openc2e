@@ -9,10 +9,10 @@
 #include "fileformats/PrayFileReader.h"
 
 #include <array>
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 const std::array<std::string, 11> tagblocks = {
 	"AGNT", // C3 agent

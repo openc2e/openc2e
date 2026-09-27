@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <ghc/filesystem.hpp>
-#include <stdint.h>
+#include <filesystem>
 #include <stdexcept>
+#include <stdint.h>
 #include <string>
 
 class mappedfileerror : public std::runtime_error {
@@ -32,7 +32,7 @@ class mappedfileerror : public std::runtime_error {
 class mappedfile final {
   public:
 	mappedfile();
-	mappedfile(const ghc::filesystem::path& filename);
+	mappedfile(const std::filesystem::path& filename);
 	mappedfile(const mappedfile&) = delete;
 	mappedfile& operator=(const mappedfile&) = delete;
 	mappedfile(mappedfile&&);

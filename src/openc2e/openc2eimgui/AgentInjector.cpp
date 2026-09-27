@@ -7,7 +7,7 @@
 #include "common/backend/Backend.h"
 #include "common/backend/BackendTexture.h"
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <imgui.h>
 #include <imgui_internal.h>
 

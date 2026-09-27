@@ -4,12 +4,12 @@
 #include "fileformats/PrayFileWriter.h"
 #include "fileformats/PraySourceParser.h"
 
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 #include <map>
 #include <string>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv) {
 	{

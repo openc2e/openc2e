@@ -4,10 +4,10 @@
 #include "fileformats/mngfile.h"
 #include "fileformats/mngparser.h"
 
+#include <filesystem>
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv) {
 	if (argc != 2) {

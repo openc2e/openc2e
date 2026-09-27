@@ -17,11 +17,11 @@
 #include "creatures/oldCreature.h"
 #include "historyManager.h"
 
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 #include <imgui.h>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 namespace Openc2eImgui {
 

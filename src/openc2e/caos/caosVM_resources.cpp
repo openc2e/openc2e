@@ -28,10 +28,10 @@
 #include "common/throw_ifnot.h"
 #include "prayManager.h"
 
+#include <filesystem>
 #include <fmt/core.h>
 #include <stdint.h>
-#include <ghc/filesystem.hpp>
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 bool prayInstall(std::string name, unsigned int type, bool actually_install) {
 	fs::path (*find_func)(fs::path);

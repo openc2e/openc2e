@@ -23,19 +23,19 @@
 #include "fileformats/PrayFileReader.h"
 
 #include <cassert>
-#include <stdint.h>
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <map>
+#include <stdint.h>
 #include <string>
 
 class PrayBlock {
   protected:
 	bool tagsloaded;
-	ghc::filesystem::path filename;
+	std::filesystem::path filename;
 
   public:
 	PrayBlock();
-	PrayBlock(const ghc::filesystem::path& filename, PrayBlockMetadata);
+	PrayBlock(const std::filesystem::path& filename, PrayBlockMetadata);
 	PrayBlock(const PrayBlock&) = delete;
 	PrayBlock(PrayBlock&&) = default;
 	PrayBlock& operator=(const PrayBlock&) = delete;
@@ -54,7 +54,7 @@ class PrayBlock {
 
 class prayManager {
   protected:
-	void addFile(const ghc::filesystem::path&);
+	void addFile(const std::filesystem::path&);
 
   public:
 	std::map<std::string, PrayBlock> blocks;

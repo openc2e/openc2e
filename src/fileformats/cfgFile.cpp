@@ -182,7 +182,7 @@ std::map<std::string, std::string> readcfgfile(Reader& in) {
 	return result;
 }
 
-std::map<std::string, std::string> readcfgfile(ghc::filesystem::path p) {
+std::map<std::string, std::string> readcfgfile(std::filesystem::path p) {
 	FileReader in(p);
 	return readcfgfile(in);
 }

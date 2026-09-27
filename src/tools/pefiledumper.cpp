@@ -1,9 +1,9 @@
 #include "fileformats/peFile.h"
 
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv) {
 	if (argc != 2) {

@@ -11,9 +11,9 @@
 #include "s16Image.h"
 #include "sprImage.h"
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 namespace ImageUtils {
 

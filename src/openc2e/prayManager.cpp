@@ -26,9 +26,9 @@
 #include "fileformats/PrayFileReader.h"
 
 #include <cassert>
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 PrayBlock::PrayBlock() {
 }

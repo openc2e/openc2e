@@ -25,7 +25,7 @@
 #include "common/endianlove.h"
 #include "common/io/SpanReader.h"
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 /*
  * This isn't a full PE parser, but it manages to extract resources from the

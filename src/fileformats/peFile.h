@@ -23,7 +23,7 @@
 #include "common/io/FileReader.h"
 #include "common/optional.h"
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -82,7 +82,7 @@ class peFile {
 	FileReader file;
 
   public:
-	peFile(ghc::filesystem::path);
+	peFile(std::filesystem::path);
 	~peFile();
 
 	optional<resourceInfo> findResource(PeResourceType type, PeLanguage lang, uint32_t name);

@@ -5,8 +5,8 @@
 #include "common/readfile.h"
 
 #include <assert.h>
-#include <stdint.h>
 #include <fmt/core.h>
+#include <stdint.h>
 
 enum cataloguetokentype {
 	TOK_BAREWORD_TAG,
@@ -219,7 +219,7 @@ CatalogueFile catalogueparse(const std::vector<CatalogueToken>& tokens) {
 	return result;
 }
 
-CatalogueFile readCatalogueFile(ghc::filesystem::path p) {
+CatalogueFile readCatalogueFile(std::filesystem::path p) {
 	FileReader in(p);
 	return readCatalogueFile(in);
 }

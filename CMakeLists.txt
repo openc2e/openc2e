@@ -93,7 +93,6 @@ endif()
 
 add_subdirectory(externals/cxxopts EXCLUDE_FROM_ALL)
 add_subdirectory(externals/fmt EXCLUDE_FROM_ALL)
-add_subdirectory(externals/ghc_filesystem EXCLUDE_FROM_ALL)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE) # fix 'mismatch detected for RuntimeLibrary'
 set(INSTALL_GTEST OFF)
 add_subdirectory(externals/googletest EXCLUDE_FROM_ALL)
@@ -155,7 +154,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(openc2e-common BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
 target_link_libraries(openc2e-common
-	PUBLIC fmt ghc_filesystem
+	PUBLIC fmt
 	PRIVATE "$<$<PLATFORM_ID:Darwin>:-framework Foundation>"
 )
 
@@ -177,7 +176,7 @@ add_executable(test_common
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	target_compile_options(test_common BEFORE PRIVATE -Wconversion -Wsign-conversion -Wsign-compare)
 endif()
-target_link_libraries(test_common openc2e-common ghc_filesystem gtest_main)
+target_link_libraries(test_common openc2e-common gtest_main)
 
 add_library(openc2e-fileformats STATIC
 	src/fileformats/attFile.cpp
@@ -214,7 +213,7 @@ add_library(openc2e-fileformats STATIC
 )
 target_include_directories(openc2e-fileformats PRIVATE src/fileformats)
 target_link_libraries(openc2e-fileformats
-	PUBLIC ghc_filesystem openc2e-common
+	PUBLIC openc2e-common
 	PRIVATE ZLIB::ZLIB
 )
 
@@ -354,7 +353,6 @@ add_library(openc2e_core OBJECT
 target_include_directories(openc2e_core PRIVATE src/openc2e)
 target_link_libraries(openc2e_core PUBLIC
 	cxxopts
-	ghc_filesystem
 	imgui
 	openc2e-common
 	openc2e-fileformats
@@ -413,7 +411,6 @@ target_include_directories(opencreatures1_core PUBLIC src/opencreatures1)
 target_link_libraries(opencreatures1_core PUBLIC
 	openc2e-common
 	openc2e-fileformats
-	ghc_filesystem
 )
 
 add_executable(opencreatures1
@@ -447,28 +444,27 @@ add_executable(cobdumper src/tools/cobdumper.cpp)
 target_link_libraries(cobdumper openc2e_core)
 
 add_executable(creaturesarchivedumper src/tools/creaturesarchivedumper.cpp)
-target_link_libraries(creaturesarchivedumper openc2e-common ghc_filesystem z)
+target_link_libraries(creaturesarchivedumper openc2e-common z)
 
 add_executable(expdumper src/tools/expdumper.cpp)
-target_link_libraries(expdumper openc2e-fileformats ghc_filesystem)
+target_link_libraries(expdumper openc2e-fileformats)
 
 add_executable(mngdumper src/tools/mngdumper.cpp)
-target_link_libraries(mngdumper ghc_filesystem openc2e-fileformats)
+target_link_libraries(mngdumper openc2e-fileformats)
 
 add_executable(mngbuild src/tools/mngbuild.cpp)
-target_link_libraries(mngbuild ghc_filesystem openc2e-fileformats)
+target_link_libraries(mngbuild openc2e-fileformats)
 
 add_executable(mngplayer
 	src/tools/mngplayer.cpp
 )
-target_link_libraries(mngplayer openc2e_sdlbackend openc2e-mngmusic openc2e-fileformats ghc_filesystem)
+target_link_libraries(mngplayer openc2e_sdlbackend openc2e-mngmusic openc2e-fileformats)
 
 add_executable(mngplayer2
     src/mngplayer2/mngplayer2.cpp
     src/mngplayer2/mngplayer2.rc
 )
 target_link_libraries(mngplayer2
-	ghc_filesystem
 	nativefiledialog
 	openc2e-mngmusic
 	openc2e_sdlbackend
@@ -487,15 +483,15 @@ add_executable(praybuilder src/tools/praybuilder.cpp)
 target_link_libraries(praybuilder openc2e-fileformats)
 
 add_executable(sfcdumper src/tools/sfcdumper.cpp)
-target_link_libraries(sfcdumper openc2e-fileformats ghc_filesystem)
+target_link_libraries(sfcdumper openc2e-fileformats)
 
 add_executable(spritedumper src/tools/spritedumper.cpp)
-target_link_libraries(spritedumper openc2e-fileformats ghc_filesystem)
+target_link_libraries(spritedumper openc2e-fileformats)
 
 add_executable(translate_voice
 	src/tools/translate_voice.cpp
 )
-target_link_libraries(translate_voice openc2e-common openc2e_core openc2e_sdlbackend ghc_filesystem)
+target_link_libraries(translate_voice openc2e-common openc2e_core openc2e_sdlbackend)
 
 # tests
 enable_testing()

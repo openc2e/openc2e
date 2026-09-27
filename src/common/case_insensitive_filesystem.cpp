@@ -5,14 +5,14 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <system_error>
 #include <unordered_map>
 #include <vector>
 
 namespace case_insensitive_filesystem {
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 static std::unordered_map<fs::path, detail::cacheinfo, detail::path_hash> s_cache;
 

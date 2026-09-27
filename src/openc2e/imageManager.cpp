@@ -29,11 +29,11 @@
 #include "fileformats/paletteFile.h"
 
 #include <array>
+#include <filesystem>
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 #include <memory>
 
-using namespace ghc::filesystem;
+using namespace std::filesystem;
 
 std::shared_ptr<creaturesImage> tryOpenImage(std::string fname) {
 	path realfile(findImageFile(fname));

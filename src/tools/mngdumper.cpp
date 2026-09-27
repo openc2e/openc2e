@@ -3,11 +3,11 @@
 #include "common/io/FileWriter.h"
 #include "fileformats/mngfile.h"
 
+#include <filesystem>
 #include <fmt/format.h>
-#include <ghc/filesystem.hpp>
 #include <utility>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 int main(int argc, char** argv) {
 	if (argc != 2) {

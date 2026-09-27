@@ -28,11 +28,11 @@
 #endif
 
 #include <chrono>
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 #include <math.h>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 
 // SDL tries stealing main on some platforms, which we don't want.

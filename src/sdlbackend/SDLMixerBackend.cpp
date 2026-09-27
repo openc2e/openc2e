@@ -9,10 +9,10 @@
 #include <SDL3/SDL.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_native_midi/SDL_native_midi.h>
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <mutex>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 template <typename T, void (*F)(T*)>
 struct deleter {

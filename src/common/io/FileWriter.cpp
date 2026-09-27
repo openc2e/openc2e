@@ -11,7 +11,7 @@
 #include <unistd.h>
 #endif
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 static inline std::string errno_message() {
 	return std::error_code(errno, std::generic_category()).message();

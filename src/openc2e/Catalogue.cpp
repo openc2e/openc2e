@@ -22,12 +22,12 @@
 #include "fileformats/catalogueFile.h"
 
 #include <cassert>
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 #include <string>
 
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 Catalogue catalogue;
 

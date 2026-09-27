@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -28,62 +28,62 @@ class FileWriter;
 
 class DataDirectory {
   public:
-	DataDirectory(ghc::filesystem::path main);
-	ghc::filesystem::path main;
-	ghc::filesystem::path backgrounds;
-	ghc::filesystem::path body_data;
-	ghc::filesystem::path bootstrap;
-	ghc::filesystem::path catalogue;
-	ghc::filesystem::path creature_galleries;
-	ghc::filesystem::path exported_creatures;
-	ghc::filesystem::path genetics;
-	ghc::filesystem::path images;
-	ghc::filesystem::path journal;
-	ghc::filesystem::path overlay_data;
-	ghc::filesystem::path agents;
-	ghc::filesystem::path sounds;
-	ghc::filesystem::path users;
-	ghc::filesystem::path worlds;
+	DataDirectory(std::filesystem::path main);
+	std::filesystem::path main;
+	std::filesystem::path backgrounds;
+	std::filesystem::path body_data;
+	std::filesystem::path bootstrap;
+	std::filesystem::path catalogue;
+	std::filesystem::path creature_galleries;
+	std::filesystem::path exported_creatures;
+	std::filesystem::path genetics;
+	std::filesystem::path images;
+	std::filesystem::path journal;
+	std::filesystem::path overlay_data;
+	std::filesystem::path agents;
+	std::filesystem::path sounds;
+	std::filesystem::path users;
+	std::filesystem::path worlds;
 };
 
 extern std::vector<DataDirectory> data_directories;
 
-std::vector<ghc::filesystem::path> getMainDirectories();
+std::vector<std::filesystem::path> getMainDirectories();
 
-ghc::filesystem::path findMainDirectoryFile(ghc::filesystem::path name);
-ghc::filesystem::path findBackgroundFile(ghc::filesystem::path name);
-ghc::filesystem::path findBodyDataFile(ghc::filesystem::path name);
-ghc::filesystem::path findCatalogueFile(ghc::filesystem::path name);
-ghc::filesystem::path findCobFile(ghc::filesystem::path name);
-ghc::filesystem::path findGeneticsFile(ghc::filesystem::path name);
-ghc::filesystem::path findImageFile(ghc::filesystem::path name);
-ghc::filesystem::path findOverlayDataFile(ghc::filesystem::path name);
-ghc::filesystem::path findSoundFile(ghc::filesystem::path name);
+std::filesystem::path findMainDirectoryFile(std::filesystem::path name);
+std::filesystem::path findBackgroundFile(std::filesystem::path name);
+std::filesystem::path findBodyDataFile(std::filesystem::path name);
+std::filesystem::path findCatalogueFile(std::filesystem::path name);
+std::filesystem::path findCobFile(std::filesystem::path name);
+std::filesystem::path findGeneticsFile(std::filesystem::path name);
+std::filesystem::path findImageFile(std::filesystem::path name);
+std::filesystem::path findOverlayDataFile(std::filesystem::path name);
+std::filesystem::path findSoundFile(std::filesystem::path name);
 
-FileWriter createUserBackgroundFile(ghc::filesystem::path name);
-FileWriter createUserBodyDataFile(ghc::filesystem::path name);
-FileWriter createUserCatalogueFile(ghc::filesystem::path name);
-FileWriter createUserCobFile(ghc::filesystem::path name);
-FileWriter createUserGeneticsFile(ghc::filesystem::path name);
-FileWriter createUserImageFile(ghc::filesystem::path name);
-FileWriter createUserOverlayDataFile(ghc::filesystem::path name);
-FileWriter createUserSoundFile(ghc::filesystem::path name);
+FileWriter createUserBackgroundFile(std::filesystem::path name);
+FileWriter createUserBodyDataFile(std::filesystem::path name);
+FileWriter createUserCatalogueFile(std::filesystem::path name);
+FileWriter createUserCobFile(std::filesystem::path name);
+FileWriter createUserGeneticsFile(std::filesystem::path name);
+FileWriter createUserImageFile(std::filesystem::path name);
+FileWriter createUserOverlayDataFile(std::filesystem::path name);
+FileWriter createUserSoundFile(std::filesystem::path name);
 
-ghc::filesystem::path getCurrentWorldJournalPath(ghc::filesystem::path name);
-ghc::filesystem::path getMainJournalPath(ghc::filesystem::path name);
-ghc::filesystem::path getOtherWorldJournalPath(ghc::filesystem::path name);
+std::filesystem::path getCurrentWorldJournalPath(std::filesystem::path name);
+std::filesystem::path getMainJournalPath(std::filesystem::path name);
+std::filesystem::path getOtherWorldJournalPath(std::filesystem::path name);
 
-std::vector<ghc::filesystem::path> findAgentFiles(std::string wild);
-std::vector<ghc::filesystem::path> findCobFiles(std::string wild);
-std::vector<ghc::filesystem::path> findGeneticsFiles(std::string wild);
-std::vector<ghc::filesystem::path> findJournalFiles(std::string wild);
-std::vector<ghc::filesystem::path> findSoundFiles(std::string wild);
+std::vector<std::filesystem::path> findAgentFiles(std::string wild);
+std::vector<std::filesystem::path> findCobFiles(std::string wild);
+std::vector<std::filesystem::path> findGeneticsFiles(std::string wild);
+std::vector<std::filesystem::path> findJournalFiles(std::string wild);
+std::vector<std::filesystem::path> findSoundFiles(std::string wild);
 
-ghc::filesystem::path getUserDataDir();
+std::filesystem::path getUserDataDir();
 
-ghc::filesystem::path getWorldSwitcherBootstrapDirectory();
-std::vector<ghc::filesystem::path> getBootstrapDirectories();
-std::vector<ghc::filesystem::path> getCatalogueDirectories();
+std::filesystem::path getWorldSwitcherBootstrapDirectory();
+std::vector<std::filesystem::path> getBootstrapDirectories();
+std::vector<std::filesystem::path> getCatalogueDirectories();
 
-ghc::filesystem::path homeDirectory();
-ghc::filesystem::path storageDirectory();
+std::filesystem::path homeDirectory();
+std::filesystem::path storageDirectory();

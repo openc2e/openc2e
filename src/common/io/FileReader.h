@@ -59,14 +59,14 @@ instead of fopen()/fread() and manage its own buffer :)
 
 #include "common/io/Reader.h"
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
 class FileReader final : public Reader {
   public:
-	FileReader(const ghc::filesystem::path&);
+	FileReader(const std::filesystem::path&);
 	FileReader(const FileReader&) = delete;
 	FileReader(FileReader&&);
 	~FileReader();
@@ -74,7 +74,7 @@ class FileReader final : public Reader {
 	FileReader& operator=(const FileReader&) = delete;
 	FileReader& operator=(FileReader&&) = delete;
 
-	const ghc::filesystem::path& path() const;
+	const std::filesystem::path& path() const;
 
 	std::vector<uint8_t> read_to_end() override;
 	void seek_absolute(size_t) override;
@@ -86,7 +86,7 @@ class FileReader final : public Reader {
   private:
 	void do_read(uint8_t*, size_t) override;
 
-	ghc::filesystem::path path_;
+	std::filesystem::path path_;
 	FILE* ptr_ = nullptr;
 	size_t pos_ = 0;
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ghc/filesystem.hpp>
+#include <filesystem>
 #include <vector>
 
 class FileWriter;
@@ -14,11 +14,11 @@ enum PathType {
 class PathManager {
   public:
 	PathManager();
-	void set_main_directory(ghc::filesystem::path main_dir);
-	ghc::filesystem::path find_path(PathType, const std::string&);
-	std::vector<ghc::filesystem::path> find_path_wildcard(PathType, const std::string&);
+	void set_main_directory(std::filesystem::path main_dir);
+	std::filesystem::path find_path(PathType, const std::string&);
+	std::vector<std::filesystem::path> find_path_wildcard(PathType, const std::string&);
 	FileWriter create_file(PathType, const std::string&);
 
   private:
-	ghc::filesystem::path m_main_dir;
+	std::filesystem::path m_main_dir;
 };

@@ -5,7 +5,7 @@
 #include "common/io/FileWriter.h"
 #include "common/wildcard_match.h"
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 PathManager::PathManager() {
 }

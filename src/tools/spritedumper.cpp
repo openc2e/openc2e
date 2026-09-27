@@ -4,11 +4,11 @@
 #include "fileformats/paletteFile.h"
 #include "fileformats/pngImage.h"
 
+#include <filesystem>
 #include <fmt/format.h>
 #include <stdint.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 void stitch_to_sheet(MultiImage& image) {
 	if (image.size() <= 1) {

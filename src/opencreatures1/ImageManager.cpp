@@ -11,10 +11,10 @@
 #include "fileformats/paletteFile.h"
 #include "fileformats/sprImage.h"
 
+#include <filesystem>
 #include <fmt/core.h>
-#include <ghc/filesystem.hpp>
 
-namespace fs = ghc::filesystem;
+namespace fs = std::filesystem;
 
 
 ImageManager::ImageManager() {
