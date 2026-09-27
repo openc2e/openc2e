@@ -18,7 +18,8 @@ static std::unordered_map<fs::path, detail::cacheinfo, detail::path_hash> s_cach
 
 static bool path_startswith(const fs::path& path, fs::path prefix) {
 	auto end = prefix.end();
-	if (!std::prev(end)->has_filename()) {
+	if (!prefix.has_filename()) {
+		// ends with a directory separator, ignore last empty component
 		end--;
 	}
 	return std::equal(prefix.begin(), end, path.begin());
