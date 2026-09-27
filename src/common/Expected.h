@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ConstructAt.h"
-#include "Monostate.h"
+#include <utility>
 
 #include <type_traits>
 
@@ -153,9 +153,9 @@ class Expected {
   private:
 	void destroy() {
 		if (has_value_) {
-			destroy_at(&value_);
+			std::destroy_at(&value_);
 		} else {
-			destroy_at(&error_);
+			std::destroy_at(&error_);
 		}
 	}
 	void reset() {
@@ -166,7 +166,7 @@ class Expected {
 
 	bool has_value_;
 	union {
-		std::conditional_t<std::is_void<Value>::value, Monostate, Value> value_;
+		std::conditional_t<std::is_void<Value>::value, std::monostate, Value> value_;
 		Error error_;
 	};
 };
