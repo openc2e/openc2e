@@ -111,7 +111,9 @@ endif()
 if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
 	add_compile_options(-Wextra -Wall -Wno-conversion)
 endif()
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # make sure assert() works
 string(REPLACE "/DNDEBUG" "" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
