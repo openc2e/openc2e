@@ -4,13 +4,13 @@
 #include "common/io/IOException.h"
 #include "common/io/SpanReader.h"
 #include "common/io/WriterFmt.h"
-#include "common/optional.h"
 #include "common/span.h"
 #include "fileformats/PrayFileReader.h"
 
 #include <array>
 #include <filesystem>
 #include <fmt/core.h>
+#include <optional>
 
 namespace fs = std::filesystem;
 
@@ -37,7 +37,7 @@ static bool is_printable(const std::string& s) {
 	return true;
 }
 
-optional<PrayTagBlock> maybe_get_block_as_tags(PrayFileReader& file, int i) {
+std::optional<PrayTagBlock> maybe_get_block_as_tags(PrayFileReader& file, int i) {
 	for (auto tagblock : tagblocks) {
 		if (file.getBlockType(i) == tagblock) {
 			return file.getBlockTags(i);

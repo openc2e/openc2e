@@ -7,19 +7,19 @@
 #include "MetaRoom.h"
 #include "Room.h"
 #include "World.h"
-#include "common/optional.h"
 #include "creatures/CreatureAgent.h"
 #include "creatures/oldCreature.h"
 
 #include <array>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <optional>
 
 using namespace ImGuiUtils;
 
 namespace Openc2eImgui {
 
-static optional<int> getTemperatureNearSelectedCreature() {
+static std::optional<int> getTemperatureNearSelectedCreature() {
 	if (world.selectedcreature) {
 		auto room = roomContainingAgent(world.selectedcreature);
 		if (room) {
@@ -29,7 +29,7 @@ static optional<int> getTemperatureNearSelectedCreature() {
 	return {};
 }
 
-static optional<int> getTemperatureAtCenterOfCamera() {
+static std::optional<int> getTemperatureAtCenterOfCamera() {
 	auto room = engine.camera->getMetaRoom()->roomAt(engine.camera->getXCentre(), engine.camera->getYCentre());
 	if (room) {
 		return room->temp;
@@ -94,7 +94,7 @@ void DrawC2StatusBar() {
 		}
 
 		// prefer the room the selected creature is in
-		optional<int> temperature = getTemperatureNearSelectedCreature();
+		std::optional<int> temperature = getTemperatureNearSelectedCreature();
 		if (!temperature) {
 			// then try the room at the center of the camera
 			temperature = getTemperatureAtCenterOfCamera();

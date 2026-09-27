@@ -129,7 +129,7 @@ void Engine::setBackend(Backend* b) {
 }
 
 static std::vector<std::string> read_wordlist(peFile* exefile, PeLanguage lang) {
-	optional<resourceInfo> r = exefile->findResource(PE_RESOURCETYPE_STRING, lang, 14);
+	std::optional<resourceInfo> r = exefile->findResource(PE_RESOURCETYPE_STRING, lang, 14);
 	if (!r) {
 		fmt::print("Warning: Couldn't load word list (couldn't find resource)!\n");
 		return {};

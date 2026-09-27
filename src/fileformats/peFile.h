@@ -21,9 +21,9 @@
 
 #include "common/Image.h"
 #include "common/io/FileReader.h"
-#include "common/optional.h"
 
 #include <filesystem>
+#include <optional>
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -85,8 +85,8 @@ class peFile {
 	peFile(std::filesystem::path);
 	~peFile();
 
-	optional<resourceInfo> findResource(PeResourceType type, PeLanguage lang, uint32_t name);
-	optional<resourceInfo> findResource(PeResourceType type, PeLanguage lang, PeSubLanguage sublang, uint32_t name);
+	std::optional<resourceInfo> findResource(PeResourceType type, PeLanguage lang, uint32_t name);
+	std::optional<resourceInfo> findResource(PeResourceType type, PeLanguage lang, PeSubLanguage sublang, uint32_t name);
 	std::vector<std::string> getResourceStrings(resourceInfo);
 	Image getBitmap(uint32_t name);
 

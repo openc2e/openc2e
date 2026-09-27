@@ -175,8 +175,8 @@ peFile::peFile(fs::path path)
 peFile::~peFile() {
 }
 
-optional<resourceInfo> peFile::findResource(PeResourceType type, PeLanguage lang, uint32_t name) {
-	optional<resourceInfo> best_match;
+std::optional<resourceInfo> peFile::findResource(PeResourceType type, PeLanguage lang, uint32_t name) {
+	std::optional<resourceInfo> best_match;
 	for (auto& r : resources) {
 		if (!(r.type == type && r.lang == lang && r.name == name)) {
 			continue;
@@ -192,7 +192,7 @@ optional<resourceInfo> peFile::findResource(PeResourceType type, PeLanguage lang
 	return best_match;
 }
 
-optional<resourceInfo> peFile::findResource(
+std::optional<resourceInfo> peFile::findResource(
 	PeResourceType type, PeLanguage lang, PeSubLanguage sublang, uint32_t name) {
 	for (auto& r : resources) {
 		if (!(r.type == type && r.lang == lang && r.sublang == sublang && r.name == name)) {

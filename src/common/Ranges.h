@@ -1,9 +1,8 @@
 #pragma once
 
-#include "optional.h"
-
-#include <type_traits>
+#include <optional>
 #include <stdint.h>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -89,10 +88,10 @@ auto find_if(R&& r, Pred&& pred) {
 	auto it = begin(r);
 	for (; it != end(r); ++it) {
 		if (pred(*it)) {
-			return optional<result_type>(*it);
+			return std::optional<result_type>(*it);
 		}
 	}
-	return optional<result_type>();
+	return std::optional<result_type>();
 }
 
 template <typename R, typename Pred>

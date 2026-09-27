@@ -2,8 +2,8 @@
 
 #include "common/HeapValue.h"
 #include "common/SimpleVariant.h"
-#include "common/optional.h"
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -90,10 +90,10 @@ struct MNGFunction {
 };
 
 struct MNGStage {
-	optional<MNGExpression> pan;
-	optional<MNGExpression> volume;
-	optional<MNGExpression> delay;
-	optional<MNGExpression> tempodelay;
+	std::optional<MNGExpression> pan;
+	std::optional<MNGExpression> volume;
+	std::optional<MNGExpression> delay;
+	std::optional<MNGExpression> tempodelay;
 };
 
 struct MNGEffect {
@@ -116,18 +116,18 @@ struct MNGVoice {
 	std::string wave;
 	// TODO: are multiple conditions actually allowed?
 	std::vector<MNGCondition> conditions;
-	optional<std::string> effect;
-	optional<MNGExpression> interval;
+	std::optional<std::string> effect;
+	std::optional<MNGExpression> interval;
 	std::vector<MNGUpdate> updates;
 };
 
 struct MNGAleotoricLayer {
 	std::string name;
-	optional<float> volume;
-	optional<std::string> effect;
-	optional<float> beatsynch;
-	optional<float> updaterate;
-	optional<float> interval;
+	std::optional<float> volume;
+	std::optional<std::string> effect;
+	std::optional<float> beatsynch;
+	std::optional<float> updaterate;
+	std::optional<float> interval;
 	std::unordered_map<std::string, float> variables;
 	std::vector<MNGUpdate> updates;
 	std::vector<MNGVoice> voices;
@@ -136,8 +136,8 @@ struct MNGAleotoricLayer {
 struct MNGLoopLayer {
 	std::string name;
 	std::string wave;
-	optional<float> volume;
-	optional<float> updaterate;
+	std::optional<float> volume;
+	std::optional<float> updaterate;
 	std::unordered_map<std::string, float> variables;
 	std::vector<MNGUpdate> updates;
 };
@@ -146,10 +146,10 @@ using MNGLayer = SimpleVariant<MNGLoopLayer, MNGAleotoricLayer>;
 
 struct MNGTrack {
 	std::string name;
-	optional<float> fadein;
-	optional<float> fadeout;
-	optional<float> beatlength;
-	optional<float> volume;
+	std::optional<float> fadein;
+	std::optional<float> fadeout;
+	std::optional<float> beatlength;
+	std::optional<float> volume;
 	std::vector<MNGLayer> layers;
 };
 

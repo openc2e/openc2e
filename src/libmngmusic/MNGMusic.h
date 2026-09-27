@@ -1,12 +1,12 @@
 #pragma once
 
 #include "common/audio/AudioChannel.h"
-#include "common/optional.h"
 #include "fileformats/mngfile.h"
 #include "fileformats/mngparser.h"
 
 #include <chrono>
 #include <memory>
+#include <optional>
 
 // use times as floating-point numbers because that's how MNG files are written,
 // and this makes calculations much easier (avoiding duration_cast and manual
@@ -45,7 +45,7 @@ class MNGMusic {
 class MusicStage {
   public:
 	MusicStage(MNGStage);
-	optional<MNGExpression> pan, volume, delay, tempodelay;
+	std::optional<MNGExpression> pan, volume, delay, tempodelay;
 };
 
 class MusicEffect {
@@ -61,7 +61,7 @@ class MusicVoice {
 	std::string wave;
 	std::vector<MNGCondition> conditions;
 	std::shared_ptr<MusicEffect> effect;
-	optional<MNGExpression> interval;
+	std::optional<MNGExpression> interval;
 	std::vector<MNGUpdate> updates;
 
 	MusicVoice(class MusicLayer* p, MNGVoice n);
@@ -105,7 +105,7 @@ class MusicAleotoricLayer : public MusicLayer {
 	std::vector<QueuedWave> queued_waves;
 	std::vector<PlayingWave> playing_waves;
 	float interval;
-	optional<float> beatsynch;
+	std::optional<float> beatsynch;
 
 	MusicAleotoricLayer(MNGAleotoricLayer n, MusicTrack* p);
 	void update(float track_volume, float track_beatlength);
@@ -150,6 +150,6 @@ class MusicTrack {
 
 	std::string getName() { return node.name; }
 
-	optional<mngtimepoint> fadein_start;
-	optional<mngtimepoint> fadeout_start;
+	std::optional<mngtimepoint> fadein_start;
+	std::optional<mngtimepoint> fadeout_start;
 };
